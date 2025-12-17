@@ -7,6 +7,44 @@
     <!-- Materialize CSS CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <style>
+                @media (max-width: 600px) {
+                    .modal {
+                        width: 95% !important;
+                        max-width: 95% !important;
+                        padding: 0 0.5rem !important;
+                    }
+                    .modal-content {
+                        padding: 18px 6px 6px 6px !important;
+                    }
+                    .btn-large.employee-btn {
+                        font-size: 1rem;
+                        padding: 0.8rem 0.5rem;
+                    }
+                    .modal-content h5 {
+                        font-size: 1.3rem;
+                    }
+                }
+                .modal-content {
+                    padding-bottom: 0;
+                }
+                .employee-btn {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    margin-bottom: 16px !important;
+                    gap: 8px;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    letter-spacing: 1px;
+                }
+                .employee-btn .material-icons.left {
+                    margin-right: 8px;
+                    margin-left: 0;
+                }
+                .modal-footer {
+                    text-align: right;
+                }
         body {
             background: #f5f5f5;
         }
