@@ -120,21 +120,46 @@
                                 <h5 class="center-align">Select Employee to Make Quotation</h5>
                                 <p class="center-align">Who will make this quotation?</p>
                                 <div class="row" style="margin-top: 30px;">
-                                    <div class="col s12 m4 center-align">
-                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Ma'am Chariz" data-id="001">
-                                            <i class="material-icons left">person</i>Ma'am Chariz - 001
+                                    <div class="col s12 m6 center-align">
+                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Ma'am Charisse" data-id="001" data-password="charisse123">
+                                            <i class="material-icons left">person</i>Ma'am Charisse - 001
                                         </button>
                                     </div>
-                                    <div class="col s12 m4 center-align">
-                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Sir Jonas" data-id="002">
-                                            <i class="material-icons left">person</i>Sir Jonas - 002
+                                    <div class="col s12 m6 center-align">
+                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Sir Jude" data-id="002" data-password="jude123">
+                                            <i class="material-icons left">person</i>Sir Jude - 002
                                         </button>
                                     </div>
-                                    <div class="col s12 m4 center-align">
-                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Ferdinand" data-id="003">
-                                            <i class="material-icons left">person</i>Ferdinand - 003
+                                    <div class="col s12 m6 center-align">
+                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Sir Gab" data-id="003" data-password="gab123">
+                                            <i class="material-icons left">person</i>Sir Gab - 003
                                         </button>
                                     </div>
+                                    <div class="col s12 m6 center-align">
+                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Ma'am Cheryl" data-id="004" data-password="cheryl123">
+                                            <i class="material-icons left">person</i>Ma'am Cheryl - 004
+                                        </button>
+                                    </div>
+                                    <div class="col s12 m6 center-align">
+                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Sir Julius" data-id="005" data-password="julius123">
+                                            <i class="material-icons left">person</i>Sir Julius - 005
+                                        </button>
+                                    </div>
+                                        <!-- Password Modal -->
+                                        <div id="passwordModal" class="modal">
+                                            <div class="modal-content">
+                                                <h5 class="center-align">Enter Password</h5>
+                                                <div class="input-field">
+                                                    <input id="employeePassword" type="password" class="validate">
+                                                    <label for="employeePassword">Password</label>
+                                                </div>
+                                                <div id="passwordError" style="color: red; display: none; text-align: center;">Incorrect password. Please try again.</div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <a href="#!" id="passwordCancel" class="modal-close btn-flat">Cancel</a>
+                                                <a href="#!" id="passwordSubmit" class="btn blue">Submit</a>
+                                            </div>
+                                        </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -152,17 +177,73 @@
     document.addEventListener('DOMContentLoaded', function() {
         var modals = document.querySelectorAll('.modal');
         M.Modal.init(modals);
-        // Handle employee button click
+        var employeeModal = M.Modal.getInstance(document.getElementById('employeeModal'));
+        var passwordModal = M.Modal.getInstance(document.getElementById('passwordModal'));
+        var selectedEmployee = null;
+        var employeePasswordInput = document.getElementById('employeePassword');
+        var passwordError = document.getElementById('passwordError');
+        var passwordSubmit = document.getElementById('passwordSubmit');
+        var passwordCancel = document.getElementById('passwordCancel');
+
+        // Quotation number tracking (simulate persistent storage)
+        var baseYear = 2025;
+        var baseNumber = 1689;
+        function getNextQuotationNumber(empId) {
+            var key = 'quotationNumber_' + empId;
+            var lastNum = parseInt(localStorage.getItem(key) || baseNumber);
+            localStorage.setItem(key, lastNum + 1);
+            return baseYear + '-' + empId.padStart(3, '0') + lastNum;
+        }
+
+        // Open employee modal on Generate Quotation click
+        var genBtn = document.querySelector('.modal-trigger');
+        if (genBtn) {
+            genBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                employeeModal.open();
+            });
+        }
+
         document.querySelectorAll('.employee-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
-                var empName = this.getAttribute('data-name');
-                var empId = this.getAttribute('data-id');
-                // Store in localStorage for use in quotation.html
-                localStorage.setItem('selectedEmployeeName', empName);
-                localStorage.setItem('selectedEmployeeId', empId);
-                // Redirect to quotation.html
-                window.location.href = 'quotation.html';
+                selectedEmployee = {
+                    name: this.getAttribute('data-name'),
+                    id: this.getAttribute('data-id'),
+                    password: this.getAttribute('data-password')
+                };
+                employeePasswordInput.value = '';
+                passwordError.style.display = 'none';
+                M.updateTextFields();
+                passwordModal.open();
+                employeePasswordInput.focus();
             });
+        });
+
+        passwordSubmit.addEventListener('click', function() {
+            var entered = employeePasswordInput.value;
+            if (selectedEmployee && entered === selectedEmployee.password) {
+                // Store in localStorage for use in quotation.html
+                localStorage.setItem('selectedEmployeeName', selectedEmployee.name);
+                localStorage.setItem('selectedEmployeeId', selectedEmployee.id);
+                // Generate and store the next quotation number
+                var quoteNum = getNextQuotationNumber(selectedEmployee.id);
+                localStorage.setItem('currentQuotationNumber', quoteNum);
+                // Close both modals and proceed
+                passwordModal.close();
+                employeeModal.close();
+                window.location.href = 'quotation.html';
+            } else {
+                passwordError.style.display = 'block';
+            }
+        });
+        passwordCancel.addEventListener('click', function() {
+            passwordError.style.display = 'none';
+            passwordModal.close();
+        });
+        employeePasswordInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                passwordSubmit.click();
+            }
         });
     });
     </script>
