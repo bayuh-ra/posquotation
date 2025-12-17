@@ -514,7 +514,14 @@
                             <option value="Set">Set</option>
                         </select></td>
                         <td>
-                            <div class="item-name">MyDiner Point Of Sale &amp; Inventory System (BIR Ready)</div>
+                            <select id="descriptionDropdown" style="font-weight: bold; font-size: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; min-width: 180px; width: auto; max-width: 100%; cursor: pointer;">
+                                <option value="IBS MYDINER POS">IBS MYDINER POS</option>
+                                <option value="IBS R5 POS">IBS R5 POS</option>
+                                <option value="IBS XPOS RETAIL POS">IBS XPOS RETAIL POS</option>
+                                <option value="IBS XPOS FASTFOOD POS">IBS XPOS FASTFOOD POS</option>
+                                <option value="IBS XPOS RESTAURANT POS">IBS XPOS RESTAURANT POS</option>
+                            </select>
+                            <div id="typeInclusions" style="margin-top: 6px; font-size: 10px; color: #1976d2; font-style: italic;">Inclusions for selected type will appear here.</div>
                         </td>
                         <td><input type="text" class="price-input" value="" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                         <td class="total-cell"></td>
@@ -615,6 +622,29 @@
                     </tr>
                 </tfoot>
             </table>
+                <script>
+                // Show inclusions based on TYPE dropdown (packageType)
+                document.addEventListener('DOMContentLoaded', function() {
+                    var typeDropdown = document.getElementById('packageType');
+                    var typeInclusions = document.getElementById('typeInclusions');
+                    var typeExamples = {
+                        'STANDARD POS RETAIL PACKAGES': 'Inclusions: Retail POS software, inventory management, barcode scanning, receipt printing.',
+                        'STANDARD POS RESTAURANT PACKAGE': 'Inclusions: Restaurant POS software, table management, kitchen display, order tracking.',
+                        'BASIC POS FASTFOOD PACKAGE': 'Inclusions: Fastfood POS, quick order entry, combo management, receipt printing.',
+                        'BASIC POS RETAIL PACKAGE': 'Inclusions: Basic retail POS, inventory, barcode support, sales reporting.',
+                        'POS SOFTWARE ONLY': 'Inclusions: POS software license only, no hardware included.',
+                        'CUSTOMIZED': 'Inclusions: Custom POS solution tailored to your business needs.'
+                    };
+                    if (typeDropdown && typeInclusions) {
+                        function updateInclusions() {
+                            var val = typeDropdown.value;
+                            typeInclusions.textContent = typeExamples[val] || 'Inclusions for selected type will appear here.';
+                        }
+                        typeDropdown.addEventListener('change', updateInclusions);
+                        updateInclusions();
+                    }
+                });
+                </script>
             <script>
             // Auto-fill description based on package type
             document.addEventListener('DOMContentLoaded', function() {
