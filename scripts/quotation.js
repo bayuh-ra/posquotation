@@ -28,6 +28,87 @@ async function loadData() {
     }
 }
 
+// Function to replace dropdown with wrapped text after selection
+function handleDropdownSelection(selectElement) {
+    selectElement.addEventListener('change', function() {
+        if (this.value) {
+            // Get selected option
+            const selectedOption = this.options[this.selectedIndex];
+            const selectedText = selectedOption.text;
+            const productDescription = selectedOption.dataset.description || '';
+            
+            // Create a div to show the wrapped text
+            const textDiv = document.createElement('div');
+            textDiv.className = 'selected-dropdown-text';
+            
+            // Add product name
+            const nameDiv = document.createElement('div');
+            nameDiv.textContent = selectedText;
+            nameDiv.style.fontWeight = 'bold';
+            textDiv.appendChild(nameDiv);
+            
+            // Add product description if available (only for descriptionDropdown)
+            if (this.id === 'descriptionDropdown' && productDescription) {
+                // Split description by line breaks or bullet points
+                const descLines = productDescription.split('\n').filter(line => line.trim());
+                
+                if (descLines.length > 0) {
+                    const listContainer = document.createElement('div');
+                    listContainer.style.cssText = `
+                        font-size: 9px;
+                        color: #666;
+                        margin-top: 6px;
+                        margin-left: 15px;
+                    `;
+                    
+                    descLines.forEach(line => {
+                        const listItem = document.createElement('div');
+                        listItem.style.cssText = `
+                            margin-bottom: 2px;
+                            line-height: 1.4;
+                        `;
+                        // Add checkmark before each item
+                        listItem.innerHTML = '✓ ' + line.trim();
+                        listContainer.appendChild(listItem);
+                    });
+                    
+                    textDiv.appendChild(listContainer);
+                }
+            }
+            
+            textDiv.style.cssText = `
+                font-size: 10px;
+                line-height: 1.4;
+                word-wrap: break-word;
+                white-space: normal;
+                padding: 4px;
+                cursor: pointer;
+                max-width: 100%;
+            `;
+            
+            // Store the select element for later (in case we need to change it)
+            textDiv.dataset.selectId = this.id;
+            
+            // Click to show dropdown again
+            textDiv.addEventListener('click', function() {
+                this.style.display = 'none';
+                selectElement.style.display = 'block';
+                selectElement.focus();
+            });
+            
+            // Remove any existing text div
+            const existingDiv = this.parentNode.querySelector('.selected-dropdown-text');
+            if (existingDiv) {
+                existingDiv.remove();
+            }
+            
+            // Hide the select and show the div
+            this.style.display = 'none';
+            this.parentNode.insertBefore(textDiv, this.nextSibling);
+        }
+    });
+}
+
 // Populate package type dropdown
 function populatePackageTypes() {
     const packageTypeSelect = document.getElementById('packageType');
@@ -75,6 +156,9 @@ function populatePackageTypes() {
     });
 
     if (packageTypeSelect.value) packageTypeSelect.dispatchEvent(new Event('change'));
+    
+    // Enable text wrapping after selection
+    handleDropdownSelection(packageTypeSelect);
 }
 
 // Load products associated with a package type
@@ -122,6 +206,9 @@ function populateDescriptions() {
     const descriptionDropdown = document.getElementById('descriptionDropdown');
     if (descriptionDropdown) {
         descriptionDropdown.innerHTML = '<option value="" selected disabled>Select package type first</option>';
+        
+        // Enable text wrapping after selection
+        handleDropdownSelection(descriptionDropdown);
     }
 }
 
@@ -277,6 +364,23 @@ async function saveQuotation() {
         alert('Error saving quotation: ' + (error.message || 'Unknown error'));
     }
 }
+
+// For print: ensure the wrapped text shows instead of dropdown
+window.addEventListener('beforeprint', function() {
+    document.querySelectorAll('.selected-dropdown-text').forEach(function(div) {
+        div.style.display = 'block';
+    });
+    document.querySelectorAll('#packageType, #descriptionDropdown').forEach(function(select) {
+        if (select.nextElementSibling && select.nextElementSibling.classList.contains('selected-dropdown-text')) {
+            select.style.display = 'none';
+        }
+    });
+});
+
+// After print: restore dropdown display if needed
+window.addEventListener('afterprint', function() {
+    // Optionally restore dropdowns after printing
+});
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {

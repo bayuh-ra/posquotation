@@ -1,5 +1,6 @@
 // backend/supabase.js
 
+
 // Initialize Supabase client (create once and reuse to avoid redeclaration)
 window.SUPABASE_CLIENT = window.SUPABASE_CLIENT || window.supabase.createClient(
   SUPABASE_CONFIG.url,
@@ -105,9 +106,57 @@ async function getPackageTypes() {
     .select('*')
     .order('name');
   
-  if (error) console.error('Error fetching package types:', error);
+  if (error) {
+    console.error('Error fetching package types:', error);
+    return [];
+  }
   return data || [];
 }
+
+async function updatePackageTypeByName(oldName, newName, description) {
+  // 1️⃣ If name did not change → update description only
+  if (oldName === newName) {
+    const { data, error } = await supabaseClient
+      .from('package_type')
+      .update({ description })
+      .eq('name', oldName)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating package type:', error);
+      throw error;
+    }
+    return data;
+  }
+
+  // 2️⃣ Check if new name already exists
+  const { data: exists, error: checkError } = await supabaseClient
+    .from('package_type')
+    .select('name')
+    .eq('name', newName)
+    .maybeSingle();
+
+  if (checkError) throw checkError;
+  if (exists) {
+    throw new Error('Package type name already exists');
+  }
+
+  // 3️⃣ Rename safely
+  const { data, error } = await supabaseClient
+    .from('package_type')
+    .update({ name: newName, description })
+    .eq('name', oldName)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error renaming package type:', error);
+    throw error;
+  }
+  return data;
+}
+
 
 // ===== PACKAGE ITEMS =====
 async function getPackageItems(packageName) {

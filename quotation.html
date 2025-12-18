@@ -14,6 +14,19 @@
     <link rel="stylesheet" href="styles/quotation.css">
 </head>
 <body>
+    <!-- No-print buttons at the top -->
+    <div class="no-print" style="text-align: center; margin: 20px 0; padding: 20px; background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+        <button onclick="goBack()" style="background: #6c757d; color: white; padding: 10px 30px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold;">
+            ← Back to Home
+        </button>
+        <button onclick="saveQuotation()" style="background: #1a5276; color: white; padding: 10px 30px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; margin-left: 10px;">
+            Save Quotation
+        </button>
+        <button onclick="window.print()" style="background: #28a745; color: white; padding: 10px 30px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; margin-left: 10px;">
+            Print Quotation
+        </button>
+    </div>
+
     <div id="pdf-content">
         <!-- PAGE 1 -->
         <div class="page">
@@ -77,8 +90,7 @@
                 <tbody>
                     <tr>
                         <td rowspan="2" style="vertical-align: top; font-weight: bold; min-width: 180px;">
-                            <select id="packageType" style="font-weight: bold; font-size: 9px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; min-width: 180px; width: auto; max-width: 100%; cursor: pointer;">
-                                <option value="" selected disabled>Select package type</option>
+                            <select id="packageType" style="font-weight: bold; font-size: 9px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; cursor: pointer;">                                <option value="" selected disabled>Select package type</option>
                             </select>
                         </td>
                         <td><input type="number" value="0" min="0" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
@@ -86,8 +98,7 @@
                             <option value="" selected disabled>Select</option>
                         </select></td>
                         <td>
-                            <select id="descriptionDropdown" style="font-weight: bold; font-size: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; min-width: 180px; width: auto; max-width: 100%; cursor: pointer;">
-                                <option value="" selected disabled>Select description</option>
+                            <select id="descriptionDropdown" style="font-weight: bold; font-size: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; cursor: pointer;">                                <option value="" selected disabled>Select description</option>
                             </select>
                             <div id="typeInclusions" style="margin-top: 6px; font-size: 10px; color: #1976d2; font-style: italic;">Inclusions for selected type will appear here.</div>
                         </td>
@@ -248,19 +259,16 @@
         </div>
     </div>
 
-    <!-- No-print buttons -->
-    <div class="no-print" style="text-align: center; margin: 20px 0;">
-        <button onclick="saveQuotation()" style="background: #1a5276; color: white; padding: 10px 30px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold;">
-            Save Quotation
-        </button>
-        <button onclick="window.print()" style="background: #28a745; color: white; padding: 10px 30px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; margin-left: 10px;">
-            Print Quotation
-        </button>
-    </div>
-
     <!-- Scripts - Load in correct order -->
     <script src="backend/supabase.js"></script>
     <script src="scripts/quotation.js"></script>
+    
+    <script>
+        function goBack() {
+            // Don't clear employee data - preserve it for when they return
+            window.location.href = 'index.html';
+        }
+    </script>
 
 </body>
 </html>

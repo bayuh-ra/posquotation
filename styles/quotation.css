@@ -403,6 +403,37 @@ table tfoot td {
     padding-top: 10px;
 }
 
+/* Dropdown width fix */
+#packageType {
+    width: 130px;
+    font-size: 10px;
+    padding: 4px;
+    height: auto;
+    min-height: 30px;
+}
+
+#packageType option {
+    white-space: normal;
+    word-wrap: break-word;
+    padding: 4px;
+}
+
+#descriptionDropdown {
+    width: 100%;
+    max-width: 350px;
+    font-size: 10px;
+    padding: 4px;
+    margin-bottom: 10px;
+    height: auto;
+    min-height: 30px;
+}
+
+#descriptionDropdown option {
+    white-space: normal;
+    word-wrap: break-word;
+    padding: 4px;
+}
+
 /* Print Styles */
 @media print {
     @page {
@@ -459,30 +490,51 @@ table tfoot td {
         width: 100% !important;
     }
     
-    /* Hide all form inputs and show their values */
-    select, 
+    /* Style select dropdowns to look like regular text */
+    select {
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        font-weight: bold !important;
+        color: #000 !important;
+        font-size: 10px !important;
+    }
+    
+    /* Hide dropdown arrow */
+    select::-ms-expand {
+        display: none;
+    }
+    
+    /* Style inputs to look like regular text */
     input[type="text"],
     input[type="number"] {
         border: none !important;
         box-shadow: none !important;
         outline: none !important;
         background: transparent !important;
-        -webkit-appearance: none !important;
-        -moz-appearance: none !important;
-        appearance: none !important;
-        pointer-events: none !important;
         padding: 0 !important;
-    }
-    
-    /* Hide dropdown arrows */
-    select {
-        background-image: none !important;
-    }
-    
-    /* Make sure text is visible */
-    input, select {
         color: #000 !important;
         font-weight: 500 !important;
+    }
+    
+    /* Hide placeholder text in print */
+    input::placeholder {
+        color: transparent !important;
+    }
+    
+    /* Hide empty inputs */
+    input[value=""],
+    input:not([value]) {
+        display: none !important;
+    }
+    
+    /* Make sure filled values are visible */
+    input[value]:not([value=""]) {
+        display: inline-block !important;
+        color: #000 !important;
     }
     
     /* Ensure colors print correctly */
@@ -490,5 +542,26 @@ table tfoot td {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         color-adjust: exact !important;
+    }
+    
+    /* Format table cells for print */
+    table td {
+        padding: 8px !important;
+        vertical-align: top !important;
+    }
+    
+    /* Show item names clearly */
+    .item-name {
+        font-weight: 600 !important;
+        color: #1a5276 !important;
+    }
+    
+    /* Format inclusions/descriptions */
+    #typeInclusions {
+        font-size: 9px !important;
+        color: #000 !important;
+        font-style: italic !important;
+        margin-top: 5px !important;
+        line-height: 1.4 !important;
     }
 }
