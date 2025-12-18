@@ -4,47 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quotation Automation - Home</title>
+    
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="backend/config.js"></script>
+    <script src="backend/supabase.js"></script>
+    
     <!-- Materialize CSS CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
     <style>
-                @media (max-width: 600px) {
-                    .modal {
-                        width: 95% !important;
-                        max-width: 95% !important;
-                        padding: 0 0.5rem !important;
-                    }
-                    .modal-content {
-                        padding: 18px 6px 6px 6px !important;
-                    }
-                    .btn-large.employee-btn {
-                        font-size: 1rem;
-                        padding: 0.8rem 0.5rem;
-                    }
-                    .modal-content h5 {
-                        font-size: 1.3rem;
-                    }
-                }
-                .modal-content {
-                    padding-bottom: 0;
-                }
-                .employee-btn {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 100%;
-                    margin-bottom: 16px !important;
-                    gap: 8px;
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                    letter-spacing: 1px;
-                }
-                .employee-btn .material-icons.left {
-                    margin-right: 8px;
-                    margin-left: 0;
-                }
-                .modal-footer {
-                    text-align: right;
-                }
+        @media (max-width: 600px) {
+            .modal {
+                width: 95% !important;
+                max-width: 95% !important;
+            }
+            .modal-content {
+                padding: 24px 16px !important;
+            }
+            .employee-btn {
+                font-size: 0.95rem;
+                padding: 16px 12px;
+            }
+            .modal-content h5 {
+                font-size: 1.4rem;
+            }
+            .employee-container {
+                grid-template-columns: 1fr !important;
+            }
+        }
+        .modal {
+            max-width: 700px !important;
+            border-radius: 16px !important;
+            overflow: visible !important;
+        }
+        .modal-content {
+            padding: 32px 40px 24px 40px;
+        }
+        .modal-content h5 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a5276;
+            margin-bottom: 8px;
+        }
+        .modal-content > p {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 24px;
+        }
+        .employee-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 20px 24px;
+            gap: 12px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            background: #fff;
+            color: #1a5276;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .employee-btn .material-icons {
+            font-size: 28px;
+            margin-right: 4px;
+        }
+        .employee-btn:hover {
+            background: linear-gradient(135deg, #1a5276 0%, #2874a6 100%);
+            color: #fff;
+            border-color: #1a5276;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(26,82,118,0.25);
+        }
+        .employee-btn:active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26,82,118,0.2);
+        }
+        .modal-footer {
+            padding: 16px 24px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
         body {
             background: #f5f5f5;
         }
@@ -94,16 +141,54 @@
             box-shadow: 0 4px 16px rgba(26,82,118,0.10);
             border-color: #1565c0;
         }
-        }
         .btn-large:hover {
             background: #1a5276;
             color: #fff;
             transform: translateY(-2px) scale(1.04);
             box-shadow: 0 6px 18px rgba(26,82,118,0.18);
         }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .employee-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 32px;
+            padding: 0 8px;
+        }
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-blue-only">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="gap-patch">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="row center-align">
             <div class="col s12 m8 offset-m2 l6 offset-l3">
@@ -114,134 +199,213 @@
                         <div class="corporate-desc">Welcome to the Quotation Automation System.<br>Click below to generate a new quotation.</div>
                         <a href="#employeeModal" class="btn btn-large waves-effect waves-light modal-trigger">Generate Quotation</a>
                     </div>
-                        <!-- Employee Selection Modal -->
-                        <div id="employeeModal" class="modal">
-                            <div class="modal-content">
-                                <h5 class="center-align">Select Employee to Make Quotation</h5>
-                                <p class="center-align">Who will make this quotation?</p>
-                                <div class="row" style="margin-top: 30px;">
-                                    <div class="col s12 m6 center-align">
-                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Ma'am Charisse" data-id="001" data-password="charisse123">
-                                            <i class="material-icons left">person</i>Ma'am Charisse - 001
-                                        </button>
-                                    </div>
-                                    <div class="col s12 m6 center-align">
-                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Sir Jude" data-id="002" data-password="jude123">
-                                            <i class="material-icons left">person</i>Sir Jude - 002
-                                        </button>
-                                    </div>
-                                    <div class="col s12 m6 center-align">
-                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Sir Gab" data-id="003" data-password="gab123">
-                                            <i class="material-icons left">person</i>Sir Gab - 003
-                                        </button>
-                                    </div>
-                                    <div class="col s12 m6 center-align">
-                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Ma'am Cheryl" data-id="004" data-password="cheryl123">
-                                            <i class="material-icons left">person</i>Ma'am Cheryl - 004
-                                        </button>
-                                    </div>
-                                    <div class="col s12 m6 center-align">
-                                        <button class="btn-large employee-btn" style="width:100%; margin-bottom: 10px;" data-name="Sir Julius" data-id="005" data-password="julius123">
-                                            <i class="material-icons left">person</i>Sir Julius - 005
-                                        </button>
-                                    </div>
-                                        <!-- Password Modal -->
-                                        <div id="passwordModal" class="modal">
-                                            <div class="modal-content">
-                                                <h5 class="center-align">Enter Password</h5>
-                                                <div class="input-field">
-                                                    <input id="employeePassword" type="password" class="validate">
-                                                    <label for="employeePassword">Password</label>
-                                                </div>
-                                                <div id="passwordError" style="color: red; display: none; text-align: center;">Incorrect password. Please try again.</div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <a href="#!" id="passwordCancel" class="modal-close btn-flat">Cancel</a>
-                                                <a href="#!" id="passwordSubmit" class="btn blue">Submit</a>
-                                            </div>
-                                        </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <a href="#!" class="modal-close btn-flat">Cancel</a>
+                    
+                    <!-- Employee Selection Modal -->
+                    <div id="employeeModal" class="modal">
+                        <div class="modal-content">
+                            <h5 class="center-align">Select Employee to Make Quotation</h5>
+                            <p class="center-align">Who will make this quotation?</p>
+                            <div id="employeeContainer" class="employee-container">
+                                <!-- Employees will be loaded here dynamically -->
                             </div>
                         </div>
+                        <div class="modal-footer">
+                            <a href="#!" class="modal-close btn-flat">Cancel</a>
+                        </div>
+                    </div>
+
+                    <!-- Password Modal -->
+                    <div id="passwordModal" class="modal">
+                        <div class="modal-content">
+                            <h5 class="center-align">Enter Password</h5>
+                            <p class="center-align" style="margin-bottom: 32px;">Verify your identity to proceed</p>
+                            <form autocomplete="off">
+                                <div class="input-field">
+                                    <input id="employeePassword" type="password" class="validate" autocomplete="off" style="font-size: 1.1rem; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box;">
+                                    <label for="employeePassword" style="font-size: 1rem;">Password</label>
+                                </div>
+                            </form>
+                            <div id="passwordError" style="color: #e53935; display: none; text-align: center; padding: 12px; background: #ffebee; border-radius: 8px; font-weight: 500; margin-top: 16px;">
+                                <i class="material-icons" style="vertical-align: middle; margin-right: 8px;">error</i>
+                                <span>Incorrect password. Please try again.</span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#!" id="passwordCancel" class="btn-flat" style="color: #666; font-weight: 600;">Cancel</a>
+                            <a href="#!" id="passwordSubmit" class="btn" style="background: linear-gradient(135deg, #1a5276 0%, #2874a6 100%); font-weight: 600; border-radius: 8px; padding: 0 32px;">Submit</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Materialize JS CDN -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var modals = document.querySelectorAll('.modal');
+    document.addEventListener('DOMContentLoaded', async function () {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        // Wait for Supabase client to be ready
+        if (typeof getEmployees !== 'function') {
+            console.error('Supabase functions not loaded!');
+            M.toast({html: 'Error: Database connection failed', classes: 'red'});
+            return;
+        }
+        
+        // Initialize Materialize modals
+        const modals = document.querySelectorAll('.modal');
         M.Modal.init(modals);
-        var employeeModal = M.Modal.getInstance(document.getElementById('employeeModal'));
-        var passwordModal = M.Modal.getInstance(document.getElementById('passwordModal'));
-        var selectedEmployee = null;
-        var employeePasswordInput = document.getElementById('employeePassword');
-        var passwordError = document.getElementById('passwordError');
-        var passwordSubmit = document.getElementById('passwordSubmit');
-        var passwordCancel = document.getElementById('passwordCancel');
 
-        // Quotation number tracking (simulate persistent storage)
-        var baseYear = 2025;
-        var baseNumber = 1689;
-        function getNextQuotationNumber(empId) {
-            var key = 'quotationNumber_' + empId;
-            var lastNum = parseInt(localStorage.getItem(key) || baseNumber);
-            localStorage.setItem(key, lastNum + 1);
-            return baseYear + '-' + empId.padStart(3, '0') + lastNum;
+        const employeeModal = M.Modal.getInstance(document.getElementById('employeeModal'));
+        const passwordModal = M.Modal.getInstance(document.getElementById('passwordModal'));
+
+        const employeePasswordInput = document.getElementById('employeePassword');
+        const passwordError = document.getElementById('passwordError');
+        const passwordSubmit = document.getElementById('passwordSubmit');
+        const passwordCancel = document.getElementById('passwordCancel');
+        const employeeContainer = document.getElementById('employeeContainer');
+
+        let selectedEmployee = null;
+
+        // ==========================================
+        // LOAD EMPLOYEES FROM SUPABASE
+        // ==========================================
+        loadingOverlay.classList.add('active');
+        
+        console.log('Fetching employees...');
+        
+        try {
+            const employees = await getEmployees();
+            console.log('Employees fetched:', employees);
+            
+            loadingOverlay.classList.remove('active');
+
+            if (!employees || employees.length === 0) {
+                console.warn('No employees returned from database');
+                employeeContainer.innerHTML = '<p class="center-align">No employees found</p>';
+                M.toast({html: 'No employees found in database', classes: 'orange'});
+                return;
+            }
+
+            // Clear container and populate with employee buttons
+            employeeContainer.innerHTML = '';
+            
+            employees.forEach(emp => {
+                const btn = document.createElement('button');
+                btn.className = 'employee-btn waves-effect waves-light';
+                btn.innerHTML = `<i class="material-icons">person</i>${emp.full_name.toUpperCase()}`;
+                btn.dataset.id = emp.id;
+                btn.dataset.code = emp.employee_code;
+                btn.dataset.name = emp.full_name;
+                
+                employeeContainer.appendChild(btn);
+            });
+
+        } catch (error) {
+            loadingOverlay.classList.remove('active');
+            console.error('Error loading employees:', error);
+            M.toast({html: `Error: ${error.message || 'Failed to load employees'}`, classes: 'red'});
+            employeeContainer.innerHTML = `<p class="center-align red-text">Error loading employees<br><small>${error.message || ''}</small></p>`;
+            return;
         }
 
-        // Open employee modal on Generate Quotation click
-        var genBtn = document.querySelector('.modal-trigger');
-        if (genBtn) {
-            genBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                employeeModal.open();
-            });
-        }
-
-        document.querySelectorAll('.employee-btn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                selectedEmployee = {
-                    name: this.getAttribute('data-name'),
-                    id: this.getAttribute('data-id'),
-                    password: this.getAttribute('data-password')
-                };
-                employeePasswordInput.value = '';
-                passwordError.style.display = 'none';
-                M.updateTextFields();
-                passwordModal.open();
-                employeePasswordInput.focus();
-            });
+        // ==========================================
+        // OPEN EMPLOYEE MODAL
+        // ==========================================
+        document.querySelector('.modal-trigger').addEventListener('click', e => {
+            e.preventDefault();
+            employeeModal.open();
         });
 
-        passwordSubmit.addEventListener('click', function() {
-            var entered = employeePasswordInput.value;
-            if (selectedEmployee && entered === selectedEmployee.password) {
-                // Store in localStorage for use in quotation.html
-                localStorage.setItem('selectedEmployeeName', selectedEmployee.name);
-                localStorage.setItem('selectedEmployeeId', selectedEmployee.id);
-                // Generate and store the next quotation number
-                var quoteNum = getNextQuotationNumber(selectedEmployee.id);
-                localStorage.setItem('currentQuotationNumber', quoteNum);
-                // Close both modals and proceed
+        // ==========================================
+        // EMPLOYEE SELECTION (Event Delegation)
+        // ==========================================
+        employeeContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.employee-btn');
+            if (!btn || !btn.dataset.id) return;
+            
+            selectedEmployee = {
+                id: btn.dataset.id,
+                code: btn.dataset.code,
+                name: btn.dataset.name
+            };
+            
+            employeePasswordInput.value = '';
+            passwordError.style.display = 'none';
+            M.updateTextFields();
+            passwordModal.open();
+            setTimeout(() => employeePasswordInput.focus(), 100);
+        });
+
+        // ==========================================
+        // PASSWORD VALIDATION
+        // ==========================================
+        passwordSubmit.addEventListener('click', async () => {
+            const enteredPassword = employeePasswordInput.value;
+
+            if (!enteredPassword) {
+                passwordError.textContent = 'Please enter a password';
+                passwordError.style.display = 'block';
+                return;
+            }
+
+            loadingOverlay.classList.add('active');
+            
+            try {
+                const employee = await getEmployeeByCode(selectedEmployee.code);
+                loadingOverlay.classList.remove('active');
+
+                if (!employee || employee.password_hash !== enteredPassword) {
+                    passwordError.textContent = 'Incorrect password. Please try again.';
+                    passwordError.style.display = 'block';
+                    return;
+                }
+
+                // Save session data
+                localStorage.setItem('selectedEmployeeId', employee.id);
+                localStorage.setItem('selectedEmployeeName', employee.full_name);
+                localStorage.setItem('selectedEmployeeCode', employee.employee_code);
+
+                // Get quotation number from RPC
+                const quotationNo = await getNextQuotationNo(employee.id);
+                
+                if (quotationNo) {
+                    localStorage.setItem('currentQuotationNumber', quotationNo);
+                } else {
+                    // Fallback if RPC fails
+                    const fallbackNo = `2025-${employee.employee_code}-${Date.now()}`;
+                    localStorage.setItem('currentQuotationNumber', fallbackNo);
+                    M.toast({html: 'Using fallback quotation number', classes: 'orange'});
+                }
+
+                // Close modals and redirect
                 passwordModal.close();
                 employeeModal.close();
-                window.location.href = 'quotation.html';
-            } else {
+                
+                M.toast({html: `Welcome, ${employee.full_name}!`, classes: 'green'});
+                
+                setTimeout(() => {
+                    window.location.href = 'quotation.html';
+                }, 500);
+
+            } catch (error) {
+                loadingOverlay.classList.remove('active');
+                console.error('Error validating password:', error);
+                passwordError.textContent = 'An error occurred. Please try again.';
                 passwordError.style.display = 'block';
             }
         });
-        passwordCancel.addEventListener('click', function() {
+
+        passwordCancel.addEventListener('click', () => {
             passwordError.style.display = 'none';
             passwordModal.close();
         });
-        employeePasswordInput.addEventListener('keydown', function(e) {
+
+        employeePasswordInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') {
+                e.preventDefault();
                 passwordSubmit.click();
             }
         });

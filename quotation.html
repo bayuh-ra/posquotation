@@ -1,437 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="backend/config.js"></script>
+    <script src="backend/supabase.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quotation - LAP I.T. Solutions</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            font-size: 11px;
-            line-height: 1.5;
-            color: #000;
-            background-color: #f5f5f5;
-            font-weight: 500;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
-        .page {
-            width: 8.5in;
-            min-height: 11in;
-            margin: 20px auto;
-            background: white;
-            padding: 0.4in 0.5in;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        
-        .page-break {
-            page-break-before: always;
-        }
-        
-        /* Header Styles */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-        }
-        
-        .company-info {
-            flex: 1;
-        }
-        
-        .company-name {
-            font-size: 22px;
-            font-weight: bold;
-            color: #1a5276;
-            margin-bottom: 3px;
-        }
-        
-        .company-contact {
-            font-size: 9px;
-            color: #555;
-            line-height: 1.5;
-        }
-        
-        .quotation-title {
-            text-align: right;
-        }
-        
-        .quotation-title h1 {
-            font-size: 26px;
-            color: #1a5276;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        /* Info Sections */
-        .info-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            gap: 15px;
-        }
-        
-        .client-info, .quote-info {
-            flex: 1;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        .info-title {
-            font-weight: bold;
-            color: #1a5276;
-            margin-bottom: 8px;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-        
-        .info-row {
-            display: flex;
-            margin-bottom: 3px;
-        }
-        
-        .info-label {
-            font-weight: 700;
-            width: 110px;
-            color: #000;
-        }
-        
-        .info-value {
-            color: #333;
-        }
-        
-        /* Package Title */
-        .package-title {
-            background: #1a5276;
-            color: white;
-            padding: 8px 12px;
-            font-size: 12px;
-            font-weight: bold;
-            margin: 15px 0 0 0;
-            text-transform: uppercase;
-        }
-        
-        /* Table Styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-        }
-        
-        table th {
-            background: #d6e6f0;
-            color: #000;
-            padding: 10px 8px;
-            text-align: left;
-            font-size: 11px;
-            font-weight: 700;
-            border: 1px solid #ccc;
-        }
-        
-        table th:nth-child(1) { width: 90px; }
-        table th:nth-child(2) { width: 40px; text-align: center; }
-        table th:nth-child(3) { width: 50px; text-align: center; }
-        table th:nth-child(5) { width: 80px; text-align: right; }
-        table th:nth-child(6) { width: 80px; text-align: right; }
-        
-        table td {
-            padding: 8px;
-            border: 1px solid #ccc;
-            vertical-align: top;
-            font-size: 10px;
-        }
-        
-        table td:nth-child(2),
-        table td:nth-child(3) {
-            text-align: center;
-        }
-        
-        table td:nth-child(5),
-        table td:nth-child(6) {
-            text-align: right;
-        }
-        
-        table tfoot td {
-            border: 1px solid #ccc;
-        }
-        
-        .item-name {
-            font-weight: 600;
-            color: #1a5276;
-        }
-        
-        .item-description {
-            font-size: 10px;
-            color: #555;
-            margin-top: 2px;
-        }
-        
-        .feature-list {
-            margin: 5px 0 0 15px;
-            font-size: 9px;
-            color: #333;
-            list-style: none;
-            padding-left: 0;
-        }
-        
-        .feature-list li {
-            margin-bottom: 2px;
-        }
-        
-        .spec-list {
-            margin: 5px 0 0 15px;
-            font-size: 9px;
-            color: #666;
-        }
-        
-        .spec-list li {
-            margin-bottom: 2px;
-        }
-        
-        .modules-badge {
-            background: #17a2b8;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 8px;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 3px;
-        }
-        
-        .free-badge {
-            background: #28a745;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-size: 9px;
-            font-weight: bold;
-        }
-        
-        /* Service Section */
-        .service-section {
-            background: #e8f4f8;
-            padding: 10px 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            border-left: 3px solid #17a2b8;
-            font-size: 10px;
-        }
-        
-        .service-title {
-            font-weight: bold;
-            color: #17a2b8;
-            margin-bottom: 3px;
-        }
-        
-        /* Pricing Section */
-        .pricing-section {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 15px;
-        }
-        
-        .pricing-table {
-            width: 280px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .pricing-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 12px;
-            border-bottom: 1px solid #ddd;
-            font-size: 10px;
-        }
-        
-        .pricing-row:last-child {
-            border-bottom: none;
-        }
-        
-        .pricing-row.total {
-            background: #1a5276;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-        }
-        
-        /* Payment Terms */
-        .payment-terms {
-            background: #fff3cd;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            border-left: 3px solid #ffc107;
-        }
-        
-        .payment-terms h3 {
-            color: #856404;
-            margin-bottom: 8px;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-        
-        .payment-terms ol {
-            margin-left: 18px;
-            font-size: 10px;
-        }
-        
-        .payment-terms li {
-            margin-bottom: 4px;
-            color: #666;
-        }
-        
-        .payment-amount {
-            font-weight: bold;
-            color: #1a5276;
-        }
-        
-        /* Terms and Conditions */
-        .terms-section {
-            background: white;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-        
-        .terms-section h3 {
-            color: #000;
-            margin-bottom: 12px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        
-        .terms-list {
-            font-size: 10px;
-            color: #000;
-            font-weight: 500;
-            line-height: 1.6;
-        }
-        
-        .terms-list > li {
-            margin-bottom: 8px;
-            line-height: 1.6;
-        }
-        
-        .exclusions-list {
-            margin: 5px 0 0 20px;
-            font-size: 10px;
-        }
-        
-        .exclusions-list li {
-            margin-bottom: 3px;
-        }
-        
-        /* Support Section */
-        .support-section {
-            background: #d4edda;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            border-left: 3px solid #28a745;
-        }
-        
-        .support-section h3 {
-            color: #155724;
-            margin-bottom: 8px;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-        
-        .support-content {
-            font-size: 10px;
-            color: #555;
-        }
-        
-        .support-content p {
-            margin-bottom: 5px;
-        }
-        
-        .support-methods {
-            margin: 5px 0 5px 20px;
-        }
-        
-        .support-methods li {
-            margin-bottom: 2px;
-        }
-        
-        /* Footer / Signature */
-        .contract-statement {
-            text-align: center;
-            font-size: 10px;
-            color: #555;
-            margin: 20px 0;
-            font-style: italic;
-        }
-        
-        .signature-section {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-            gap: 40px;
-        }
-        
-        .signature-box {
-            flex: 1;
-            text-align: center;
-        }
-        
-        .signature-line {
-            border-top: 1px solid #333;
-            margin-top: 40px;
-            padding-top: 5px;
-        }
-        
-        .signature-label {
-            font-size: 10px;
-            color: #555;
-        }
-        
-        .footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 9px;
-            color: #888;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-        }
-        
-        @media print {
-            body, html {
-                background: #fff !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .page {
-                page-break-after: always;
-                box-shadow: none !important;
-                margin: 0 !important;
-                width: 8.5in !important;
-                min-height: 11in !important;
-                padding: 0.4in 0.5in !important;
-            }
-            table {
-                page-break-inside: avoid;
-                width: 100% !important;
-            }
-            select, input {
-                box-shadow: none !important;
-                outline: none !important;
-            }
-        }
-    </style>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles/quotation.css">
 </head>
 <body>
     <div id="pdf-content">
@@ -498,28 +76,16 @@
                     <tr>
                         <td rowspan="2" style="vertical-align: top; font-weight: bold; min-width: 180px;">
                             <select id="packageType" style="font-weight: bold; font-size: 9px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; min-width: 180px; width: auto; max-width: 100%; cursor: pointer;">
-                                <option value="STANDARD POS RETAIL PACKAGES">STANDARD POS RETAIL PACKAGES</option>
-                                <option value="STANDARD POS RESTAURANT PACKAGE">STANDARD POS RESTAURANT PACKAGE</option>
-                                <option value="BASIC POS FASTFOOD PACKAGE">BASIC POS FASTFOOD PACKAGE</option>
-                                <option value="BASIC POS RETAIL PACKAGE">BASIC POS RETAIL PACKAGE</option>
-                                <option value="POS SOFTWARE ONLY">POS SOFTWARE ONLY</option>
-                                <option value="CUSTOMIZED">CUSTOMIZED</option>
+                                <option value="" selected disabled>Select package type</option>
                             </select>
                         </td>
                         <td><input type="number" value="0" min="0" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                        <td><select style="font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px;">
+                        <td><select class="unit-select" style="font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px;">
                             <option value="" selected disabled>Select</option>
-                            <option value="License">License</option>
-                            <option value="PC">PC</option>
-                            <option value="Set">Set</option>
                         </select></td>
                         <td>
                             <select id="descriptionDropdown" style="font-weight: bold; font-size: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; min-width: 180px; width: auto; max-width: 100%; cursor: pointer;">
-                                <option value="IBS MYDINER POS">IBS MYDINER POS</option>
-                                <option value="IBS R5 POS">IBS R5 POS</option>
-                                <option value="IBS XPOS RETAIL POS">IBS XPOS RETAIL POS</option>
-                                <option value="IBS XPOS FASTFOOD POS">IBS XPOS FASTFOOD POS</option>
-                                <option value="IBS XPOS RESTAURANT POS">IBS XPOS RESTAURANT POS</option>
+                                <option value="" selected disabled>Select description</option>
                             </select>
                             <div id="typeInclusions" style="margin-top: 6px; font-size: 10px; color: #1976d2; font-style: italic;">Inclusions for selected type will appear here.</div>
                         </td>
@@ -528,11 +94,8 @@
                     </tr>
                     <tr>
                         <td><input type="number" value="0" min="0" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                        <td><select style="font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px;">
+                        <td><select class="unit-select" style="font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px;">
                             <option value="" selected disabled>Select</option>
-                            <option value="License">License</option>
-                            <option value="PC">PC</option>
-                            <option value="Set">Set</option>
                         </select></td>
                         <td>
                             <div class="item-name" style="text-align: left;">Computer Set – Cashier Station</div>
@@ -543,11 +106,8 @@
                     <tr>
                         <td></td>
                         <td><input type="number" value="0" min="0" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                        <td><select style="font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px;">
+                        <td><select class="unit-select" style="font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px;">
                             <option value="" selected disabled>Select</option>
-                            <option value="License">License</option>
-                            <option value="PC">PC</option>
-                            <option value="Set">Set</option>
                         </select></td>
                         <td><div class="item-name">Cash Drawer</div></td>
                         <td><input type="text" class="price-input" value="" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
@@ -556,11 +116,8 @@
                     <tr>
                         <td></td>
                         <td><input type="number" value="0" min="0" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                        <td><select style="font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px;">
+                        <td><select class="unit-select" style="font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px;">
                             <option value="" selected disabled>Select</option>
-                            <option value="License">License</option>
-                            <option value="PC">PC</option>
-                            <option value="Set">Set</option>
                         </select></td>
                         <td><div class="item-name">Thermal Printer</div></td>
                         <td><input type="text" class="price-input" value="" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
@@ -569,11 +126,8 @@
                     <tr>
                         <td></td>
                         <td><input type="number" value="0" min="0" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                        <td><select style="font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px;">
+                        <td><select class="unit-select" style="font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px;">
                             <option value="" selected disabled>Select</option>
-                            <option value="License">License</option>
-                            <option value="PC">PC</option>
-                            <option value="Set">Set</option>
                         </select></td>
                         <td><div class="item-name">650VA UPS</div></td>
                         <td><input type="text" class="price-input" value="" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
@@ -622,51 +176,7 @@
                     </tr>
                 </tfoot>
             </table>
-                <script>
-                // Show inclusions based on TYPE dropdown (packageType)
-                document.addEventListener('DOMContentLoaded', function() {
-                    var typeDropdown = document.getElementById('packageType');
-                    var typeInclusions = document.getElementById('typeInclusions');
-                    var typeExamples = {
-                        'STANDARD POS RETAIL PACKAGES': 'Inclusions: Retail POS software, inventory management, barcode scanning, receipt printing.',
-                        'STANDARD POS RESTAURANT PACKAGE': 'Inclusions: Restaurant POS software, table management, kitchen display, order tracking.',
-                        'BASIC POS FASTFOOD PACKAGE': 'Inclusions: Fastfood POS, quick order entry, combo management, receipt printing.',
-                        'BASIC POS RETAIL PACKAGE': 'Inclusions: Basic retail POS, inventory, barcode support, sales reporting.',
-                        'POS SOFTWARE ONLY': 'Inclusions: POS software license only, no hardware included.',
-                        'CUSTOMIZED': 'Inclusions: Custom POS solution tailored to your business needs.'
-                    };
-                    if (typeDropdown && typeInclusions) {
-                        function updateInclusions() {
-                            var val = typeDropdown.value;
-                            typeInclusions.textContent = typeExamples[val] || 'Inclusions for selected type will appear here.';
-                        }
-                        typeDropdown.addEventListener('change', updateInclusions);
-                        updateInclusions();
-                    }
-                });
-                </script>
-            <script>
-            // Auto-fill description based on package type
-            document.addEventListener('DOMContentLoaded', function() {
-                var typeSelect = document.getElementById('packageType');
-                var descriptionInputs = document.querySelectorAll('td:nth-child(4) .item-name');
-                var descriptionDetails = {
-                    'POS COMPLETE PACKAGE': 'POS COMPLETE PACKAGE DESCRIPTION AND DETAILS',
-                    'POS SOFTWARE ONLY': 'POS SOFTWARE ONLY DESCRIPTION AND DETAILS',
-                    'POS SOFTWARE + HARDWARE': 'POS SOFTWARE + HARDWARE DESCRIPTION AND DETAILS'
-                };
-                if(typeSelect) {
-                    typeSelect.addEventListener('change', function() {
-                        var val = typeSelect.value;
-                        // Find the first .item-name in the description column and update it
-                        var descDiv = document.querySelector('td:nth-child(4) .item-name');
-                        if(descDiv && descriptionDetails[val]) {
-                            descDiv.textContent = descriptionDetails[val];
-                        }
-                    });
-                }
-            });
-            </script>
+                
         </div>
         
         <!-- PAGE 2 -->
@@ -736,6 +246,19 @@
         </div>
     </div>
 
-</div>
+    <!-- No-print buttons -->
+    <div class="no-print" style="text-align: center; margin: 20px 0;">
+        <button onclick="saveQuotation()" style="background: #1a5276; color: white; padding: 10px 30px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold;">
+            Save Quotation
+        </button>
+        <button onclick="window.print()" style="background: #28a745; color: white; padding: 10px 30px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; margin-left: 10px;">
+            Print Quotation
+        </button>
+    </div>
+
+    <!-- Scripts - Load in correct order -->
+    <script src="backend/supabase.js"></script>
+    <script src="scripts/quotation.js"></script>
+
 </body>
 </html>
