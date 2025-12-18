@@ -13,7 +13,7 @@ async function getProducts() {
     .from('products')
     .select(`
       *,
-      category:product_categories(id, name)
+      category:product_categories!products_category_fkey(name)
     `)
     .order('name');
   
@@ -21,11 +21,11 @@ async function getProducts() {
   return data;
 }
 
-async function getProductsByCategory(categoryId) {
+async function getProductsByCategory(categoryName) {
   const { data, error } = await supabaseClient
     .from('products')
     .select('*')
-    .eq('category_id', categoryId);
+    .eq('category', categoryName);
   
   if (error) console.error('Error:', error);
   return data;
@@ -82,10 +82,10 @@ async function getEmployeeByCode(code) {
 }
 
 // ===== QUOTATION NUMBER (RPC) =====
-async function getNextQuotationNo(employeeId) {
+async function getNextQuotationNo(employeeName) {
   try {
     const { data, error } = await supabaseClient.rpc('get_next_quotation_no', { 
-      emp: employeeId 
+      emp_name: employeeName 
     });
     if (error) {
       console.error('RPC error get_next_quotation_no:', error);
@@ -109,6 +109,20 @@ async function getPackageTypes() {
   return data || [];
 }
 
+// ===== PACKAGE ITEMS =====
+async function getPackageItems(packageName) {
+  const { data, error } = await supabaseClient
+    .from('package_type_products')
+    .select(`
+      *,
+      product:products!package_type_products_product_name_fkey(name, base_price, description)
+    `)
+    .eq('package_type_name', packageName);
+  
+  if (error) console.error('Error fetching package items:', error);
+  return data || [];
+}
+
 // ===== QUOTATIONS =====
 async function createQuotation(quotationData) {
   const { data, error } = await supabaseClient
@@ -117,14 +131,20 @@ async function createQuotation(quotationData) {
     .select()
     .single();
   
-  if (error) console.error('Error creating quotation:', error);
+  if (error) {
+    console.error('Error creating quotation:', error);
+    throw error;
+  }
   return data;
 }
 
 async function getQuotations() {
   const { data, error } = await supabaseClient
     .from('quotations')
-    .select('*')
+    .select(`
+      *,
+      employee:employees!quotations_employee_name_fkey(full_name, employee_code)
+    `)
     .order('created_at', { ascending: false });
   
   if (error) console.error('Error fetching quotations:', error);
@@ -136,10 +156,12 @@ async function getQuotationById(id) {
     .from('quotations')
     .select(`
       *,
+      employee:employees!quotations_employee_name_fkey(full_name, employee_code),
       items:quotation_items(
         *,
-        product:products(name),
-        unit:units(name)
+        product:products!quotation_items_product_name_fkey(name, description),
+        unit:units!quotation_items_unit_name_fkey(name),
+        package_type:package_type!quotation_items_package_type_name_fkey(name, description)
       )
     `)
     .eq('id', id)
@@ -179,7 +201,10 @@ async function addQuotationItem(itemData) {
     .select()
     .single();
   
-  if (error) console.error('Error adding quotation item:', error);
+  if (error) {
+    console.error('Error adding quotation item:', error);
+    throw error;
+  }
   return data;
 }
 

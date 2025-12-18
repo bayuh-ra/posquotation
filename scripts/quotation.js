@@ -42,7 +42,8 @@ function populatePackageTypes() {
     if (packageTypes && packageTypes.length > 0) {
         packageTypes.forEach(type => {
             const option = document.createElement('option');
-            const val = type.id || type.name || '';
+            // Use name instead of id
+            const val = type.name || '';
             option.value = val;
             option.textContent = type.name || type.title || val;
             if (type.description) option.dataset.inclusions = type.description;
@@ -58,35 +59,69 @@ function populatePackageTypes() {
         if (typeInclusions) typeInclusions.textContent = 'No package type data found. Check Supabase or table permissions.';
     }
 
-    packageTypeSelect.addEventListener('change', function () {
+    packageTypeSelect.addEventListener('change', async function () {
         const selectedVal = this.value;
-        const selected = packageTypes.find(t => String(t.id) === String(selectedVal) || t.name === selectedVal);
+        const selected = packageTypes.find(t => t.name === selectedVal);
+        
+        // Update inclusions text
         if (typeInclusions) {
             typeInclusions.textContent = selected ? (selected.description || selected.inclusions || '') : 'Inclusions for selected type will appear here.';
+        }
+        
+        // Load products for this package type
+        if (selectedVal) {
+            await loadProductsForPackageType(selectedVal);
         }
     });
 
     if (packageTypeSelect.value) packageTypeSelect.dispatchEvent(new Event('change'));
 }
 
-// Populate description dropdown with products
+// Load products associated with a package type
+async function loadProductsForPackageType(packageTypeName) {
+    const descriptionDropdown = document.getElementById('descriptionDropdown');
+    if (!descriptionDropdown) return;
+    
+    try {
+        // Fetch package items from Supabase
+        const packageItems = await getPackageItems(packageTypeName);
+        
+        console.log('Package items for', packageTypeName, ':', packageItems);
+        
+        descriptionDropdown.innerHTML = '<option value="" selected disabled>Select description</option>';
+        
+        if (packageItems && packageItems.length > 0) {
+            packageItems.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.product_name;
+                option.textContent = item.product_name;
+                
+                // Add product details if available
+                if (item.product) {
+                    option.dataset.description = item.product.description || '';
+                    option.dataset.price = item.product.base_price || 0;
+                }
+                
+                descriptionDropdown.appendChild(option);
+            });
+        } else {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'No products found for this package';
+            option.disabled = true;
+            descriptionDropdown.appendChild(option);
+        }
+    } catch (error) {
+        console.error('Error loading products for package:', error);
+        descriptionDropdown.innerHTML = '<option value="" selected disabled>Error loading products</option>';
+    }
+}
+
+// Populate description dropdown with products (initial load - will be replaced when package type is selected)
 function populateDescriptions() {
     const descriptionDropdown = document.getElementById('descriptionDropdown');
-    if (descriptionDropdown && products.length > 0) {
-        descriptionDropdown.innerHTML = '';
-        
-        const posProducts = products.filter(p => 
-            p.category && p.category.name === 'POS Software'
-        );
-        
-        posProducts.forEach(product => {
-            const option = document.createElement('option');
-            option.value = product.id;
-            option.textContent = product.name;
-            option.dataset.description = product.description || '';
-            option.dataset.price = product.base_price || 0;
-            descriptionDropdown.appendChild(option);
-        });
+    if (descriptionDropdown) {
+        descriptionDropdown.innerHTML = '<option value="" selected disabled>Select package type first</option>';
     }
 }
 
@@ -101,7 +136,8 @@ function populateUnits() {
         if (units && units.length > 0) {
             units.forEach(u => {
                 const opt = document.createElement('option');
-                opt.value = u.id || u.name || u.code || u;
+                // Use name instead of id
+                opt.value = u.name || u.code || u;
                 opt.textContent = u.name || u.label || opt.value;
                 sel.appendChild(opt);
             });
@@ -116,7 +152,7 @@ function populateUnits() {
 }
 
 // Initialize quotation with date and number
-function initializeQuotation() {
+async function initializeQuotation() {
     const today = new Date().toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
@@ -124,14 +160,25 @@ function initializeQuotation() {
     });
     document.getElementById('quote-date').textContent = today;
 
-    const quotationNumber = localStorage.getItem('currentQuotationNumber');
-    if (quotationNumber) {
-        document.getElementById('quote-number').textContent = quotationNumber;
-        console.log('Using quotation number from localStorage:', quotationNumber);
+    // Generate and display the next quotation number
+    const employeeName = localStorage.getItem('selectedEmployeeName');
+    if (employeeName) {
+        try {
+            const nextQuotationNo = await getNextQuotationNo(employeeName);
+            if (nextQuotationNo) {
+                document.getElementById('quote-number').textContent = nextQuotationNo;
+                // Store it for use when saving
+                localStorage.setItem('currentQuotationNumber', nextQuotationNo);
+                console.log('Pre-generated quotation number:', nextQuotationNo);
+            } else {
+                document.getElementById('quote-number').textContent = 'Error generating number';
+            }
+        } catch (error) {
+            console.error('Error getting quotation number:', error);
+            document.getElementById('quote-number').textContent = 'Error';
+        }
     } else {
-        const tempNum = `TEMP-${Date.now()}`;
-        document.getElementById('quote-number').textContent = tempNum;
-        console.warn('No quotation number in localStorage, using temporary:', tempNum);
+        document.getElementById('quote-number').textContent = 'No employee selected';
     }
 }
 
@@ -169,10 +216,17 @@ function calculateTotals() {
 // Save quotation to Supabase
 async function saveQuotation() {
     try {
-        const employeeId = localStorage.getItem('selectedEmployeeId');
+        // Changed from employeeId to employeeName
+        const employeeName = localStorage.getItem('selectedEmployeeName');
+        const quotationNo = localStorage.getItem('currentQuotationNumber');
         
-        if (!employeeId) {
+        if (!employeeName) {
             alert('Error: No employee selected. Please go back to home and select an employee.');
+            return;
+        }
+
+        if (!quotationNo) {
+            alert('Error: No quotation number generated. Please refresh the page.');
             return;
         }
 
@@ -189,16 +243,18 @@ async function saveQuotation() {
         const subtotalText = document.getElementById('subtotal-cell').textContent;
         const total = parseFloat(subtotalText.replace(/[₱,]/g, '')) || 0;
         
-        console.log('Saving quotation with employee_id:', employeeId);
+        console.log('Saving quotation with employee_name:', employeeName);
         
+        // Changed employee_id to employee_name and include quotation_no
         const payload = {
+            quotation_no: quotationNo,  // Include the pre-generated quotation number
             client_name: clientName,
             office_address: officeAddress,
             contact_person: contactPerson,
             contact_number: contactNumber,
             total: total,
             discount: 0,
-            employee_id: employeeId
+            employee_name: employeeName  // Changed this line
         };
 
         console.log('Quotation payload:', payload);
@@ -208,13 +264,10 @@ async function saveQuotation() {
         if (quotation) {
             console.log('Quotation saved successfully:', quotation);
             
-            if (quotation.quotation_no) {
-                document.getElementById('quote-number').textContent = quotation.quotation_no;
-                localStorage.setItem('currentQuotationNumber', quotation.quotation_no);
-                console.log('Auto-generated quotation number:', quotation.quotation_no);
-            }
+            alert(`Quotation saved successfully!\nQuotation No: ${quotation.quotation_no || quotationNo}`);
             
-            alert(`Quotation saved successfully!\nQuotation No: ${quotation.quotation_no || 'N/A'}`);
+            // Clear the stored quotation number so a new one is generated on next page load
+            localStorage.removeItem('currentQuotationNumber');
             
         } else {
             alert('Error: Failed to save quotation. No response from server.');
@@ -229,12 +282,11 @@ async function saveQuotation() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Page loaded, initializing...');
     
-    const employeeId = localStorage.getItem('selectedEmployeeId');
+    // Keep both for logging, but only employeeName is needed now
     const employeeName = localStorage.getItem('selectedEmployeeName');
     const quotationNo = localStorage.getItem('currentQuotationNumber');
     
     console.log('Session data:', {
-        employeeId,
         employeeName,
         quotationNo
     });
