@@ -164,7 +164,7 @@ async function getPackageItems(packageName) {
     .from('package_type_products')
     .select(`
       *,
-      product:products!package_type_products_product_name_fkey(name, base_price, description)
+      product:products!package_type_products_product_name_fkey(name, base_price, description, unit)
     `)
     .eq('package_type_name', packageName);
   

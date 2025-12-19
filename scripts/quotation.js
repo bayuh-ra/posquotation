@@ -180,14 +180,58 @@ async function loadProductsForPackageType(packageTypeName) {
                 option.value = item.product_name;
                 option.textContent = item.product_name;
                 
-                // Add product details if available
+                console.log('Processing item:', item.product_name);
+                console.log('Item product:', item.product);
+                console.log('Item product unit:', item.product ? item.product.unit : 'NO PRODUCT');
+                
+                // Use product data from the join
                 if (item.product) {
                     option.dataset.description = item.product.description || '';
                     option.dataset.price = item.product.base_price || 0;
+                    option.dataset.unit = item.product.unit || '';
+                    console.log('Set dataset.unit to:', option.dataset.unit);
                 }
                 
                 descriptionDropdown.appendChild(option);
             });
+            
+            // Remove existing change event listeners by replacing the element
+            const parent = descriptionDropdown.parentNode;
+            const newDropdown = descriptionDropdown.cloneNode(true);
+            parent.replaceChild(newDropdown, descriptionDropdown);
+            
+            // Add change event listener to the new dropdown
+            const dropdown = document.getElementById('descriptionDropdown');
+            if (dropdown) {
+                dropdown.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const row = this.closest('tr');
+                    
+                    console.log('=== DESCRIPTION DROPDOWN CHANGED ===');
+                    console.log('Selected:', selectedOption.value);
+                    console.log('Dataset unit:', selectedOption.dataset.unit);
+                    console.log('Dataset price:', selectedOption.dataset.price);
+                    
+                    // Set unit
+                    const unitDisplay = row.querySelector('.unit-display');
+                    console.log('Unit display element:', unitDisplay);
+                    if (unitDisplay && selectedOption.dataset.unit) {
+                        unitDisplay.value = selectedOption.dataset.unit;
+                        console.log('Set unit display to:', unitDisplay.value);
+                    } else {
+                        console.log('Could not set unit - display:', unitDisplay, 'unit data:', selectedOption.dataset.unit);
+                    }
+                    
+                    // Set price
+                    const priceInput = row.querySelector('.price-input');
+                    if (priceInput && selectedOption.dataset.price) {
+                        priceInput.value = selectedOption.dataset.price;
+                    }
+                    
+                    calculateRowTotal(row);
+                    calculateTotals();
+                });
+            }
         } else {
             const option = document.createElement('option');
             option.value = '';
@@ -195,10 +239,60 @@ async function loadProductsForPackageType(packageTypeName) {
             option.disabled = true;
             descriptionDropdown.appendChild(option);
         }
+        
+        // Also populate all existing product dropdowns in additional rows
+        await populateAllProductDropdowns(packageTypeName);
+        
     } catch (error) {
         console.error('Error loading products for package:', error);
         descriptionDropdown.innerHTML = '<option value="" selected disabled>Error loading products</option>';
     }
+}
+
+// New function to populate all product dropdowns when package type changes
+// Populate product dropdowns with ALL non-License products from database
+async function populateAllProductDropdowns(packageTypeName) {
+    const productDropdowns = document.querySelectorAll('.product-dropdown');
+    
+    // Fetch ALL products from database (not just package products)
+    const allProducts = await getProducts();
+    
+    console.log('populateAllProductDropdowns - found', productDropdowns.length, 'dropdowns');
+    console.log('All products from database:', allProducts);
+    
+    productDropdowns.forEach((dropdown, index) => {
+        dropdown.innerHTML = '<option value="" selected disabled>Select product</option>';
+        
+        if (allProducts && allProducts.length > 0) {
+            // Filter to only show non-License products
+            const filteredProducts = allProducts.filter(product => {
+                if (!product.unit) {
+                    console.log('Skipping product (no unit):', product.name);
+                    return false;
+                }
+                const isLicense = product.unit.toLowerCase() === 'license';
+                console.log('Product:', product.name, 'Unit:', product.unit, 'Is License?', isLicense);
+                return !isLicense; // Keep non-License products
+            });
+            
+            console.log('Dropdown', index, '- filtered products:', filteredProducts.length, 'out of', allProducts.length);
+            
+            filteredProducts.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.name;
+                option.textContent = product.name;
+                
+                // Set product data
+                option.dataset.unit = product.unit || '';
+                option.dataset.price = product.base_price || 0;
+                option.dataset.description = product.description || '';
+                
+                dropdown.appendChild(option);
+            });
+            
+            console.log('Dropdown', index, '- populated with', filteredProducts.length, 'options');
+        }
+    });
 }
 
 // Populate description dropdown with products (initial load - will be replaced when package type is selected)
@@ -271,32 +365,46 @@ async function initializeQuotation() {
 
 // Calculate totals
 function calculateTotals() {
-    const rows = document.querySelectorAll('tbody tr');
+    const rows = document.querySelectorAll('tbody tr:not(#delivery-row)');
     let subtotal = 0;
     
     rows.forEach(row => {
-        const qtyInput = row.querySelector('input[type="number"]');
+        const qtyInput = row.querySelector('.qty-input');
         const priceInput = row.querySelector('.price-input');
         const totalCell = row.querySelector('.total-cell');
         
         if (qtyInput && priceInput && totalCell) {
             const qty = parseFloat(qtyInput.value) || 0;
-            const priceText = priceInput.value.replace(/[₱,]/g, '').trim();
+            const price = parseFloat(priceInput.value) || 0;
+            const total = qty * price;
             
-            if (priceText.toUpperCase() === 'FREE') {
-                totalCell.textContent = 'FREE';
-            } else {
-                const price = parseFloat(priceText) || 0;
-                const total = qty * price;
-                totalCell.textContent = total > 0 ? `₱${total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '';
-                subtotal += total;
-            }
+            totalCell.textContent = total > 0 ? `₱${total.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '₱0.00';
+            subtotal += total;
         }
     });
     
+    // Add delivery row to subtotal
+    const deliveryRow = document.getElementById('delivery-row');
+    if (deliveryRow) {
+        const deliveryQty = deliveryRow.querySelector('.delivery-qty-input');
+        const deliveryPrice = deliveryRow.querySelector('.delivery-price-input');
+        
+        if (deliveryQty && deliveryPrice) {
+            const qty = parseFloat(deliveryQty.value) || 0;
+            const price = parseFloat(deliveryPrice.value) || 0;
+            subtotal += (qty * price);
+        }
+    }
+    
     const subtotalCell = document.getElementById('subtotal-cell');
     if (subtotalCell) {
-        subtotalCell.textContent = `₱${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        subtotalCell.textContent = `₱${subtotal.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
+    
+    // Also update discounted price (same as subtotal for now)
+    const discountedCell = document.getElementById('discounted-price-cell');
+    if (discountedCell) {
+        discountedCell.textContent = `₱${subtotal.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
 }
 
@@ -398,9 +506,115 @@ document.addEventListener('DOMContentLoaded', function() {
     loadData();
     initializeQuotation();
     
-    document.querySelectorAll('input[type="number"], .price-input').forEach(input => {
-        input.addEventListener('input', calculateTotals);
+    // Add event listeners to all existing rows
+    document.querySelectorAll('.product-row, #package-type-row').forEach(row => {
+        const qtyInput = row.querySelector('.qty-input');
+        const priceInput = row.querySelector('.price-input');
+        const productDropdown = row.querySelector('.product-dropdown');
+        
+        if (productDropdown) {
+            productDropdown.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const currentRow = this.closest('tr');
+                
+                console.log('Product selected:', selectedOption.value, 'Unit:', selectedOption.dataset.unit);
+                
+                // Set unit
+                const unitDisplay = currentRow.querySelector('.unit-display');
+                if (unitDisplay && selectedOption.dataset.unit) {
+                    unitDisplay.value = selectedOption.dataset.unit;
+                }
+                
+                // Set price
+                const priceInput = currentRow.querySelector('.price-input');
+                if (priceInput && selectedOption.dataset.price) {
+                    priceInput.value = selectedOption.dataset.price;
+                }
+                
+                calculateRowTotal(currentRow);
+                calculateTotals();
+            });
+        }
+        
+        if (qtyInput) {
+            qtyInput.addEventListener('input', function() {
+                calculateRowTotal(row);
+                calculateTotals();
+            });
+        }
+        
+        if (priceInput) {
+            priceInput.addEventListener('input', function() {
+                calculateRowTotal(row);
+                calculateTotals();
+            });
+        }
     });
+    
+    // Add listener to description dropdown
+    const descDropdown = document.getElementById('descriptionDropdown');
+    if (descDropdown) {
+        descDropdown.addEventListener('change', function() {
+            const row = this.closest('tr');
+            calculateRowTotal(row);
+            calculateTotals();
+        });
+    }
+    
+    // Add event listeners for delivery row
+    const deliveryQty = document.querySelector('.delivery-qty-input');
+    const deliveryPrice = document.querySelector('.delivery-price-input');
+    
+    if (deliveryQty) {
+        deliveryQty.addEventListener('input', function() {
+            calculateDeliveryTotal();
+            calculateTotals();
+        });
+    }
+    
+    if (deliveryPrice) {
+        deliveryPrice.addEventListener('input', function() {
+            calculateDeliveryTotal();
+            calculateTotals();
+        });
+    }
     
     calculateTotals();
 });
+
+// Calculate delivery row total
+function calculateDeliveryTotal() {
+    const deliveryRow = document.getElementById('delivery-row');
+    const qtyInput = deliveryRow.querySelector('.delivery-qty-input');
+    const priceInput = deliveryRow.querySelector('.delivery-price-input');
+    const totalCell = deliveryRow.querySelector('.delivery-total-cell');
+    
+    if (qtyInput && priceInput && totalCell) {
+        const qty = parseFloat(qtyInput.value) || 0;
+        const price = parseFloat(priceInput.value) || 0;
+        const total = qty * price;
+        
+        if (total === 0) {
+            totalCell.textContent = 'FREE';
+            totalCell.style.color = '#28a745';
+        } else {
+            totalCell.textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            totalCell.style.color = '#000';
+        }
+    }
+}
+
+// Calculate total for a single row
+function calculateRowTotal(row) {
+    const qtyInput = row.querySelector('.qty-input');
+    const priceInput = row.querySelector('.price-input');
+    const totalCell = row.querySelector('.total-cell');
+    
+    if (qtyInput && priceInput && totalCell) {
+        const qty = parseFloat(qtyInput.value) || 0;
+        const price = parseFloat(priceInput.value) || 0;
+        const total = qty * price;
+        
+        totalCell.textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+}
