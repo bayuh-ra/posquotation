@@ -133,7 +133,7 @@ table th {
     border: 1px solid #ccc;
 }
 
-table th:nth-child(1) { width: 90px; }
+table th:nth-child(1) { width: 95px; } /* Type column */
 table th:nth-child(2) { width: 40px; text-align: center; }
 table th:nth-child(3) { width: 50px; text-align: center; }
 table th:nth-child(5) { width: 80px; text-align: right; }
@@ -456,6 +456,31 @@ table tfoot td {
         display: none !important;
     }
     
+    /* Hide price inputs by default in print (only those without show-in-print class) */
+    .price-input:not(.show-in-print),
+    .delivery-price-input {
+        display: none !important;
+    }
+    
+    /* Show price inputs when they have show-in-print class */
+    .price-input.show-in-print {
+        display: inline-block !important;
+        border: none !important;
+        background: transparent !important;
+        color: #000 !important;
+        visibility: visible !important;
+        padding: 0 !important;
+    }
+    
+    /* Ensure unit displays are visible when printing */
+    .unit-display {
+        display: block !important;
+        visibility: visible !important;
+        border: none !important;
+        background: transparent !important;
+        text-align: center !important;
+    }
+    
     .page {
         page-break-after: always;
         box-shadow: none !important;
@@ -525,10 +550,16 @@ table tfoot td {
         color: transparent !important;
     }
     
-    /* Hide empty inputs */
-    input[value=""],
-    input:not([value]) {
+    /* Hide empty inputs except unit-display */
+    input[value=""]:not(.unit-display),
+    input:not([value]):not(.unit-display) {
         display: none !important;
+    }
+    
+    /* Make sure unit-display is always visible */
+    .unit-display {
+        display: inline-block !important;
+        visibility: visible !important;
     }
     
     /* Make sure filled values are visible */

@@ -1,3 +1,6 @@
+// original copy
+
+
 // scripts/quotation.js - LAP I.T. Solutions Quotation System
 
 // Global variables
@@ -5,117 +8,6 @@ let products = [];
 let categories = [];
 let units = [];
 let packageTypes = [];
-
-// Function to replace dropdown with wrapped text after selection
-function handleDropdownSelection(selectElement) {
-    console.log('handleDropdownSelection called for:', selectElement.id || selectElement.className);
-    
-    selectElement.addEventListener('change', function() {
-        console.log('Dropdown changed, value:', this.value);
-        
-        if (this.value) {
-            // Get selected option
-            const selectedOption = this.options[this.selectedIndex];
-            const selectedText = selectedOption.text;
-            const productDescription = selectedOption.dataset.description || '';
-            
-            console.log('Selected text:', selectedText);
-            console.log('Description:', productDescription);
-            
-            // Create a div to show the wrapped text
-            const textDiv = document.createElement('div');
-            textDiv.className = 'selected-dropdown-text';
-            
-            // Add product name
-            const nameDiv = document.createElement('div');
-            nameDiv.textContent = selectedText;
-            nameDiv.style.fontWeight = 'bold';
-            textDiv.appendChild(nameDiv);
-            
-            // Add product description if available
-            if (productDescription) {
-                // Split description by line breaks first
-                let descLines = productDescription.split('\n').filter(line => line.trim());
-                
-                // If no line breaks found, try splitting by common patterns
-                // Check if description looks like it has multiple items without line breaks
-                if (descLines.length === 1 && productDescription.length > 50) {
-                    // Try to intelligently split long descriptions
-                    // Look for patterns like: "Item1 Item2 Item3" or "Feature: description Feature: description"
-                    const singleLine = productDescription;
-                    
-                    // Check for common patterns and split accordingly
-                    // Pattern 1: Check if there are numbers like "15.6", "120GB" which usually indicate separate items
-                    if (/\d+(?:GB|TB|MB|"|'|GHz|MHz|inch)/.test(singleLine)) {
-                        // Split on common hardware specs patterns
-                        descLines = singleLine.split(/(?<=\s)(?=\d+(?:GB|TB|MB|"|'|GHz|MHz|inch|months|year|warranty))/).filter(line => line.trim());
-                    } else {
-                        // Keep as single line if no clear pattern
-                        descLines = [singleLine];
-                    }
-                }
-                
-                if (descLines.length > 0) {
-                    const listContainer = document.createElement('div');
-                    listContainer.style.cssText = `
-                        font-size: 9px;
-                        color: #666;
-                        margin-top: 6px;
-                        text-align: left;
-                    `;
-                    
-                    descLines.forEach(line => {
-                        const listItem = document.createElement('div');
-                        listItem.style.cssText = `
-                            margin-bottom: 2px;
-                            line-height: 1.4;
-                            text-align: left;
-                        `;
-                        // Add checkmark before each item
-                        listItem.innerHTML = '✓ ' + line.trim();
-                        listContainer.appendChild(listItem);
-                    });
-                    
-                    textDiv.appendChild(listContainer);
-                }
-            }
-            
-            textDiv.style.cssText = `
-                font-size: 10px;
-                line-height: 1.4;
-                word-wrap: break-word;
-                white-space: normal;
-                padding: 4px;
-                cursor: pointer;
-                max-width: 100%;
-                text-align: left;
-            `;
-            
-            // Store the select element for later (in case we need to change it)
-            textDiv.dataset.selectId = this.id || '';
-            
-            // Click to show dropdown again
-            textDiv.addEventListener('click', function() {
-                console.log('Text div clicked, showing dropdown again');
-                this.style.display = 'none';
-                selectElement.style.display = 'block';
-                selectElement.focus();
-            });
-            
-            // Remove any existing text div
-            const existingDiv = this.parentNode.querySelector('.selected-dropdown-text');
-            if (existingDiv) {
-                existingDiv.remove();
-            }
-            
-            // Hide the select and show the div
-            this.style.display = 'none';
-            this.parentNode.insertBefore(textDiv, this.nextSibling);
-            
-            console.log('Text div created and inserted');
-        }
-    });
-}
 
 // Load all data from Supabase
 async function loadData() {
@@ -137,6 +29,87 @@ async function loadData() {
     } catch (error) {
         console.error('Error loading data:', error);
     }
+}
+
+// Function to replace dropdown with wrapped text after selection
+function handleDropdownSelection(selectElement) {
+    selectElement.addEventListener('change', function() {
+        if (this.value) {
+            // Get selected option
+            const selectedOption = this.options[this.selectedIndex];
+            const selectedText = selectedOption.text;
+            const productDescription = selectedOption.dataset.description || '';
+            
+            // Create a div to show the wrapped text
+            const textDiv = document.createElement('div');
+            textDiv.className = 'selected-dropdown-text';
+            
+            // Add product name
+            const nameDiv = document.createElement('div');
+            nameDiv.textContent = selectedText;
+            nameDiv.style.fontWeight = 'bold';
+            textDiv.appendChild(nameDiv);
+            
+            // Add product description if available (only for descriptionDropdown)
+            if (this.id === 'descriptionDropdown' && productDescription) {
+                // Split description by line breaks or bullet points
+                const descLines = productDescription.split('\n').filter(line => line.trim());
+                
+                if (descLines.length > 0) {
+                    const listContainer = document.createElement('div');
+                    listContainer.style.cssText = `
+                        font-size: 9px;
+                        color: #666;
+                        margin-top: 6px;
+                        margin-left: 15px;
+                    `;
+                    
+                    descLines.forEach(line => {
+                        const listItem = document.createElement('div');
+                        listItem.style.cssText = `
+                            margin-bottom: 2px;
+                            line-height: 1.4;
+                        `;
+                        // Add checkmark before each item
+                        listItem.innerHTML = '✓ ' + line.trim();
+                        listContainer.appendChild(listItem);
+                    });
+                    
+                    textDiv.appendChild(listContainer);
+                }
+            }
+            
+            textDiv.style.cssText = `
+                font-size: 10px;
+                line-height: 1.4;
+                word-wrap: break-word;
+                white-space: normal;
+                padding: 4px;
+                cursor: pointer;
+                max-width: 100%;
+            `;
+            
+            // Store the select element for later (in case we need to change it)
+            textDiv.dataset.selectId = this.id;
+            
+            // Click to show dropdown again
+            textDiv.addEventListener('click', function() {
+                this.style.display = 'none';
+                selectElement.style.display = 'block';
+                selectElement.focus();
+            });
+            
+            // Remove any existing text div
+            const existingDiv = this.parentNode.querySelector('.selected-dropdown-text');
+            if (existingDiv) {
+                existingDiv.remove();
+            }
+            
+            // Hide the select and show the div
+            this.style.display = 'none';
+            this.parentNode.insertBefore(textDiv, this.nextSibling);
+        }
+    });
 }
 
 // Populate package type dropdown
@@ -186,9 +159,6 @@ function populatePackageTypes() {
     });
 
     if (packageTypeSelect.value) packageTypeSelect.dispatchEvent(new Event('change'));
-    
-    // Enable text wrapping after selection
-    handleDropdownSelection(packageTypeSelect);
     
     // Enable text wrapping after selection
     handleDropdownSelection(packageTypeSelect);
@@ -264,9 +234,6 @@ async function loadProductsForPackageType(packageTypeName) {
                     calculateRowTotal(row);
                     calculateTotals();
                 });
-                
-                // Enable text wrapping after selection
-                handleDropdownSelection(dropdown);
             }
         } else {
             const option = document.createElement('option');
@@ -278,11 +245,6 @@ async function loadProductsForPackageType(packageTypeName) {
         
         // Also populate all existing product dropdowns in additional rows
         await populateAllProductDropdowns(packageTypeName);
-        
-        // Apply handleDropdownSelection to all product dropdowns
-        document.querySelectorAll('.product-dropdown').forEach(dropdown => {
-            handleDropdownSelection(dropdown);
-        });
         
     } catch (error) {
         console.error('Error loading products for package:', error);
@@ -424,14 +386,16 @@ function calculateTotals() {
         }
     });
     
-    // Add delivery row to subtotal (qty is always 1, no input field)
+    // Add delivery row to subtotal
     const deliveryRow = document.getElementById('delivery-row');
     if (deliveryRow) {
+        const deliveryQty = deliveryRow.querySelector('.delivery-qty-input');
         const deliveryPrice = deliveryRow.querySelector('.delivery-price-input');
         
-        if (deliveryPrice) {
+        if (deliveryQty && deliveryPrice) {
+            const qty = parseFloat(deliveryQty.value) || 0;
             const price = parseFloat(deliveryPrice.value) || 0;
-            subtotal += price; // qty is always 1
+            subtotal += (qty * price);
         }
     }
     
@@ -513,7 +477,23 @@ async function saveQuotation() {
 }
 
 // For print: ensure the wrapped text shows instead of dropdown
-// For print: ensure the wrapped text shows instead of dropdown
+window.addEventListener('beforeprint', function() {
+    document.querySelectorAll('.selected-dropdown-text').forEach(function(div) {
+        div.style.display = 'block';
+    });
+    document.querySelectorAll('#packageType, #descriptionDropdown').forEach(function(select) {
+        if (select.nextElementSibling && select.nextElementSibling.classList.contains('selected-dropdown-text')) {
+            select.style.display = 'none';
+        }
+    });
+});
+
+// After print: restore dropdown display if needed
+window.addEventListener('afterprint', function() {
+    // Optionally restore dropdowns after printing
+});
+
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Page loaded, initializing...');
     
@@ -541,13 +521,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const currentRow = this.closest('tr');
                 
                 console.log('Product selected:', selectedOption.value, 'Unit:', selectedOption.dataset.unit);
-                console.log('Product description:', selectedOption.dataset.description);
-                
-                // Auto-set quantity to 1 when product is selected
-                const qtyInput = currentRow.querySelector('.qty-input');
-                if (qtyInput && parseFloat(qtyInput.value) === 0) {
-                    qtyInput.value = 1;
-                }
                 
                 // Set unit
                 const unitDisplay = currentRow.querySelector('.unit-display');
@@ -591,8 +564,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Add event listeners for delivery row (only price, qty is always 1)
+    // Add event listeners for delivery row
+    const deliveryQty = document.querySelector('.delivery-qty-input');
     const deliveryPrice = document.querySelector('.delivery-price-input');
+    
+    if (deliveryQty) {
+        deliveryQty.addEventListener('input', function() {
+            calculateDeliveryTotal();
+            calculateTotals();
+        });
+    }
     
     if (deliveryPrice) {
         deliveryPrice.addEventListener('input', function() {
@@ -607,12 +588,14 @@ document.addEventListener('DOMContentLoaded', function() {
 // Calculate delivery row total
 function calculateDeliveryTotal() {
     const deliveryRow = document.getElementById('delivery-row');
+    const qtyInput = deliveryRow.querySelector('.delivery-qty-input');
     const priceInput = deliveryRow.querySelector('.delivery-price-input');
     const totalCell = deliveryRow.querySelector('.delivery-total-cell');
     
-    if (priceInput && totalCell) {
+    if (qtyInput && priceInput && totalCell) {
+        const qty = parseFloat(qtyInput.value) || 0;
         const price = parseFloat(priceInput.value) || 0;
-        const total = price; // qty is always 1
+        const total = qty * price;
         
         if (total === 0) {
             totalCell.textContent = 'FREE';
@@ -623,57 +606,6 @@ function calculateDeliveryTotal() {
         }
     }
 }
-
-// For print: ensure the wrapped text shows instead of dropdown
-window.addEventListener('beforeprint', function() {
-    console.log('=== BEFORE PRINT EVENT ===');
-    
-    // Show wrapped text divs
-    document.querySelectorAll('.selected-dropdown-text').forEach(function(div) {
-        div.style.display = 'block';
-    });
-    
-    // Hide dropdowns that have wrapped text replacements
-    document.querySelectorAll('#packageType, #descriptionDropdown, .product-dropdown').forEach(function(select) {
-        if (select.nextElementSibling && select.nextElementSibling.classList.contains('selected-dropdown-text')) {
-            select.style.display = 'none';
-        }
-    });
-    
-    // Ensure unit-display inputs are visible
-    document.querySelectorAll('.unit-display').forEach(function(input) {
-        input.style.display = 'block';
-        input.style.visibility = 'visible';
-        input.style.border = 'none';
-        input.style.background = 'transparent';
-    });
-    
-    // Show price inputs only when qty > 1
-    document.querySelectorAll('.product-row, #package-type-row').forEach(function(row, index) {
-        const qtyInput = row.querySelector('.qty-input');
-        const priceInput = row.querySelector('.price-input');
-        
-        if (qtyInput && priceInput) {
-            const qty = parseFloat(qtyInput.value) || 0;
-            console.log('Row', index, '- Qty:', qty, 'Price input:', priceInput.value);
-            
-            if (qty > 1) {
-                priceInput.classList.add('show-in-print');
-                console.log('Row', index, '- Added show-in-print class');
-            } else {
-                priceInput.classList.remove('show-in-print');
-                console.log('Row', index, '- Removed show-in-print class (qty <= 1)');
-            }
-        }
-    });
-    
-    console.log('=== END BEFORE PRINT ===');
-});
-
-// After print: restore dropdown display if needed
-window.addEventListener('afterprint', function() {
-    // Optionally restore dropdowns after printing
-});
 
 // Calculate total for a single row
 function calculateRowTotal(row) {
