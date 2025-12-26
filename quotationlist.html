@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="backend/config.js"></script>
+    <script src="backend/supabase.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotations List - LAP I.T. Solutions</title>
+    <link rel="stylesheet" href="styles/quotations-list.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <img src="LOGO1.png" alt="LAP I.T. Solutions Logo" class="logo">
+                <div>
+                    <h1>Quotations List</h1>
+                    <p class="subtitle">View and manage all quotations</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <button onclick="goBack()" class="btn btn-secondary">
+                    ← Back to Home
+                </button>
+                <button onclick="createNewQuotation()" class="btn btn-primary">
+                    + New Quotation
+                </button>
+            </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by quotation number, client name, or employee..." onkeyup="filterQuotations()">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterByStatus('all')">All</button>
+                <button class="filter-btn" onclick="filterByStatus('pending')">Pending</button>
+                <button class="filter-btn" onclick="filterByStatus('approved')">Approved</button>
+                <button class="filter-btn" onclick="filterByStatus('rejected')">Rejected</button>
+            </div>
+        </div>
+
+        <!-- Quotations Table -->
+        <div class="table-container">
+            <table id="quotationsTable">
+                <thead>
+                    <tr>
+                        <th>Quotation No.</th>
+                        <th>Date</th>
+                        <th>Client</th>
+                        <th>Employee</th>
+                        <th>Package Type</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="quotationsTableBody">
+                    <!-- Rows will be populated by JavaScript -->
+                    <tr>
+                        <td colspan="8" class="loading">
+                            <div class="loader"></div>
+                            <p>Loading quotations...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" style="display: none;">
+            <div class="empty-state">
+                <div class="empty-icon">📄</div>
+                <h3>No Quotations Found</h3>
+                <p>Create your first quotation to get started</p>
+                <button onclick="createNewQuotation()" class="btn btn-primary">+ Create Quotation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span style="font-size: 24px;">⚠️</span>
+                <h2>Confirm Delete</h2>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this quotation?</p>
+                <p style="color: #666; font-size: 12px; margin-top: 10px;">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn-delete" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let quotations = [];
+        let quotationToDelete = null;
+        let currentFilter = 'all';
+
+        // Navigate back to home
+        function goBack() {
+            window.location.href = 'home.html';
+        }
+
+        // Create new quotation
+        function createNewQuotation() {
+            window.location.href = 'quotation.html';
+        }
+
+        // Load quotations from database
+        async function loadQuotations() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('quotations')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error loading quotations:', error);
+                    showError('Failed to load quotations');
+                    return;
+                }
+
+                quotations = data || [];
+                displayQuotations();
+            } catch (error) {
+                console.error('Error:', error);
+                showError('An error occurred while loading quotations');
+            }
+        }
+
+        // Display quotations in table
+        function displayQuotations() {
+            const tbody = document.getElementById('quotationsTableBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (quotations.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'flex';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            
+            let filteredQuotations = quotations;
+            
+            // Apply status filter
+            if (currentFilter !== 'all') {
+                filteredQuotations = quotations.filter(q => q.status === currentFilter);
+            }
+
+            // Apply search filter
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                filteredQuotations = filteredQuotations.filter(q => 
+                    (q.quotation_no && q.quotation_no.toLowerCase().includes(searchTerm)) ||
+                    (q.client_name && q.client_name.toLowerCase().includes(searchTerm)) ||
+                    (q.employee_name && q.employee_name.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            if (filteredQuotations.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #666;">No quotations found matching your criteria</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredQuotations.map(q => `
+                <tr>
+                    <td><strong>${q.quotation_no || 'N/A'}</strong></td>
+                    <td>${formatDate(q.quotation_date || q.created_at)}</td>
+                    <td>${q.client_name || '-'}</td>
+                    <td>${q.employee_name || '-'}</td>
+                    <td>${q.package_type || '-'}</td>
+                    <td class="amount">₱${formatAmount(q.total || 0)}</td>
+                    <td><span class="status-badge ${q.status || 'pending'}">${capitalizeFirst(q.status || 'pending')}</span></td>
+                    <td class="actions">
+                        <button onclick="viewQuotation('${q.id}')" class="btn-action btn-view" title="View">👁️</button>
+                        <button onclick="deleteQuotation('${q.id}')" class="btn-action btn-delete-icon" title="Delete">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Filter by status
+        function filterByStatus(status) {
+            currentFilter = status;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            displayQuotations();
+        }
+
+        // Filter quotations by search
+        function filterQuotations() {
+            displayQuotations();
+        }
+
+        // View quotation (read-only)
+        function viewQuotation(id) {
+            // Find the quotation in the array
+            const quotation = quotations.find(q => q.id === id);
+            
+            if (!quotation) {
+                alert('Quotation not found');
+                return;
+            }
+            
+            // Store quotation data in localStorage
+            localStorage.setItem('viewQuotationData', JSON.stringify(quotation));
+            localStorage.setItem('viewMode', 'true');
+            
+            // Redirect to quotation page
+            window.location.href = 'quotation.html';
+        }
+
+        // Delete quotation
+        function deleteQuotation(id) {
+            quotationToDelete = id;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            quotationToDelete = null;
+        }
+
+        // Confirm delete
+        async function confirmDelete() {
+            if (!quotationToDelete) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('quotations')
+                    .delete()
+                    .eq('id', quotationToDelete);
+
+                if (error) {
+                    console.error('Error deleting quotation:', error);
+                    alert('Failed to delete quotation');
+                    return;
+                }
+
+                // Reload quotations
+                await loadQuotations();
+                closeDeleteModal();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while deleting quotation');
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target === modal) {
+                closeDeleteModal();
+            }
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        // Format amount
+        function formatAmount(amount) {
+            return parseFloat(amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Capitalize first letter
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Show error message
+        function showError(message) {
+            const tbody = document.getElementById('quotationsTableBody');
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 40px; color: #dc3545;">⚠️ ${message}</td></tr>`;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuotations();
+        });
+    </script>
+</body>
+</html>

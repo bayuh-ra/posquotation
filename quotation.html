@@ -12,7 +12,294 @@
     
     <!-- External CSS -->
     <link rel="stylesheet" href="styles/quotation.css">
-
+    
+    <style>
+        /* Mobile responsive button styles */
+        .no-print {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .button-container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            flex: 1;
+            min-width: 120px;
+            max-width: 200px;
+            transition: all 0.3s;
+        }
+        
+        .button-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        @media (max-width: 768px) {
+            .button-container {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+            
+            .button-container button {
+                flex: 1;
+                min-width: 100px;
+                max-width: none;
+                font-size: 12px;
+                padding: 10px 15px;
+                white-space: nowrap;
+            }
+        }
+        
+        .add-product-btn {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .add-product-btn button {
+            background: #667eea;
+            color: white;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .add-product-btn button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Delete Confirmation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            animation: slideDown 0.3s;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            padding: 20px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .modal-body {
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .modal-footer button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c82333;
+        }
+        
+        /* PDF Preview Modal */
+        .pdf-preview-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s;
+        }
+        
+        .pdf-preview-content {
+            background-color: #fff;
+            margin: 2% auto;
+            padding: 0;
+            width: 95%;
+            height: 95%;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .pdf-preview-header {
+            padding: 15px 20px;
+            background-color: #1a5276;
+            color: white;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .pdf-preview-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .close-preview {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        .close-preview:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .pdf-preview-body {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .pdf-preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .pdf-preview-footer {
+            padding: 15px 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            border-top: 1px solid #dee2e6;
+            background: white;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .pdf-preview-footer button {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-close-preview {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-close-preview:hover {
+            background: #5a6268;
+        }
+        
+        .btn-download-pdf {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-download-pdf:hover {
+            background: #218838;
+        }
+    </style>
 </head>
 <body>
     <!-- No-print buttons at the top -->
@@ -42,7 +329,7 @@
                     <div class="company-contact" style="line-height: 1.4; font-family: 'Arial', sans-serif; font-size: 10px; font-weight: normal; color: #000;">
                         <div>Door B-3 Marcela Building 11-A, J.Palma Gil Street, Davao<br>City, Philippines, 8000</div>
                         <div>Landline: (082) 296-0363  Mobile: 0905-5565713</div>
-                        <div>Email: lapitsolutions09@gmail.com</div>
+                        <div>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f39f92839a87809c9f86879a9c9d809a9d909c81839c8192879697b3949e929a9fdd909c9e">[email&#160;protected]</a></div>
                     </div>
                 </div>
                 <div class="quotation-title">
@@ -145,7 +432,7 @@
                 </tbody>
                 <tfoot>
                     <tr style="background: #d6e6f0;">
-                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Subtotal</td>
+                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Subtotal (including delivery)</td>
                         <td id="subtotal-cell" style="text-align: right; font-weight: bold; padding: 10px;">₱0.00</td>
                         <td class="no-print"></td>
                     </tr>
@@ -248,32 +535,20 @@
         </div>
     </div>
 
-    <!-- PDF Preview Modal -->
-    <div id="pdfPreviewModal" class="pdf-preview-modal no-print">
-        <div class="pdf-preview-content">
-            <div class="pdf-preview-header">
-                <h2>📄 PDF Preview</h2>
-                <button class="close-preview" onclick="closePDFPreview()">&times;</button>
-            </div>
-            <div class="pdf-preview-body">
-                <iframe id="pdfPreviewFrame" class="pdf-preview-iframe"></iframe>
-            </div>
-            <div class="pdf-preview-footer">
-                <button class="btn-close-preview" onclick="closePDFPreview()">Close</button>
-                <button class="btn-download-pdf" onclick="downloadPDF()">💾 Download PDF</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Scripts - Load in correct order -->
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="backend/supabase.js"></script>
     <script src="scripts/quotation.js"></script>
     
     <script>
         function goBack() {
-            window.location.href = 'index.html';
+            // Check if we came from the quotations list
+            const referrer = document.referrer;
+            if (referrer.includes('quotationlist.html')) {
+                window.location.href = 'quotationlist.html';
+            } else {
+                window.location.href = 'home.html';
+            }
         }
         
         // Add product row function
@@ -444,69 +719,329 @@
             }
         }
         
-        // PDF Preview and Download Functions
-        let pdfBlob = null;
+        // ==========================================
+        // VIEW MODE FUNCTIONALITY
+        // ==========================================
         
-        function showPDFPreview() {
-            // Get client info
-            const clientName = document.querySelector('.client-info input[placeholder="Enter recipient name"]').value;
-            const quotationNo = document.getElementById('quote-number').textContent;
+        // Check if we're in view mode when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            const viewMode = localStorage.getItem('viewMode');
+            const quotationData = localStorage.getItem('viewQuotationData');
             
-            if (!clientName || clientName.trim() === '') {
-                alert('Please enter client name before generating PDF');
+            if (viewMode === 'true' && quotationData) {
+                try {
+                    const quotation = JSON.parse(quotationData);
+                    loadQuotationInViewMode(quotation);
+                    
+                    // Clear the flags
+                    localStorage.removeItem('viewMode');
+                    localStorage.removeItem('viewQuotationData');
+                } catch (error) {
+                    console.error('Error loading view mode:', error);
+                }
+            }
+        });
+        
+        // Function to load quotation in view-only mode
+        async function loadQuotationInViewMode(quotation) {
+            console.log('Loading quotation in view mode:', quotation);
+            console.log('Quotation ID:', quotation.id);
+            console.log('Package Type:', quotation.package_type);
+            console.log('All quotation fields:', Object.keys(quotation));
+            
+            // Populate client information
+            const clientInputs = document.querySelectorAll('.client-info input');
+            if (clientInputs[0]) clientInputs[0].value = quotation.client_name || '';
+            if (clientInputs[1]) clientInputs[1].value = quotation.office_address || '';
+            if (clientInputs[2]) clientInputs[2].value = quotation.contact_person || '';
+            if (clientInputs[3]) clientInputs[3].value = quotation.contact_number || '';
+            
+            // Populate quotation number and date
+            const quoteNumber = document.getElementById('quote-number');
+            const quoteDate = document.getElementById('quote-date');
+            if (quoteNumber) quoteNumber.textContent = quotation.quotation_no || '';
+            if (quoteDate) {
+                const date = quotation.quotation_date || quotation.created_at;
+                if (date) {
+                    const formatted = new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                    quoteDate.textContent = formatted;
+                }
+            }
+            
+            // LOAD QUOTATION ITEMS WITH PRODUCT DATA USING JOIN
+            try {
+                const { data: items, error } = await supabaseClient
+                    .from('quotation_items')
+                    .select(`
+                        *,
+                        product:products(
+                            id,
+                            name,
+                            description,
+                            unit,
+                            base_price
+                        )
+                    `)
+                    .eq('quotation_id', quotation.id)
+                    .order('row_order', { ascending: true });
+                
+                if (error) {
+                    console.error('Error loading quotation items:', error);
+                    alert('Error loading quotation items: ' + error.message);
+                } else if (items && items.length > 0) {
+                    console.log('Loaded items with products:', items);
+                    console.log('Quotation package_type:', quotation.package_type);
+                    
+                    // Pass package_type to populate function (with fallback)
+                    const packageType = quotation.package_type || 'Basic POS Package';
+                    console.log('Using package type:', packageType);
+                    populateQuotationItems(items, packageType);
+                } else {
+                    console.log('No items found for this quotation');
+                    alert('No items found for this quotation.');
+                }
+            } catch (error) {
+                console.error('Error fetching items:', error);
+                alert('Error fetching items: ' + error.message);
+            }
+            
+            // Make page read-only
+            makePageReadOnly();
+        }
+        
+        // Function to populate the quotation items in the table
+        function populateQuotationItems(items, packageType) {
+            const tbody = document.getElementById('quotation-tbody');
+            if (!tbody) {
+                console.error('Table body not found');
                 return;
             }
             
-            // Show loading message
-            const modal = document.getElementById('pdfPreviewModal');
-            const iframe = document.getElementById('pdfPreviewFrame');
-            modal.style.display = 'block';
-            iframe.srcdoc = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; font-family: Arial; color: #666;"><div style="text-align: center;"><div style="font-size: 48px; margin-bottom: 20px;">📄</div><div style="font-size: 18px; font-weight: bold;">Generating PDF Preview...</div><div style="margin-top: 10px;">Please wait</div></div></div>';
+            // Clear existing rows
+            tbody.innerHTML = '';
             
-            // Generate PDF
-            const element = document.getElementById('pdf-content');
-            const opt = {
-                margin: 0,
-                filename: `Quotation_${quotationNo}_${clientName}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
+            let isFirstProductRow = true; // Track if this is the first product (second row of package)
             
-            html2pdf().set(opt).from(element).toPdf().output('blob').then(function(blob) {
-                pdfBlob = blob;
-                const url = URL.createObjectURL(blob);
-                iframe.src = url;
-            }).catch(function(error) {
-                console.error('Error generating PDF:', error);
-                iframe.srcdoc = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; font-family: Arial; color: #dc3545;"><div style="text-align: center;"><div style="font-size: 48px; margin-bottom: 20px;">⚠️</div><div style="font-size: 18px; font-weight: bold;">Error Generating PDF</div><div style="margin-top: 10px;">Please try again</div></div></div>';
+            items.forEach((item, index) => {
+                console.log('Processing item', index, ':', item);
+                
+                if (item.row_type === 'package') {
+                    // Create package type row
+                    const packageRow = document.createElement('tr');
+                    packageRow.id = 'package-type-row';
+                    
+                    // Check if this is NEW structure (with product_id) or OLD structure (without)
+                    const hasProductData = item.product && item.product.name;
+                    
+                    // Get product data
+                    let productName, productDescription, unit;
+                    
+                    if (hasProductData) {
+                        // NEW structure: use data from product join
+                        productName = item.product.name;
+                        productDescription = item.product.description || '';
+                        unit = item.product.unit || '';
+                    } else {
+                        // OLD structure: use data saved in quotation_items
+                        productName = item.product_name || 'Unknown Product';
+                        productDescription = item.description || '';
+                        unit = item.unit || '';
+                    }
+                    
+                    // Format description: Product Name (bold) + bullet points
+                    let descriptionContent = '';
+                    if (productName || productDescription) {
+                        // Product name as first line (bold)
+                        descriptionContent = `<div style="font-weight: bold; font-size: 10px; padding: 5px 5px 2px 5px;">${productName}</div>`;
+                        
+                        // Add description with bullet points if available
+                        if (productDescription) {
+                            const lines = productDescription.split('\n').filter(line => line.trim());
+                            if (lines.length > 0) {
+                                descriptionContent += '<div style="font-size: 9px; color: #666; padding: 2px 5px;">';
+                                lines.forEach(line => {
+                                    descriptionContent += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
+                                });
+                                descriptionContent += '</div>';
+                            }
+                        }
+                    }
+                    
+                    packageRow.innerHTML = `
+                        <td rowspan="2" style="vertical-align: top; font-weight: bold; font-size: 10px; padding: 8px;">
+                            ${packageType || 'Package'}
+                        </td>
+                        <td><input type="number" value="${item.quantity}" disabled class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
+                        <td><input type="text" value="${unit}" disabled class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; width: 100%; text-align: center;"></td>
+                        <td>
+                            ${descriptionContent}
+                        </td>
+                        <td><input type="number" value="${item.price}" disabled class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
+                        <td class="total-cell" style="text-align: right; font-weight: bold;">₱${parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td class="no-print"></td>
+                    `;
+                    tbody.appendChild(packageRow);
+                    
+                } else if (item.row_type === 'product') {
+                    // Create product row
+                    const productRow = document.createElement('tr');
+                    productRow.className = 'product-row';
+                    
+                    // Check if this is NEW structure (with product_id) or OLD structure (without)
+                    const hasProductData = item.product && item.product.name;
+                    
+                    // Get product data
+                    let productName, productDescription, unit;
+                    
+                    if (hasProductData) {
+                        // NEW structure: use data from product join
+                        productName = item.product.name;
+                        productDescription = item.product.description || '';
+                        unit = item.product.unit || '';
+                    } else {
+                        // OLD structure: use data saved in quotation_items
+                        productName = item.product_name || 'Unknown Product';
+                        productDescription = item.description || '';
+                        unit = item.unit || '';
+                    }
+                    
+                    // Format description with bullet points
+                    let descriptionHTML = '';
+                    if (productDescription) {
+                        const lines = productDescription.split('\n').filter(line => line.trim());
+                        if (lines.length > 1) {
+                            descriptionHTML = '<div style="font-size: 9px; color: #666; margin-top: 4px;">';
+                            lines.forEach(line => {
+                                descriptionHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
+                            });
+                            descriptionHTML += '</div>';
+                        } else if (productDescription.trim()) {
+                            descriptionHTML = `<div style="font-size: 9px; color: #666; margin-top: 4px;">${productDescription}</div>`;
+                        }
+                    }
+                    
+                    // First product row doesn't have empty <td> because package type has rowspan="2"
+                    // All other product rows need empty <td> for the Type column
+                    const firstColumnHTML = isFirstProductRow ? '' : '<td></td>';
+                    // Remove indentation - all products should align the same
+                    isFirstProductRow = false;
+                    
+                    productRow.innerHTML = `
+                        ${firstColumnHTML}
+                        <td><input type="number" value="${item.quantity}" disabled class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
+                        <td><input type="text" value="${unit}" disabled class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; width: 100%; text-align: center;"></td>
+                        <td>
+                            <div style="font-weight: bold; font-size: 10px; padding: 5px;">${productName}</div>
+                            ${descriptionHTML}
+                        </td>
+                        <td><input type="number" value="${item.price}" disabled class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
+                        <td class="total-cell" style="text-align: right; font-weight: bold;">₱${parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td class="no-print"></td>
+                    `;
+                    tbody.appendChild(productRow);
+                    
+                } else if (item.row_type === 'delivery') {
+                    // Create delivery row (delivery has no product)
+                    const deliveryRow = document.createElement('tr');
+                    deliveryRow.id = 'delivery-row';
+                    const isFree = parseFloat(item.price) === 0 || parseFloat(item.total) === 0;
+                    
+                    deliveryRow.innerHTML = `
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <div style="font-style: italic;">
+                                <strong>Delivery, setup, installation, and training</strong><br>
+                                <strong>Guaranteed (1) year technical support via text, call and remote access</strong><br>
+                                Via text, call and remote access
+                            </div>
+                        </td>
+                        <td><input type="number" value="${item.price}" disabled class="delivery-price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
+                        <td class="delivery-total-cell" style="text-align: right; font-weight: bold; color: ${isFree ? '#28a745' : '#000'};">${isFree ? 'FREE' : '₱' + parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td class="no-print"></td>
+                    `;
+                    tbody.appendChild(deliveryRow);
+                }
+            });
+            
+            // Update totals
+            const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+            const subtotalCell = document.getElementById('subtotal-cell');
+            const discountedCell = document.getElementById('discounted-price-cell');
+            
+            if (subtotalCell) {
+                subtotalCell.textContent = '₱' + subtotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            if (discountedCell) {
+                discountedCell.textContent = '₱' + subtotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            
+            console.log('Finished populating', items.length, 'items. Subtotal:', subtotal);
+        }
+        
+        // Function to make entire page read-only
+        function makePageReadOnly() {
+            // Add visual indicator banner
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer) {
+                const viewBanner = document.createElement('div');
+                viewBanner.className = 'no-print';
+                viewBanner.style.cssText = 'background: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #856404; border-radius: 8px; font-size: 16px;';
+                viewBanner.innerHTML = '🔒 VIEW MODE - This quotation is read-only. You can only print or save as PDF.';
+                buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);
+            }
+            
+            // Update "Save Quotation" button
+            const buttons = document.querySelectorAll('.button-container button');
+            if (buttons[1]) { // Second button is "Save Quotation"
+                buttons[1].textContent = '🔒 View Mode (Read Only)';
+                buttons[1].style.background = '#6c757d';
+                buttons[1].style.cursor = 'not-allowed';
+                buttons[1].onclick = function(e) {
+                    e.preventDefault();
+                    alert('This quotation is in view-only mode. You cannot make changes.');
+                    return false;
+                };
+            }
+            
+            // Change "Back" button text to "Back to List"
+            if (buttons[0]) {
+                buttons[0].textContent = '← Back to List';
+            }
+            
+            // Disable all inputs and selects
+            const allInputs = document.querySelectorAll('input, select, textarea');
+            allInputs.forEach(input => {
+                input.disabled = true;
+                input.style.cursor = 'not-allowed';
+                input.style.opacity = '0.7';
+            });
+            
+            // Hide all delete buttons
+            const deleteButtons = document.querySelectorAll('button[onclick*="deleteRow"]');
+            deleteButtons.forEach(btn => {
+                btn.style.display = 'none';
+            });
+            
+            // Hide "Add Another Product" button
+            const addProductBtn = document.querySelector('.add-product-btn');
+            if (addProductBtn) {
+                addProductBtn.style.display = 'none';
+            }
+            
+            // Hide Action column header and cells
+            const actionHeaders = document.querySelectorAll('th.no-print');
+            actionHeaders.forEach(th => {
+                th.style.display = 'none';
+            });
+            
+            const actionCells = document.querySelectorAll('td.no-print');
+            actionCells.forEach(td => {
+                td.style.display = 'none';
             });
         }
         
-        function closePDFPreview() {
-            document.getElementById('pdfPreviewModal').style.display = 'none';
-            document.getElementById('pdfPreviewFrame').src = '';
-            pdfBlob = null;
-        }
-        
-        function downloadPDF() {
-            if (!pdfBlob) {
-                alert('PDF not ready. Please wait for preview to load.');
-                return;
-            }
-            
-            const clientName = document.querySelector('.client-info input[placeholder="Enter recipient name"]').value;
-            const quotationNo = document.getElementById('quote-number').textContent;
-            const filename = `Quotation_${quotationNo}_${clientName}.pdf`;
-            
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(pdfBlob);
-            link.download = filename;
-            link.click();
-            
-            // Close modal after download
-            setTimeout(closePDFPreview, 500);
-        }
     </script>
 
 </body>

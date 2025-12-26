@@ -448,9 +448,15 @@ function calculateTotals() {
 }
 
 // Save quotation to Supabase
+// Updated saveQuotation function - saves quotation AND its items
+// Replace your existing saveQuotation() function with this
+
+// Updated saveQuotation function - uses product_id instead of storing names/descriptions
+// Replace your existing saveQuotation() function in scripts/quotation.js with this
+
 async function saveQuotation() {
     try {
-        // Changed from employeeId to employeeName
+        // Get employee name
         const employeeName = localStorage.getItem('selectedEmployeeName');
         const quotationNo = localStorage.getItem('currentQuotationNumber');
         
@@ -464,6 +470,7 @@ async function saveQuotation() {
             return;
         }
 
+        // Get client information
         const clientName = document.querySelector('.client-info input[placeholder="Enter recipient name"]').value;
         const officeAddress = document.querySelector('.client-info input[placeholder="Enter office address"]').value;
         const contactPerson = document.querySelector('.client-info input[placeholder="Enter contact person"]').value;
@@ -474,38 +481,166 @@ async function saveQuotation() {
             return;
         }
         
+        // Get package type
+        const packageTypeSelect = document.getElementById('packageType');
+        const packageType = packageTypeSelect.options[packageTypeSelect.selectedIndex]?.text || '';
+        
+        // Get quotation date
+        const quotationDate = document.getElementById('quote-date').textContent;
+        
+        // Get total amount
         const subtotalText = document.getElementById('subtotal-cell').textContent;
         const total = parseFloat(subtotalText.replace(/[₱,]/g, '')) || 0;
         
         console.log('Saving quotation with employee_name:', employeeName);
+        console.log('Package type:', packageType);
         
-        // Changed employee_id to employee_name and include quotation_no
-        const payload = {
-            quotation_no: quotationNo,  // Include the pre-generated quotation number
+        // STEP 1: Save the main quotation
+        const quotationPayload = {
+            quotation_no: quotationNo,
+            quotation_date: quotationDate,
             client_name: clientName,
             office_address: officeAddress,
             contact_person: contactPerson,
             contact_number: contactNumber,
+            package_type: packageType,
             total: total,
             discount: 0,
-            employee_name: employeeName  // Changed this line
+            employee_name: employeeName,
+            status: 'pending'
         };
 
-        console.log('Quotation payload:', payload);
+        console.log('Quotation payload:', quotationPayload);
 
-        const quotation = await createQuotation(payload);
+        const quotation = await createQuotation(quotationPayload);
         
-        if (quotation) {
-            console.log('Quotation saved successfully:', quotation);
-            
-            alert(`Quotation saved successfully!\nQuotation No: ${quotation.quotation_no || quotationNo}`);
-            
-            // Clear the stored quotation number so a new one is generated on next page load
-            localStorage.removeItem('currentQuotationNumber');
-            
-        } else {
+        if (!quotation || !quotation.id) {
             alert('Error: Failed to save quotation. No response from server.');
+            return;
         }
+        
+        console.log('Quotation saved successfully:', quotation);
+        
+        // STEP 2: Collect all quotation items with product_id lookup
+        const items = [];
+        let rowOrder = 0;
+        
+        // Get package type row (first row)
+        const packageRow = document.getElementById('package-type-row');
+        if (packageRow) {
+            const packageQty = parseFloat(packageRow.querySelector('.qty-input')?.value) || 0;
+            const packagePrice = parseFloat(packageRow.querySelector('.price-input')?.value) || 0;
+            const packageTotal = parseFloat(packageRow.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
+            
+            // Get the selected product name from description dropdown
+            const packageDesc = document.getElementById('descriptionDropdown');
+            const packageProductName = packageDesc?.options[packageDesc.selectedIndex]?.value || '';
+            
+            // Look up product_id from product name
+            let packageProductId = null;
+            if (packageProductName) {
+                const { data: productData, error: productError } = await supabaseClient
+                    .from('products')
+                    .select('id')
+                    .eq('name', packageProductName)
+                    .single();
+                
+                if (!productError && productData) {
+                    packageProductId = productData.id;
+                }
+            }
+            
+            items.push({
+                quotation_id: quotation.id,
+                product_id: packageProductId,
+                row_type: 'package',
+                quantity: packageQty,
+                price: packagePrice,
+                total: packageTotal,
+                row_order: rowOrder++
+            });
+        }
+        
+        // Get all product rows
+        const productRows = document.querySelectorAll('.product-row');
+        for (const row of productRows) {
+            const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+            
+            // Only save rows that have a quantity > 0
+            if (qty > 0) {
+                const dropdown = row.querySelector('.product-dropdown');
+                const productName = dropdown?.options[dropdown.selectedIndex]?.value || '';
+                const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
+                const total = parseFloat(row.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
+                
+                // Look up product_id from product name
+                let productId = null;
+                if (productName) {
+                    const { data: productData, error: productError } = await supabaseClient
+                        .from('products')
+                        .select('id')
+                        .eq('name', productName)
+                        .single();
+                    
+                    if (!productError && productData) {
+                        productId = productData.id;
+                    }
+                }
+                
+                items.push({
+                    quotation_id: quotation.id,
+                    product_id: productId,
+                    row_type: 'product',
+                    quantity: qty,
+                    price: price,
+                    total: total,
+                    row_order: rowOrder++
+                });
+            }
+        }
+        
+        // Get delivery row (delivery is not a product, so product_id will be NULL)
+        const deliveryRow = document.getElementById('delivery-row');
+        if (deliveryRow) {
+            const deliveryPrice = parseFloat(deliveryRow.querySelector('.delivery-price-input')?.value) || 0;
+            const deliveryTotal = deliveryRow.querySelector('.delivery-total-cell')?.textContent || 'FREE';
+            const deliveryTotalNum = deliveryTotal === 'FREE' ? 0 : parseFloat(deliveryTotal.replace(/[₱,]/g, '')) || 0;
+            
+            items.push({
+                quotation_id: quotation.id,
+                product_id: null, // Delivery is not a product
+                row_type: 'delivery',
+                quantity: 1,
+                price: deliveryPrice,
+                total: deliveryTotalNum,
+                row_order: rowOrder++
+            });
+        }
+        
+        console.log('Items to save:', items);
+        
+        // STEP 3: Save all items to database
+        if (items.length > 0) {
+            const { data: savedItems, error: itemsError } = await supabaseClient
+                .from('quotation_items')
+                .insert(items)
+                .select();
+            
+            if (itemsError) {
+                console.error('Error saving quotation items:', itemsError);
+                alert('Quotation saved, but failed to save items: ' + itemsError.message);
+                return;
+            }
+            
+            console.log('Items saved successfully:', savedItems);
+        }
+        
+        // Success!
+        alert(`Quotation saved successfully!\n\nQuotation No: ${quotation.quotation_no || quotationNo}\nPackage Type: ${packageType}\nItems Saved: ${items.length}`);
+        
+        // Clear the stored quotation number
+        localStorage.removeItem('currentQuotationNumber');
+        
     } catch (error) {
         console.error('Error saving quotation:', error);
         alert('Error saving quotation: ' + (error.message || 'Unknown error'));

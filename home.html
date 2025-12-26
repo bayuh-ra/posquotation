@@ -1,3 +1,4 @@
+<!-- home.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -243,7 +244,7 @@
         </div>
 
         <!-- Action Cards -->
-        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <!-- Create Quotation Card -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover fade-in" style="animation-delay: 0.3s">
                 <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-6">
@@ -278,6 +279,44 @@
                     </ul>
                     <button id="quotationBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105">
                         Start New Quotation →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quotations List Card -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover fade-in" style="animation-delay: 0.35s">
+                <div class="bg-gradient-to-br from-green-600 to-teal-800 p-6">
+                    <div class="flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Quotations List</h3>
+                    <p class="text-green-100">View and manage all quotations</p>
+                </div>
+                <div class="p-6">
+                    <ul class="space-y-2 mb-6 text-gray-600">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Search & filter quotations
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            View, edit, and delete
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Track quotation status
+                        </li>
+                    </ul>
+                    <button id="quotationsListBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+                        View All Quotations →
                     </button>
                 </div>
             </div>
@@ -381,6 +420,7 @@
             
             // Buttons
             const quotationBtn = document.getElementById('quotationBtn');
+            const quotationsListBtn = document.getElementById('quotationsListBtn');
             const adminBtn = document.getElementById('adminBtn');
             const closeEmployeeBtn = document.getElementById('closeEmployeeBtn');
             const closePasswordBtn = document.getElementById('closePasswordBtn');
@@ -536,6 +576,10 @@
                 window.location.href = 'quotation.html';
             }
             
+            function goToQuotationsList() {
+                window.location.href = 'quotationlist.html';
+            }
+            
             function goToAdmin() {
                 const savedEmployeeName = localStorage.getItem('selectedEmployeeName');
                 if (!savedEmployeeName) {
@@ -589,6 +633,7 @@
             // EVENT LISTENERS
             // ==========================================
             quotationBtn.addEventListener('click', goToQuotation);
+            quotationsListBtn.addEventListener('click', goToQuotationsList);
             adminBtn.addEventListener('click', goToAdmin);
             closeEmployeeBtn.addEventListener('click', closeEmployeeModal);
             closePasswordBtn.addEventListener('click', closePasswordModal);
