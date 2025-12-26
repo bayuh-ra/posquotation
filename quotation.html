@@ -299,6 +299,50 @@
         .btn-download-pdf:hover {
             background: #218838;
         }
+        
+        /* Page number and footer styles */
+        .page-footer {
+            position: absolute;
+            bottom: 0.3in;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 0.5in;
+        }
+        
+        .page-number {
+            position: absolute;
+            left: 0.5in;
+            width: 30px;
+            height: 30px;
+            background-color: #1a5276;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .footer-link {
+            font-size: 10px;
+            color: #1a5276;
+            text-align: center;
+        }
+        
+        .footer-link a {
+            color: #1a5276;
+            text-decoration: none;
+        }
+        
+        /* Ensure page has relative positioning for absolute footer */
+        .page {
+            position: relative;
+            padding-bottom: 0.7in; /* Make room for footer */
+        }
     </style>
 </head>
 <body>
@@ -448,6 +492,14 @@
             <div class="no-print add-product-btn">
                 <button onclick="addProductRow()">+ Add Another Product</button>
             </div>
+            
+            <!-- Page Footer -->
+            <div class="page-footer">
+                <div class="page-number">1</div>
+                <div class="footer-link">
+                    <a href="https://www.facebook.com/lapsolutions/" target="_blank">https://www.facebook.com/lapsolutions/</a>
+                </div>
+            </div>
         </div>
         
         <!-- PAGE 2 -->
@@ -512,6 +564,14 @@
                         <div style="width: 200px; border-bottom: 1px solid #000; margin-bottom: 3px;"></div>
                         <div style="font-size: 10px; color: #000; text-align: center;">Signature over Printed Name</div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Page Footer -->
+            <div class="page-footer">
+                <div class="page-number">2</div>
+                <div class="footer-link">
+                    <a href="https://www.facebook.com/lapsolutions/" target="_blank">https://www.facebook.com/lapsolutions/</a>
                 </div>
             </div>
         </div>
