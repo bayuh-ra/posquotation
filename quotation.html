@@ -372,8 +372,8 @@
                 <div class="company-info" style="display: flex; align-items: flex-start; padding-top: 38px;">
                     <div class="company-contact" style="line-height: 1.4; font-family: 'Arial', sans-serif; font-size: 10px; font-weight: normal; color: #000;">
                         <div>Door B-3 Marcela Building 11-A, J.Palma Gil Street, Davao<br>City, Philippines, 8000</div>
-                        <div>Landline: (082) 296-0363  Mobile: 0905-5565713</div>
-                        <div>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f39f92839a87809c9f86879a9c9d809a9d909c81839c8192879697b3949e929a9fdd909c9e">[email&#160;protected]</a></div>
+                        <div>Landline: (082) 296-0363  Mobile: 0917-1147882</div>
+                        <div>Email: lapitsolutions09@gmail.com</div>
                     </div>
                 </div>
                 <div class="quotation-title">
@@ -510,9 +510,12 @@
                 <ol class="terms-list" style="margin-left: 25px; font-size: 11px; color: #000; font-weight: 500;">
                     <li style="margin-bottom: 3px;">Payment Terms:
                         <div style="margin-left: 40px; margin-top: 3px;">
-                            <strong>₱35,000</strong> down payment (non refundable) upon confirmation of order<br>
-                            <strong>₱35,000</strong> upon delivery and completion<br>
-                            <strong>₱26,000</strong> upon delivery and completion (30 days PDC)
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="30000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> down payment (non refundable) upon confirmation of order</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="40000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> upon delivery and completion</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="45000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> upon delivery and completion (30 days PDC)</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="39000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> full payment upon agreement</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="20000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> – upon agreement (non refundable)</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="25000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> – upon delivery & completion (cash/on date check)</div>
                         </div>
                         <div style="margin-left: 15px; margin-top: 5px;">
                             For check payments, please make check payable to <strong><em>LAP I.T. SOLUTIONS</em></strong>
@@ -596,11 +599,61 @@
     </div>
 
     <!-- Scripts - Load in correct order -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-    <script src="backend/supabase.js"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="backend/supabase.js"></script>
     <script src="scripts/quotation.js"></script>
     
     <script>
+        // Hide payment terms with zero values before printing
+        window.addEventListener('beforeprint', function() {
+            const paymentLines = document.querySelectorAll('.payment-term-line');
+            paymentLines.forEach(line => {
+                const input = line.querySelector('.payment-amount-input');
+                if (input && (parseFloat(input.value) === 0 || input.value === '')) {
+                    line.style.display = 'none';
+                }
+            });
+        });
+        
+        // Restore all payment terms after printing
+        window.addEventListener('afterprint', function() {
+            const paymentLines = document.querySelectorAll('.payment-term-line');
+            paymentLines.forEach(line => {
+                line.style.display = '';
+            });
+        });
+        
+        // Format payment amounts with comma separators
+        function formatPaymentAmount(input) {
+            let value = input.value.replace(/,/g, '');
+            if (value && !isNaN(value)) {
+                let num = parseFloat(value);
+                input.value = num.toLocaleString('en-US', { maximumFractionDigits: 2 });
+            }
+        }
+        
+        // Remove commas before editing
+        function removeCommas(input) {
+            input.value = input.value.replace(/,/g, '');
+        }
+        
+        // Initialize payment amount formatting
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentInputs = document.querySelectorAll('.payment-amount-input');
+            paymentInputs.forEach(input => {
+                // Format initial values
+                formatPaymentAmount(input);
+                
+                // Add event listeners
+                input.addEventListener('focus', function() {
+                    removeCommas(this);
+                });
+                
+                input.addEventListener('blur', function() {
+                    formatPaymentAmount(this);
+                });
+            });
+        });
+        
         function goBack() {
             // Check if we came from the quotations list
             const referrer = document.referrer;
@@ -1094,8 +1147,7 @@
             const actionHeaders = document.querySelectorAll('th.no-print');
             actionHeaders.forEach(th => {
                 th.style.display = 'none';
-            });
-            
+            });            
             const actionCells = document.querySelectorAll('td.no-print');
             actionCells.forEach(td => {
                 td.style.display = 'none';

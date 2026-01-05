@@ -310,6 +310,11 @@ table tfoot td {
     font-weight: bold;
 }
 
+.payment-term-line {
+    margin-bottom: 3px;
+    line-height: 1.4;
+}
+
 .terms-list {
     font-size: 10px;
     color: #000;
@@ -629,6 +634,15 @@ table tfoot td {
         padding: 0 !important;
         color: #000 !important;
         font-weight: 500 !important;
+    }
+    
+    /* Payment amount inputs should be bold in print - must come after general input styles */
+    input.payment-amount-input {
+        font-weight: bold !important;
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        color: #000 !important;
     }
     
     /* Hide placeholder text in print */
