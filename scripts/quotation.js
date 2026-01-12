@@ -440,10 +440,20 @@ function calculateTotals() {
         subtotalCell.textContent = `₱${subtotal.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
     
-    // Also update discounted price (same as subtotal for now)
+    // Get on-site delivery and discount values
+    const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
+    const discountInput = document.getElementById('discount-input');
+    
+    const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
+    const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
+    
+    // Calculate final total: subtotal + on-site delivery - discount
+    const finalTotal = subtotal + onsiteDelivery - discount;
+    
+    // Update discounted price (final total)
     const discountedCell = document.getElementById('discounted-price-cell');
     if (discountedCell) {
-        discountedCell.textContent = `₱${subtotal.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        discountedCell.textContent = `₱${finalTotal.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
 }
 
@@ -643,6 +653,203 @@ async function saveQuotation() {
         
     } catch (error) {
         console.error('Error saving quotation:', error);
+        alert('Error saving quotation: ' + (error.message || 'Unknown error'));
+    }
+}
+
+// Combined function: Save quotation AND print as PDF
+async function saveAndPrintPDF() {
+    try {
+        // Call saveQuotation but suppress the default alert
+        const employeeName = localStorage.getItem('selectedEmployeeName');
+        const quotationNo = localStorage.getItem('currentQuotationNumber');
+        
+        if (!employeeName) {
+            alert('Error: No employee selected. Please go back to home and select an employee.');
+            return;
+        }
+
+        if (!quotationNo) {
+            alert('Error: No quotation number generated. Please refresh the page.');
+            return;
+        }
+
+        // Get client information
+        const clientName = document.querySelector('.client-info input[placeholder="Enter recipient name"]').value;
+        const officeAddress = document.querySelector('.client-info input[placeholder="Enter office address"]').value;
+        const contactPerson = document.querySelector('.client-info input[placeholder="Enter contact person"]').value;
+        const contactNumber = document.querySelector('.client-info input[placeholder="Enter contact number"]').value;
+        
+        if (!clientName || !officeAddress || !contactPerson || !contactNumber) {
+            alert('Please fill in all client information fields.');
+            return;
+        }
+        
+        // Get package type
+        const packageTypeSelect = document.getElementById('packageType');
+        const packageType = packageTypeSelect.options[packageTypeSelect.selectedIndex]?.text || '';
+        
+        // Get quotation date
+        const quotationDate = document.getElementById('quote-date').textContent;
+        
+        // Get total amount
+        const subtotalText = document.getElementById('subtotal-cell').textContent;
+        const total = parseFloat(subtotalText.replace(/[₱,]/g, '')) || 0;
+        
+        console.log('Saving quotation with employee_name:', employeeName);
+        console.log('Package type:', packageType);
+        
+        // STEP 1: Save the main quotation
+        const quotationPayload = {
+            quotation_no: quotationNo,
+            quotation_date: quotationDate,
+            client_name: clientName,
+            office_address: officeAddress,
+            contact_person: contactPerson,
+            contact_number: contactNumber,
+            package_type: packageType,
+            total: total,
+            discount: 0,
+            employee_name: employeeName,
+            status: 'pending'
+        };
+
+        console.log('Quotation payload:', quotationPayload);
+
+        const quotation = await createQuotation(quotationPayload);
+        
+        if (!quotation || !quotation.id) {
+            alert('Error: Failed to save quotation. No response from server.');
+            return;
+        }
+        
+        console.log('Quotation saved successfully:', quotation);
+        
+        // STEP 2: Collect all quotation items with product_id lookup
+        const items = [];
+        let rowOrder = 0;
+        
+        // Get package type row (first row)
+        const packageRow = document.getElementById('package-type-row');
+        if (packageRow) {
+            const packageQty = parseFloat(packageRow.querySelector('.qty-input')?.value) || 0;
+            const packagePrice = parseFloat(packageRow.querySelector('.price-input')?.value) || 0;
+            const packageTotal = parseFloat(packageRow.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
+            
+            // Get the selected product name from description dropdown
+            const packageDesc = document.getElementById('descriptionDropdown');
+            const packageProductName = packageDesc?.options[packageDesc.selectedIndex]?.value || '';
+            
+            // Look up product_id from product name
+            let packageProductId = null;
+            if (packageProductName) {
+                const { data: productData, error: productError } = await supabaseClient
+                    .from('products')
+                    .select('id')
+                    .eq('name', packageProductName)
+                    .single();
+                
+                if (!productError && productData) {
+                    packageProductId = productData.id;
+                }
+            }
+            
+            items.push({
+                quotation_id: quotation.id,
+                product_id: packageProductId,
+                row_type: 'package',
+                quantity: packageQty,
+                price: packagePrice,
+                total: packageTotal,
+                row_order: rowOrder++
+            });
+        }
+        
+        // Get all product rows
+        const productRows = document.querySelectorAll('.product-row');
+        for (const row of productRows) {
+            const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+            
+            // Only save rows that have a quantity > 0
+            if (qty > 0) {
+                const dropdown = row.querySelector('.product-dropdown');
+                const productName = dropdown?.options[dropdown.selectedIndex]?.value || '';
+                const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
+                const total = parseFloat(row.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
+                
+                // Look up product_id from product name
+                let productId = null;
+                if (productName) {
+                    const { data: productData, error: productError } = await supabaseClient
+                        .from('products')
+                        .select('id')
+                        .eq('name', productName)
+                        .single();
+                    
+                    if (!productError && productData) {
+                        productId = productData.id;
+                    }
+                }
+                
+                items.push({
+                    quotation_id: quotation.id,
+                    product_id: productId,
+                    row_type: 'product',
+                    quantity: qty,
+                    price: price,
+                    total: total,
+                    row_order: rowOrder++
+                });
+            }
+        }
+        
+        // Get delivery row (delivery is not a product, so product_id will be NULL)
+        const deliveryRow = document.getElementById('delivery-row');
+        if (deliveryRow) {
+            const deliveryPrice = parseFloat(deliveryRow.querySelector('.delivery-price-input')?.value) || 0;
+            const deliveryTotal = deliveryRow.querySelector('.delivery-total-cell')?.textContent || 'FREE';
+            const deliveryTotalNum = deliveryTotal === 'FREE' ? 0 : parseFloat(deliveryTotal.replace(/[₱,]/g, '')) || 0;
+            
+            items.push({
+                quotation_id: quotation.id,
+                product_id: null, // Delivery is not a product
+                row_type: 'delivery',
+                quantity: 1,
+                price: deliveryPrice,
+                total: deliveryTotalNum,
+                row_order: rowOrder++
+            });
+        }
+        
+        console.log('Items to save:', items);
+        
+        // STEP 3: Save all items to database
+        if (items.length > 0) {
+            const { data: savedItems, error: itemsError } = await supabaseClient
+                .from('quotation_items')
+                .insert(items)
+                .select();
+            
+            if (itemsError) {
+                console.error('Error saving quotation items:', itemsError);
+                alert('Quotation saved, but failed to save items: ' + itemsError.message);
+                return;
+            }
+            
+            console.log('Items saved successfully:', savedItems);
+        }
+        
+        // Clear the stored quotation number
+        localStorage.removeItem('currentQuotationNumber');
+        
+        // Now trigger the print dialog
+        console.log('Quotation saved successfully. Opening print dialog...');
+        setTimeout(() => {
+            window.print();
+        }, 500);
+        
+    } catch (error) {
+        console.error('Error in saveAndPrintPDF:', error);
         alert('Error saving quotation: ' + (error.message || 'Unknown error'));
     }
 }

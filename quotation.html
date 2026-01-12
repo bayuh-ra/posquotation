@@ -355,7 +355,7 @@
             <button onclick="saveQuotation()" style="background: #1a5276; color: white;">
                 Save Quotation
             </button>
-            <button onclick="window.print()" style="background: #28a745; color: white;">
+            <button onclick="saveAndPrintPDF()" style="background: #28a745; color: white;">
                 Save as PDF
             </button>
         </div>
@@ -411,9 +411,23 @@
             
             <!-- Items Table -->
             <table>
+                <!-- Package Type Header Row -->
+                <thead>
+                    <tr style="background: #e8f4f8; border: 2px solid #1a5276;">
+                        <td colspan="7" style="padding: 15px; vertical-align: middle;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <label style="font-weight: bold; color: #1a5276; white-space: nowrap;">Select Package Type:</label>
+                                <select id="packageType" style="font-weight: bold; font-size: 11px; padding: 8px; border: 2px solid #1a5276; border-radius: 4px; cursor: pointer; flex: 1; min-width: 250px;">
+                                    <option value="" selected disabled>Select package type</option>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+                <!-- Column Headers -->
                 <thead>
                     <tr>
-                        <th>Type</th>
+                        <th>No. of Items</th>
                         <th>Qty.</th>
                         <th>Unit</th>
                         <th>Description</th>
@@ -425,11 +439,7 @@
                 <tbody id="quotation-tbody">
                     <!-- First Row: Package Type and Description -->
                     <tr id="package-type-row">
-                        <td rowspan="2" style="vertical-align: top; font-weight: bold;">
-                            <select id="packageType" style="font-weight: bold; font-size: 9px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; width: 100%;">
-                                <option value="" selected disabled>Select package type</option>
-                            </select>
-                        </td>
+                        <td id="total-items-cell" style="text-align: center; font-weight: bold; font-size: 12px;">0</td>
                         <td><input type="number" value="1" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                         <td><input type="text" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
                         <td>
@@ -445,6 +455,7 @@
                     
                     <!-- Second Row: First Product -->
                     <tr class="product-row">
+                        <td></td>
                         <td><input type="number" value="0" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                         <td><input type="text" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
                         <td>
@@ -480,6 +491,16 @@
                         <td id="subtotal-cell" style="text-align: right; font-weight: bold; padding: 10px;">₱0.00</td>
                         <td class="no-print"></td>
                     </tr>
+                    <tr style="background: #e8f4f8;">
+                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">On-site delivery setup & training (optional)</td>
+                        <td style="text-align: right; padding: 10px;"><input type="number" id="onsite-delivery-input" class="price-input" value="0" step="0.01" placeholder="0.00" style="width: 100px; font-size: 10px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+                        <td class="no-print"></td>
+                    </tr>
+                    <tr style="background: #e8f4f8;">
+                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Discount</td>
+                        <td style="text-align: right; padding: 10px;"><input type="number" id="discount-input" class="price-input" value="0" step="0.01" placeholder="0.00" style="width: 100px; font-size: 10px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+                        <td class="no-print"></td>
+                    </tr>
                     <tr style="background: #d6e6f0;">
                         <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Total Package Price</td>
                         <td id="discounted-price-cell" style="text-align: right; font-weight: bold; padding: 10px;">₱0.00</td>
@@ -510,12 +531,10 @@
                 <ol class="terms-list" style="margin-left: 25px; font-size: 11px; color: #000; font-weight: 500;">
                     <li style="margin-bottom: 3px;">Payment Terms:
                         <div style="margin-left: 40px; margin-top: 3px;">
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="30000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> down payment (non refundable) upon confirmation of order</div>
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="40000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> upon delivery and completion</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="30000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> downpayment (nonrefundable) upon confirmation of order</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="40000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> upon delivery and completion (cash/on date check)</div>
                             <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="45000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> upon delivery and completion (30 days PDC)</div>
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="39000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> full payment upon agreement</div>
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="20000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> – upon agreement (non refundable)</div>
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="25000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> – upon delivery & completion (cash/on date check)</div>
+                            
                         </div>
                         <div style="margin-left: 15px; margin-top: 5px;">
                             For check payments, please make check payable to <strong><em>LAP I.T. SOLUTIONS</em></strong>
@@ -652,6 +671,22 @@
                     formatPaymentAmount(this);
                 });
             });
+            
+            // Add event listeners for on-site delivery and discount inputs
+            const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
+            const discountInput = document.getElementById('discount-input');
+            
+            if (onsiteDeliveryInput) {
+                onsiteDeliveryInput.addEventListener('input', function() {
+                    calculateTotals();
+                });
+            }
+            
+            if (discountInput) {
+                discountInput.addEventListener('input', function() {
+                    calculateTotals();
+                });
+            }
         });
         
         function goBack() {
@@ -719,6 +754,7 @@
             if (rowToDelete) {
                 rowToDelete.remove();
                 calculateTotals();
+                updateTotalItemsCount();
                 closeDeleteModal();
             }
         }
@@ -806,6 +842,7 @@
                 qtyInput.addEventListener('input', function() {
                     calculateRowTotal(row);
                     calculateTotals();
+                    updateTotalItemsCount();
                 });
             }
             
@@ -829,6 +866,30 @@
                 const total = qty * price;
                 
                 totalCell.textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            
+            // Update total items count
+            updateTotalItemsCount();
+        }
+        
+        // Calculate total items count from all rows
+        function updateTotalItemsCount() {
+            const tbody = document.getElementById('quotation-tbody');
+            let totalItems = 0;
+            
+            // Get all product rows (excluding delivery row)
+            const productRows = tbody.querySelectorAll('tr:not(#delivery-row)');
+            productRows.forEach(row => {
+                const qtyInput = row.querySelector('.qty-input');
+                if (qtyInput) {
+                    totalItems += parseFloat(qtyInput.value) || 0;
+                }
+            });
+            
+            // Update the total items cell
+            const totalItemsCell = document.getElementById('total-items-cell');
+            if (totalItemsCell) {
+                totalItemsCell.textContent = totalItems;
             }
         }
         
@@ -981,9 +1042,7 @@
                     }
                     
                     packageRow.innerHTML = `
-                        <td rowspan="2" style="vertical-align: top; font-weight: bold; font-size: 10px; padding: 8px;">
-                            ${packageType || 'Package'}
-                        </td>
+                        <td id="total-items-cell" style="text-align: center; font-weight: bold; font-size: 12px;">0</td>
                         <td><input type="number" value="${item.quantity}" disabled class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
                         <td><input type="text" value="${unit}" disabled class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; width: 100%; text-align: center;"></td>
                         <td>
@@ -1089,6 +1148,9 @@
             if (discountedCell) {
                 discountedCell.textContent = '₱' + subtotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
+            
+            // Update total items count
+            updateTotalItemsCount();
             
             console.log('Finished populating', items.length, 'items. Subtotal:', subtotal);
         }
