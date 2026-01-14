@@ -117,6 +117,65 @@ function handleDropdownSelection(selectElement) {
     });
 }
 
+// Get frequently used products based on actual usage in quotations
+async function getFrequentlyUsedProducts() {
+    try {
+        // Query to get products used most frequently in quotations
+        // Join quotation_items with products and count occurrences
+        const { data, error } = await supabaseClient
+            .from('quotation_items')
+            .select(`
+                product_id,
+                product:products (
+                    id,
+                    name,
+                    description,
+                    unit,
+                    base_price
+                )
+            `)
+            .not('product_id', 'is', null); // Exclude delivery rows (which have null product_id)
+        
+        if (error) {
+            console.error('Error fetching product usage:', error);
+            return [];
+        }
+        
+        if (!data || data.length === 0) {
+            console.log('No product usage data found');
+            return [];
+        }
+        
+        // Count occurrences of each product
+        const productCount = {};
+        data.forEach(item => {
+            if (item.product && item.product.id) {
+                const productId = item.product.id;
+                if (!productCount[productId]) {
+                    productCount[productId] = {
+                        count: 0,
+                        product: item.product
+                    };
+                }
+                productCount[productId].count++;
+            }
+        });
+        
+        // Convert to array and sort by count (most used first)
+        const sortedProducts = Object.values(productCount)
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 10) // Get top 10 most used products
+            .map(item => item.product);
+        
+        console.log('Frequently used products (by usage):', sortedProducts);
+        return sortedProducts;
+        
+    } catch (error) {
+        console.error('Error in getFrequentlyUsedProducts:', error);
+        return [];
+    }
+}
+
 // Load all data from Supabase
 async function loadData() {
     try {
@@ -146,6 +205,13 @@ function populatePackageTypes() {
     if (!packageTypeSelect) return;
 
     packageTypeSelect.innerHTML = '<option value="" selected disabled>Select package type</option>';
+    
+    // Add "Customize" option at the top
+    const customizeOption = document.createElement('option');
+    customizeOption.value = 'CUSTOMIZE';
+    customizeOption.textContent = 'Customize';
+    customizeOption.dataset.inclusions = 'Build your own custom package by selecting individual products below.';
+    packageTypeSelect.appendChild(customizeOption);
 
     console.log('populatePackageTypes() - packageTypes length:', packageTypes ? packageTypes.length : 0);
     if (packageTypes && packageTypes.length > 0) console.table(packageTypes);
@@ -172,6 +238,26 @@ function populatePackageTypes() {
 
     packageTypeSelect.addEventListener('change', async function () {
         const selectedVal = this.value;
+        
+        // Check if "Customize" was selected
+        if (selectedVal === 'CUSTOMIZE') {
+            console.log('Customize option selected - clearing all fields');
+            
+            // Update inclusions text
+            if (typeInclusions) {
+                typeInclusions.textContent = 'Add your custom items below.';
+                typeInclusions.style.color = '#1976d2';
+                typeInclusions.style.fontStyle = 'italic';
+            }
+            
+            // Call the handleCustomizePackage function to clear everything
+            if (typeof handleCustomizePackage === 'function') {
+                handleCustomizePackage();
+            }
+            
+            return;
+        }
+        
         const selected = packageTypes.find(t => t.name === selectedVal);
         
         // Update inclusions text
@@ -189,15 +275,15 @@ function populatePackageTypes() {
     
     // Enable text wrapping after selection
     handleDropdownSelection(packageTypeSelect);
-    
-    // Enable text wrapping after selection
-    handleDropdownSelection(packageTypeSelect);
 }
 
 // Load products associated with a package type
 async function loadProductsForPackageType(packageTypeName) {
-    const descriptionDropdown = document.getElementById('descriptionDropdown');
-    if (!descriptionDropdown) return;
+    const tbody = document.getElementById('quotation-tbody');
+    const packageRow = document.getElementById('package-type-row');
+    const deliveryRow = document.getElementById('delivery-row');
+    
+    if (!tbody || !packageRow) return;
     
     try {
         // Fetch package items from Supabase
@@ -205,88 +291,147 @@ async function loadProductsForPackageType(packageTypeName) {
         
         console.log('Package items for', packageTypeName, ':', packageItems);
         
-        descriptionDropdown.innerHTML = '<option value="" selected disabled>Select description</option>';
-        
-        if (packageItems && packageItems.length > 0) {
-            packageItems.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.product_name;
-                option.textContent = item.product_name;
-                
-                console.log('Processing item:', item.product_name);
-                console.log('Item product:', item.product);
-                console.log('Item product unit:', item.product ? item.product.unit : 'NO PRODUCT');
-                
-                // Use product data from the join
-                if (item.product) {
-                    option.dataset.description = item.product.description || '';
-                    option.dataset.price = item.product.base_price || 0;
-                    option.dataset.unit = item.product.unit || '';
-                    console.log('Set dataset.unit to:', option.dataset.unit);
-                }
-                
-                descriptionDropdown.appendChild(option);
-            });
-            
-            // Remove existing change event listeners by replacing the element
-            const parent = descriptionDropdown.parentNode;
-            const newDropdown = descriptionDropdown.cloneNode(true);
-            parent.replaceChild(newDropdown, descriptionDropdown);
-            
-            // Add change event listener to the new dropdown
-            const dropdown = document.getElementById('descriptionDropdown');
-            if (dropdown) {
-                dropdown.addEventListener('change', function() {
-                    const selectedOption = this.options[this.selectedIndex];
-                    const row = this.closest('tr');
-                    
-                    console.log('=== DESCRIPTION DROPDOWN CHANGED ===');
-                    console.log('Selected:', selectedOption.value);
-                    console.log('Dataset unit:', selectedOption.dataset.unit);
-                    console.log('Dataset price:', selectedOption.dataset.price);
-                    
-                    // Set unit
-                    const unitDisplay = row.querySelector('.unit-display');
-                    console.log('Unit display element:', unitDisplay);
-                    if (unitDisplay && selectedOption.dataset.unit) {
-                        unitDisplay.value = selectedOption.dataset.unit;
-                        console.log('Set unit display to:', unitDisplay.value);
-                    } else {
-                        console.log('Could not set unit - display:', unitDisplay, 'unit data:', selectedOption.dataset.unit);
-                    }
-                    
-                    // Set price
-                    const priceInput = row.querySelector('.price-input');
-                    if (priceInput && selectedOption.dataset.price) {
-                        priceInput.value = selectedOption.dataset.price;
-                    }
-                    
-                    calculateRowTotal(row);
-                    calculateTotals();
-                });
-                
-                // Enable text wrapping after selection
-                handleDropdownSelection(dropdown);
-            }
-        } else {
-            const option = document.createElement('option');
-            option.value = '';
-            option.textContent = 'No products found for this package';
-            option.disabled = true;
-            descriptionDropdown.appendChild(option);
+        if (!packageItems || packageItems.length === 0) {
+            alert('No products found for this package type');
+            return;
         }
         
-        // Also populate all existing product dropdowns in additional rows
-        await populateAllProductDropdowns(packageTypeName);
+        // Clear all existing product rows (but keep package row and delivery row)
+        const existingProductRows = tbody.querySelectorAll('.product-row');
+        existingProductRows.forEach(row => row.remove());
         
-        // Apply handleDropdownSelection to all product dropdowns
-        document.querySelectorAll('.product-dropdown').forEach(dropdown => {
-            handleDropdownSelection(dropdown);
+        // Sort items: License first, Set second, then others
+        const sortedItems = packageItems.sort((a, b) => {
+            const aUnit = (a.product && a.product.unit ? a.product.unit.toLowerCase() : '');
+            const bUnit = (b.product && b.product.unit ? b.product.unit.toLowerCase() : '');
+            
+            const aIsLicense = aUnit === 'license';
+            const bIsLicense = bUnit === 'license';
+            const aIsSet = aUnit === 'set';
+            const bIsSet = bUnit === 'set';
+            
+            // License comes first
+            if (aIsLicense && !bIsLicense) return -1;
+            if (!aIsLicense && bIsLicense) return 1;
+            
+            // Set comes second (after License)
+            if (aIsSet && !bIsSet && !bIsLicense) return -1;
+            if (!aIsSet && bIsSet && !aIsLicense) return 1;
+            
+            // Everything else stays in original order
+            return 0;
         });
+        
+        console.log('Sorted items:', sortedItems);
+        
+        // Populate the first row (package-type-row) with the first product (License)
+        if (sortedItems.length > 0) {
+            const firstItem = sortedItems[0];
+            console.log('Populating first row with:', firstItem);
+            
+            // Update quantity
+            const qtyInput = packageRow.querySelector('.qty-input');
+            if (qtyInput) qtyInput.value = 1;
+            
+            // Update unit
+            const unitDisplay = packageRow.querySelector('.unit-display');
+            if (unitDisplay && firstItem.product) {
+                unitDisplay.value = firstItem.product.unit || '';
+                console.log('Set unit to:', firstItem.product.unit);
+            }
+            
+            // Update description - replace the placeholder div content
+            const descriptionDiv = document.getElementById('description-display');
+            
+            if (descriptionDiv) {
+                // Build description HTML with product name and checkmarks
+                let descriptionHTML = `<div style="font-weight: bold; font-size: 10px; margin-bottom: 4px;">${firstItem.product_name}</div>`;
+                if (firstItem.product && firstItem.product.description) {
+                    const descLines = firstItem.product.description.split('\n').filter(line => line.trim());
+                    if (descLines.length > 0) {
+                        descriptionHTML += '<div style="font-size: 9px; color: #666;">';
+                        descLines.forEach(line => {
+                            descriptionHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
+                        });
+                        descriptionHTML += '</div>';
+                    }
+                }
+                
+                // Replace the content of the description div
+                descriptionDiv.innerHTML = descriptionHTML;
+                descriptionDiv.style.color = '#000';
+                descriptionDiv.style.fontStyle = 'normal';
+            }
+            
+            // Update price
+            const priceInput = packageRow.querySelector('.price-input');
+            if (priceInput && firstItem.product) {
+                priceInput.value = firstItem.product.base_price || 0;
+                console.log('Set price to:', firstItem.product.base_price);
+            }
+            
+            // Calculate total for first row
+            calculateRowTotal(packageRow);
+        }
+        
+        // Create rows for remaining products (starting from index 1)
+        let previousRow = packageRow; // Start from the package-type-row
+        
+        for (let i = 1; i < sortedItems.length; i++) {
+            const item = sortedItems[i];
+            console.log('Creating row', i, 'for item:', item.product_name);
+            
+            // Create new product row
+            const newRow = document.createElement('tr');
+            newRow.className = 'product-row';
+            
+            // Build description HTML with checkmarks
+            let descriptionHTML = `<div style="font-weight: bold; font-size: 10px; padding: 5px;">${item.product_name}</div>`;
+            if (item.product && item.product.description) {
+                const descLines = item.product.description.split('\n').filter(line => line.trim());
+                if (descLines.length > 0) {
+                    descriptionHTML += '<div style="font-size: 9px; color: #666; margin-top: 4px;">';
+                    descLines.forEach(line => {
+                        descriptionHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
+                    });
+                    descriptionHTML += '</div>';
+                }
+            }
+            
+            newRow.innerHTML = `
+                <td></td>
+                <td><input type="number" value="1" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+                <td><input type="text" value="${item.product && item.product.unit ? item.product.unit : ''}" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
+                <td>${descriptionHTML}</td>
+                <td><input type="number" value="${item.product && item.product.base_price ? item.product.base_price : 0}" step="0.01" class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+                <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
+                <td class="no-print"><button onclick="deleteRow(this)" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button></td>
+            `;
+            
+            // Insert right after the previous row
+            previousRow.insertAdjacentElement('afterend', newRow);
+            
+            // Update previousRow for next iteration
+            previousRow = newRow;
+            
+            // Add event listeners to the new row
+            setupRowEventListeners(newRow);
+            
+            // Calculate total for this row
+            calculateRowTotal(newRow);
+            
+            console.log('Row', i, 'inserted successfully');
+        }
+        
+        // Recalculate all totals
+        calculateTotals();
+        updateTotalItemsCount();
+        
+        console.log('Finished loading', sortedItems.length, 'products');
         
     } catch (error) {
         console.error('Error loading products for package:', error);
-        descriptionDropdown.innerHTML = '<option value="" selected disabled>Error loading products</option>';
+        alert('Error loading products: ' + error.message);
     }
 }
 
@@ -454,6 +599,32 @@ function calculateTotals() {
     const discountedCell = document.getElementById('discounted-price-cell');
     if (discountedCell) {
         discountedCell.textContent = `₱${finalTotal.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
+    
+    // Update total items count
+    updateTotalItemsCount();
+}
+
+// Update total items count in the "No. of Items" cell
+function updateTotalItemsCount() {
+    const tbody = document.getElementById('quotation-tbody');
+    if (!tbody) return;
+    
+    let totalItems = 0;
+    
+    // Get all rows except delivery row
+    const rows = tbody.querySelectorAll('tr:not(#delivery-row)');
+    rows.forEach(row => {
+        const qtyInput = row.querySelector('.qty-input');
+        if (qtyInput) {
+            totalItems += parseFloat(qtyInput.value) || 0;
+        }
+    });
+    
+    // Update the total items cell (if it exists)
+    const totalItemsCell = document.getElementById('total-items-cell');
+    if (totalItemsCell) {
+        totalItemsCell.textContent = totalItems;
     }
 }
 

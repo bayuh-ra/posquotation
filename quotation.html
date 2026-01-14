@@ -355,7 +355,7 @@
             <button onclick="saveQuotation()" style="background: #1a5276; color: white;">
                 Save Quotation
             </button>
-            <button onclick="saveAndPrintPDF()" style="background: #28a745; color: white;">
+            <button onclick="window.print()" style="background: #28a745; color: white;">
                 Save as PDF
             </button>
         </div>
@@ -373,7 +373,7 @@
                     <div class="company-contact" style="line-height: 1.4; font-family: 'Arial', sans-serif; font-size: 10px; font-weight: normal; color: #000;">
                         <div>Door B-3 Marcela Building 11-A, J.Palma Gil Street, Davao<br>City, Philippines, 8000</div>
                         <div>Landline: (082) 296-0363  Mobile: 0917-1147882</div>
-                        <div>Email: lapitsolutions09@gmail.com</div>
+                        <div>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="442825342d30372b2831302d2b2a37747d042329252d286a272b29">[email&#160;protected]</a></div>
                     </div>
                 </div>
                 <div class="quotation-title">
@@ -417,8 +417,9 @@
                         <td colspan="7" style="padding: 15px; vertical-align: middle;">
                             <div style="display: flex; align-items: center; gap: 15px;">
                                 <label style="font-weight: bold; color: #1a5276; white-space: nowrap;">Select Package Type:</label>
-                                <select id="packageType" style="font-weight: bold; font-size: 11px; padding: 8px; border: 2px solid #1a5276; border-radius: 4px; cursor: pointer; flex: 1; min-width: 250px;">
+                                <select id="packageType" onchange="handlePackageTypeChange(this)" style="font-weight: bold; font-size: 11px; padding: 8px; border: 2px solid #1a5276; border-radius: 4px; cursor: pointer; flex: 1; min-width: 250px;">
                                     <option value="" selected disabled>Select package type</option>
+                                    <option value="CUSTOMIZE" style="color: #dc3545; font-weight: bold;">🎨 CUSTOMIZE (Clear All)</option>
                                 </select>
                             </div>
                         </td>
@@ -437,32 +438,25 @@
                     </tr>
                 </thead>
                 <tbody id="quotation-tbody">
-                    <!-- First Row: Package Type and Description -->
+                    <!-- First Row: Package Type Product (License) -->
                     <tr id="package-type-row">
                         <td id="total-items-cell" style="text-align: center; font-weight: bold; font-size: 12px;">0</td>
                         <td><input type="number" value="1" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                         <td><input type="text" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
                         <td>
-                            <select id="descriptionDropdown" style="font-weight: bold; font-size: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; width: 100%;">
-                                <option value="" selected disabled>Select description</option>
-                            </select>
-                            <div id="typeInclusions" style="margin-top: 6px; font-size: 10px; color: #1976d2; font-style: italic;">Inclusions for selected type will appear here.</div>
+                            <div id="description-display" style="font-weight: bold; font-size: 10px; color: #666; font-style: italic;">Select a package type above to load products</div>
                         </td>
                         <td><input type="number" class="price-input" value="" step="0.01" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                         <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
                         <td class="no-print"></td>
                     </tr>
                     
-                    <!-- Second Row: First Product -->
+                    <!-- Second Row: First Additional Product -->
                     <tr class="product-row">
                         <td></td>
                         <td><input type="number" value="0" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                         <td><input type="text" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
-                        <td>
-                            <select class="product-dropdown" style="font-weight: bold; font-size: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; width: 100%;">
-                                <option value="" selected disabled>Select product</option>
-                            </select>
-                        </td>
+                        <td style="font-size: 10px; color: #999; font-style: italic;">Product will appear here when package is selected</td>
                         <td><input type="number" class="price-input" value="" step="0.01" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                         <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
                         <td class="no-print"><button onclick="deleteRow(this)" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button></td>
@@ -489,16 +483,6 @@
                     <tr style="background: #d6e6f0;">
                         <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Subtotal (including delivery)</td>
                         <td id="subtotal-cell" style="text-align: right; font-weight: bold; padding: 10px;">₱0.00</td>
-                        <td class="no-print"></td>
-                    </tr>
-                    <tr style="background: #e8f4f8;">
-                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">On-site delivery setup & training (optional)</td>
-                        <td style="text-align: right; padding: 10px;"><input type="number" id="onsite-delivery-input" class="price-input" value="0" step="0.01" placeholder="0.00" style="width: 100px; font-size: 10px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                        <td class="no-print"></td>
-                    </tr>
-                    <tr style="background: #e8f4f8;">
-                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Discount</td>
-                        <td style="text-align: right; padding: 10px;"><input type="number" id="discount-input" class="price-input" value="0" step="0.01" placeholder="0.00" style="width: 100px; font-size: 10px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                         <td class="no-print"></td>
                     </tr>
                     <tr style="background: #d6e6f0;">
@@ -531,10 +515,12 @@
                 <ol class="terms-list" style="margin-left: 25px; font-size: 11px; color: #000; font-weight: 500;">
                     <li style="margin-bottom: 3px;">Payment Terms:
                         <div style="margin-left: 40px; margin-top: 3px;">
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="30000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> downpayment (nonrefundable) upon confirmation of order</div>
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="40000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> upon delivery and completion (cash/on date check)</div>
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="45000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: center; font-weight: bold;"></strong> upon delivery and completion (30 days PDC)</div>
-                            
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="30000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> down payment (non refundable) upon confirmation of order</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="40000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> upon delivery and completion</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="45000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> upon delivery and completion (30 days PDC)</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="39000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> full payment upon agreement</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="20000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> – upon agreement (non refundable)</div>
+                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="25000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> – upon delivery & completion (cash/on date check)</div>
                         </div>
                         <div style="margin-left: 15px; margin-top: 5px;">
                             For check payments, please make check payable to <strong><em>LAP I.T. SOLUTIONS</em></strong>
@@ -672,19 +658,34 @@
                 });
             });
             
-            // Add event listeners for on-site delivery and discount inputs
-            const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
-            const discountInput = document.getElementById('discount-input');
+            // Add "Customize" option to package type dropdown
+            setTimeout(function() {
+                const packageTypeSelect = document.getElementById('packageType');
+                if (packageTypeSelect && packageTypeSelect.options.length > 1) {
+                    // Add separator
+                    const separator = document.createElement('option');
+                    separator.disabled = true;
+                    separator.textContent = '──────────────────';
+                    packageTypeSelect.appendChild(separator);
+                    
+                    // Add Customize option
+                    const customizeOption = document.createElement('option');
+                    customizeOption.value = 'CUSTOMIZE';
+                    customizeOption.textContent = '✨ Customize (Start Fresh)';
+                    customizeOption.style.fontWeight = 'bold';
+                    customizeOption.style.color = '#667eea';
+                    packageTypeSelect.appendChild(customizeOption);
+                }
+            }, 1000);
             
-            if (onsiteDeliveryInput) {
-                onsiteDeliveryInput.addEventListener('input', function() {
-                    calculateTotals();
-                });
-            }
-            
-            if (discountInput) {
-                discountInput.addEventListener('input', function() {
-                    calculateTotals();
+            // Add event listener for package type selection
+            const packageTypeSelect = document.getElementById('packageType');
+            if (packageTypeSelect) {
+                const originalChangeHandler = packageTypeSelect.onchange;
+                packageTypeSelect.addEventListener('change', function() {
+                    if (this.value === 'CUSTOMIZE') {
+                        handleCustomizePackage();
+                    }
                 });
             }
         });
@@ -712,9 +713,7 @@
                 <td><input type="number" value="0" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                 <td><input type="text" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
                 <td>
-                    <select class="product-dropdown" style="font-weight: bold; font-size: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; width: 100%;">
-                        <option value="" selected disabled>Select product</option>
-                    </select>
+                    <div class="searchable-dropdown-container" style="position: relative; padding: 5px;"></div>
                 </td>
                 <td><input type="number" class="price-input" value="" step="0.01" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                 <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
@@ -724,17 +723,179 @@
             // Insert before the delivery row
             tbody.insertBefore(newRow, deliveryRow);
             
-            // Populate the new product dropdown with current package's products (excluding License)
-            await populateNewProductDropdown(newRow.querySelector('.product-dropdown'), true);
+            // Create searchable dropdown
+            const container = newRow.querySelector('.searchable-dropdown-container');
+            
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = '🔍 Type to search products...';
+            searchInput.autocomplete = 'off';
+            searchInput.style.cssText = `
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 11px;
+                box-sizing: border-box;
+            `;
+            
+            const dropdownList = document.createElement('div');
+            dropdownList.style.cssText = `
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 5px;
+                right: 5px;
+                max-height: 300px;
+                overflow-y: auto;
+                background: white;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 1000;
+                margin-top: 2px;
+            `;
+            
+            // Fetch products
+            const allProducts = await getProducts();
+            const frequentlyUsed = await getFrequentlyUsedProducts();
+            let allProductsList = [];
+            
+            if (allProducts && allProducts.length > 0) {
+                // Add frequently used
+                if (frequentlyUsed && frequentlyUsed.length > 0) {
+                    const freqHeader = document.createElement('div');
+                    freqHeader.textContent = '⭐ FREQUENTLY USED';
+                    freqHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+                    dropdownList.appendChild(freqHeader);
+                    
+                    frequentlyUsed.forEach(product => {
+                        const item = createDropdownItem(product, true);
+                        dropdownList.appendChild(item);
+                        allProductsList.push({ element: item, name: product.name.toLowerCase() });
+                    });
+                    
+                    const separator = document.createElement('div');
+                    separator.style.cssText = 'padding: 4px; background: #f0f0f0; border-bottom: 1px solid #ddd;';
+                    dropdownList.appendChild(separator);
+                    
+                    const allHeader = document.createElement('div');
+                    allHeader.textContent = '📦 ALL PRODUCTS';
+                    allHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+                    dropdownList.appendChild(allHeader);
+                }
+                
+                // Add all products
+                allProducts.forEach(product => {
+                    const item = createDropdownItem(product, false);
+                    dropdownList.appendChild(item);
+                    allProductsList.push({ element: item, name: product.name.toLowerCase() });
+                });
+            }
+            
+            function createDropdownItem(product, isFrequent) {
+                const item = document.createElement('div');
+                item.textContent = (isFrequent ? '⭐ ' : '') + product.name;
+                item.style.cssText = 'padding: 8px; cursor: pointer; font-size: 11px; border-bottom: 1px solid #f0f0f0;';
+                item.dataset.name = product.name;
+                item.dataset.unit = product.unit || '';
+                item.dataset.price = product.base_price || 0;
+                
+                item.addEventListener('mouseenter', function() {
+                    this.style.background = '#e3f2fd';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.background = 'white';
+                });
+                item.addEventListener('click', function() {
+                    selectProduct(this.dataset);
+                });
+                
+                return item;
+            }
+            
+            function selectProduct(productData) {
+                searchInput.value = '';
+                dropdownList.style.display = 'none';
+                
+                // Set quantity to 1
+                const qtyInput = newRow.querySelector('.qty-input');
+                if (qtyInput) qtyInput.value = 1;
+                
+                // Set unit
+                const unitDisplay = newRow.querySelector('.unit-display');
+                if (unitDisplay) unitDisplay.value = productData.unit;
+                
+                // Set price
+                const priceInput = newRow.querySelector('.price-input');
+                if (priceInput) priceInput.value = productData.price;
+                
+                // Show product name and description
+                const displayDiv = document.createElement('div');
+                displayDiv.className = 'selected-product-display';
+                displayDiv.style.cssText = 'margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e0e0e0;';
+                
+                // Find the full product data to get description
+                const fullProduct = allProducts.find(p => p.name === productData.name);
+                
+                // Build display HTML
+                let displayHTML = `<div style="font-weight: bold; font-size: 11px; color: #000; margin-bottom: 4px;">${productData.name}</div>`;
+                
+                if (fullProduct && fullProduct.description) {
+                    const descLines = fullProduct.description.split('\n').filter(line => line.trim());
+                    if (descLines.length > 0) {
+                        displayHTML += '<div style="font-size: 9px; color: #666;">';
+                        descLines.forEach(line => {
+                            displayHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
+                        });
+                        displayHTML += '</div>';
+                    }
+                }
+                
+                displayDiv.innerHTML = displayHTML;
+                
+                // Remove existing display if any
+                const existingDisplay = container.querySelector('.selected-product-display');
+                if (existingDisplay) existingDisplay.remove();
+                
+                container.appendChild(displayDiv);
+                
+                calculateRowTotal(newRow);
+                calculateTotals();
+                updateTotalItemsCount();
+            }
+            
+            // Show dropdown on focus
+            searchInput.addEventListener('focus', function() {
+                dropdownList.style.display = 'block';
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                dropdownList.style.display = 'block';
+                
+                if (searchTerm === '') {
+                    allProductsList.forEach(item => item.element.style.display = 'block');
+                } else {
+                    allProductsList.forEach(item => {
+                        item.element.style.display = item.name.includes(searchTerm) ? 'block' : 'none';
+                    });
+                }
+            });
+            
+            // Hide dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!container.contains(e.target)) {
+                    dropdownList.style.display = 'none';
+                }
+            });
+            
+            container.appendChild(searchInput);
+            container.appendChild(dropdownList);
             
             // Add event listeners
             setupRowEventListeners(newRow);
-            
-            // Enable text wrapping after selection for the new product dropdown
-            const newDropdown = newRow.querySelector('.product-dropdown');
-            if (newDropdown && typeof handleDropdownSelection === 'function') {
-                handleDropdownSelection(newDropdown);
-            }
         }
         
         // Delete row function
@@ -754,7 +915,6 @@
             if (rowToDelete) {
                 rowToDelete.remove();
                 calculateTotals();
-                updateTotalItemsCount();
                 closeDeleteModal();
             }
         }
@@ -842,7 +1002,6 @@
                 qtyInput.addEventListener('input', function() {
                     calculateRowTotal(row);
                     calculateTotals();
-                    updateTotalItemsCount();
                 });
             }
             
@@ -867,30 +1026,311 @@
                 
                 totalCell.textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
-            
-            // Update total items count
-            updateTotalItemsCount();
         }
         
-        // Calculate total items count from all rows
-        function updateTotalItemsCount() {
-            const tbody = document.getElementById('quotation-tbody');
-            let totalItems = 0;
-            
-            // Get all product rows (excluding delivery row)
-            const productRows = tbody.querySelectorAll('tr:not(#delivery-row)');
-            productRows.forEach(row => {
-                const qtyInput = row.querySelector('.qty-input');
-                if (qtyInput) {
-                    totalItems += parseFloat(qtyInput.value) || 0;
-                }
-            });
-            
-            // Update the total items cell
-            const totalItemsCell = document.getElementById('total-items-cell');
-            if (totalItemsCell) {
-                totalItemsCell.textContent = totalItems;
+        // Handle package type change - intercept CUSTOMIZE option
+        function handlePackageTypeChange(select) {
+            if (select.value === 'CUSTOMIZE') {
+                // Call the customize function
+                handleCustomizePackage();
+                
+                // Keep the dropdown at CUSTOMIZE option
+                // Don't reset to placeholder
+                return;
             }
+            
+            // For other package types, let the external script handle it
+            // This will be handled by quotation.js
+        }
+        
+        // Handle Customize package type - clears all fields
+        // Handle Customize package type - shows searchable dropdown with all products
+        async function handleCustomizePackage() {
+            console.log('=== CUSTOMIZE PACKAGE SELECTED ===');
+            
+            // Clear all existing product rows except the first one
+            const tbody = document.getElementById('quotation-tbody');
+            const productRows = tbody.querySelectorAll('.product-row');
+            productRows.forEach(row => row.remove());
+            console.log('Cleared product rows');
+            
+            // Update the first row to show a searchable product dropdown
+            const packageTypeRow = document.getElementById('package-type-row');
+            if (packageTypeRow) {
+                // Reset inputs
+                const qtyInput = packageTypeRow.querySelector('.qty-input');
+                const unitDisplay = packageTypeRow.querySelector('.unit-display');
+                const priceInput = packageTypeRow.querySelector('.price-input');
+                const totalCell = packageTypeRow.querySelector('.total-cell');
+                
+                if (qtyInput) qtyInput.value = 0;
+                if (unitDisplay) unitDisplay.value = '';
+                if (priceInput) priceInput.value = '';
+                if (totalCell) totalCell.textContent = '₱0.00';
+                console.log('Reset inputs');
+                
+                // Create searchable dropdown in description cell
+                const descriptionDiv = document.getElementById('description-display');
+                console.log('Description div found:', descriptionDiv);
+                
+                if (descriptionDiv) {
+                    console.log('Fetching products...');
+                    
+                    try {
+                        // Fetch all products and frequently used products
+                        const allProducts = await getProducts();
+                        console.log('All products loaded:', allProducts ? allProducts.length : 0);
+                        
+                        const frequentlyUsed = await getFrequentlyUsedProducts();
+                        console.log('Frequently used loaded:', frequentlyUsed ? frequentlyUsed.length : 0);
+                        
+                        // Create a custom searchable dropdown
+                        const container = document.createElement('div');
+                        container.style.cssText = 'position: relative; padding: 5px;';
+                        
+                        // Create input with dropdown functionality
+                        const searchInput = document.createElement('input');
+                        searchInput.type = 'text';
+                        searchInput.placeholder = '🔍 Type to search products...';
+                        searchInput.autocomplete = 'off';
+                        searchInput.style.cssText = `
+                            width: 100%;
+                            padding: 8px;
+                            border: 1px solid #ccc;
+                            border-radius: 4px;
+                            font-size: 11px;
+                            box-sizing: border-box;
+                        `;
+                        
+                        // Create dropdown list
+                        const dropdownList = document.createElement('div');
+                        dropdownList.style.cssText = `
+                            display: none;
+                            position: absolute;
+                            top: 100%;
+                            left: 5px;
+                            right: 5px;
+                            max-height: 300px;
+                            overflow-y: auto;
+                            background: white;
+                            border: 1px solid #ccc;
+                            border-radius: 4px;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                            z-index: 1000;
+                            margin-top: 2px;
+                        `;
+                        
+                        // Store all products for filtering
+                        let allProductsList = [];
+                        
+                        if (allProducts && allProducts.length > 0) {
+                            // Add frequently used products first
+                            if (frequentlyUsed && frequentlyUsed.length > 0) {
+                                const freqHeader = document.createElement('div');
+                                freqHeader.textContent = '⭐ FREQUENTLY USED';
+                                freqHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+                                dropdownList.appendChild(freqHeader);
+                                
+                                frequentlyUsed.forEach(product => {
+                                    const item = document.createElement('div');
+                                    item.textContent = '⭐ ' + product.name;
+                                    item.style.cssText = 'padding: 8px; cursor: pointer; font-size: 11px; border-bottom: 1px solid #f0f0f0;';
+                                    item.dataset.name = product.name;
+                                    item.dataset.unit = product.unit || '';
+                                    item.dataset.price = product.base_price || 0;
+                                    item.dataset.frequent = 'true';
+                                    
+                                    item.addEventListener('mouseenter', function() {
+                                        this.style.background = '#e3f2fd';
+                                    });
+                                    item.addEventListener('mouseleave', function() {
+                                        this.style.background = 'white';
+                                    });
+                                    item.addEventListener('click', function() {
+                                        selectProduct(this.dataset);
+                                    });
+                                    
+                                    dropdownList.appendChild(item);
+                                    allProductsList.push({ element: item, name: product.name.toLowerCase() });
+                                });
+                                
+                                const separator = document.createElement('div');
+                                separator.style.cssText = 'padding: 4px; background: #f0f0f0; border-bottom: 1px solid #ddd;';
+                                dropdownList.appendChild(separator);
+                                
+                                const allHeader = document.createElement('div');
+                                allHeader.textContent = '📦 ALL PRODUCTS';
+                                allHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+                                dropdownList.appendChild(allHeader);
+                            }
+                            
+                            // Add all products
+                            allProducts.forEach(product => {
+                                const item = document.createElement('div');
+                                item.textContent = product.name;
+                                item.style.cssText = 'padding: 8px; cursor: pointer; font-size: 11px; border-bottom: 1px solid #f0f0f0;';
+                                item.dataset.name = product.name;
+                                item.dataset.unit = product.unit || '';
+                                item.dataset.price = product.base_price || 0;
+                                
+                                item.addEventListener('mouseenter', function() {
+                                    this.style.background = '#e3f2fd';
+                                });
+                                item.addEventListener('mouseleave', function() {
+                                    this.style.background = 'white';
+                                });
+                                item.addEventListener('click', function() {
+                                    selectProduct(this.dataset);
+                                });
+                                
+                                dropdownList.appendChild(item);
+                                allProductsList.push({ element: item, name: product.name.toLowerCase() });
+                            });
+                            
+                            console.log('Added', allProductsList.length, 'products to dropdown');
+                        } else {
+                            console.error('No products found!');
+                            const noProducts = document.createElement('div');
+                            noProducts.textContent = 'No products available';
+                            noProducts.style.cssText = 'padding: 8px; color: #999; font-size: 11px;';
+                            dropdownList.appendChild(noProducts);
+                        }
+                        
+                        // Function to select a product
+                        function selectProduct(productData) {
+                            searchInput.value = '';
+                            dropdownList.style.display = 'none';
+                            
+                            // Get the row
+                            const row = packageTypeRow;
+                            
+                            // Set quantity to 1
+                            const qtyInput = row.querySelector('.qty-input');
+                            if (qtyInput) qtyInput.value = 1;
+                            
+                            // Set unit
+                            const unitDisplay = row.querySelector('.unit-display');
+                            if (unitDisplay) unitDisplay.value = productData.unit;
+                            
+                            // Set price
+                            const priceInput = row.querySelector('.price-input');
+                            if (priceInput) priceInput.value = productData.price;
+                            
+                            // Update the displayed product name and description
+                            const displayDiv = container.querySelector('.selected-product-display');
+                            if (!displayDiv) {
+                                // Create display div if it doesn't exist
+                                const newDisplayDiv = document.createElement('div');
+                                newDisplayDiv.className = 'selected-product-display';
+                                newDisplayDiv.style.cssText = 'margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e0e0e0;';
+                                container.appendChild(newDisplayDiv);
+                            }
+                            
+                            // Find the full product data to get description
+                            const fullProduct = allProducts.find(p => p.name === productData.name);
+                            
+                            // Build display HTML
+                            let displayHTML = `<div style="font-weight: bold; font-size: 11px; color: #000; margin-bottom: 4px;">${productData.name}</div>`;
+                            
+                            if (fullProduct && fullProduct.description) {
+                                const descLines = fullProduct.description.split('\n').filter(line => line.trim());
+                                if (descLines.length > 0) {
+                                    displayHTML += '<div style="font-size: 9px; color: #666;">';
+                                    descLines.forEach(line => {
+                                        displayHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
+                                    });
+                                    displayHTML += '</div>';
+                                }
+                            }
+                            
+                            const finalDisplayDiv = container.querySelector('.selected-product-display') || 
+                                                   (() => {
+                                                       const div = document.createElement('div');
+                                                       div.className = 'selected-product-display';
+                                                       div.style.cssText = 'margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e0e0e0;';
+                                                       container.appendChild(div);
+                                                       return div;
+                                                   })();
+                            
+                            finalDisplayDiv.innerHTML = displayHTML;
+                            
+                            calculateRowTotal(row);
+                            calculateTotals();
+                            updateTotalItemsCount();
+                        }
+                        
+                        // Show dropdown when clicking input
+                        searchInput.addEventListener('focus', function() {
+                            dropdownList.style.display = 'block';
+                        });
+                        
+                        // Search functionality
+                        searchInput.addEventListener('input', function() {
+                            const searchTerm = this.value.toLowerCase();
+                            dropdownList.style.display = 'block';
+                            
+                            if (searchTerm === '') {
+                                // Show all
+                                allProductsList.forEach(item => {
+                                    item.element.style.display = 'block';
+                                });
+                            } else {
+                                // Filter
+                                allProductsList.forEach(item => {
+                                    if (item.name.includes(searchTerm)) {
+                                        item.element.style.display = 'block';
+                                    } else {
+                                        item.element.style.display = 'none';
+                                    }
+                                });
+                            }
+                        });
+                        
+                        // Hide dropdown when clicking outside
+                        document.addEventListener('click', function(e) {
+                            if (!container.contains(e.target)) {
+                                dropdownList.style.display = 'none';
+                            }
+                        });
+                        
+                        // Append to container
+                        container.appendChild(searchInput);
+                        container.appendChild(dropdownList);
+                        
+                        // Replace description div content
+                        descriptionDiv.innerHTML = '';
+                        descriptionDiv.appendChild(container);
+                        
+                        console.log('Searchable dropdown added to DOM');
+                    } catch (error) {
+                        console.error('Error loading products:', error);
+                        descriptionDiv.innerHTML = '<div style="color: #dc3545; padding: 10px; font-size: 11px;">Error loading products</div>';
+                    }
+                }
+            }
+            
+            // Clear delivery
+            const deliveryPriceInput = document.querySelector('.delivery-price-input');
+            const deliveryTotalCell = document.querySelector('.delivery-total-cell');
+            if (deliveryPriceInput) deliveryPriceInput.value = 0;
+            if (deliveryTotalCell) {
+                deliveryTotalCell.textContent = 'FREE';
+                deliveryTotalCell.style.color = '#28a745';
+            }
+            
+            // Clear on-site delivery and discount
+            const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
+            const discountInput = document.getElementById('discount-input');
+            if (onsiteDeliveryInput) onsiteDeliveryInput.value = 0;
+            if (discountInput) discountInput.value = 0;
+            
+            // Recalculate totals
+            if (typeof calculateTotals === 'function') {
+                calculateTotals();
+            }
+            updateTotalItemsCount();
+            
+            console.log('=== CUSTOMIZE PACKAGE COMPLETE ===');
         }
         
         // ==========================================
@@ -1042,7 +1482,9 @@
                     }
                     
                     packageRow.innerHTML = `
-                        <td id="total-items-cell" style="text-align: center; font-weight: bold; font-size: 12px;">0</td>
+                        <td rowspan="2" style="vertical-align: top; font-weight: bold; font-size: 10px; padding: 8px;">
+                            ${packageType || 'Package'}
+                        </td>
                         <td><input type="number" value="${item.quantity}" disabled class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
                         <td><input type="text" value="${unit}" disabled class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; width: 100%; text-align: center;"></td>
                         <td>
@@ -1148,9 +1590,6 @@
             if (discountedCell) {
                 discountedCell.textContent = '₱' + subtotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
-            
-            // Update total items count
-            updateTotalItemsCount();
             
             console.log('Finished populating', items.length, 'items. Subtotal:', subtotal);
         }
