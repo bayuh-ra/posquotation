@@ -373,7 +373,7 @@
                     <div class="company-contact" style="line-height: 1.4; font-family: 'Arial', sans-serif; font-size: 10px; font-weight: normal; color: #000;">
                         <div>Door B-3 Marcela Building 11-A, J.Palma Gil Street, Davao<br>City, Philippines, 8000</div>
                         <div>Landline: (082) 296-0363  Mobile: 0917-1147882</div>
-                        <div>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="442825342d30372b2831302d2b2a37747d042329252d286a272b29">[email&#160;protected]</a></div>
+                        <div>Email: lapitsolutions09@gmail.com</div>
                     </div>
                 </div>
                 <div class="quotation-title">
@@ -481,13 +481,39 @@
                 </tbody>
                 <tfoot>
                     <tr style="background: #d6e6f0;">
-                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Subtotal (including delivery)</td>
-                        <td id="subtotal-cell" style="text-align: right; font-weight: bold; padding: 10px;">₱0.00</td>
+                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Subtotal</td>
+                        <td style="text-align: right; padding: 10px;">
+                            <input type="number" id="subtotal-input" value="0" step="0.01" min="0" 
+                                   style="width: 120px; font-size: 12px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
+                                   onchange="calculateTotalFromInputs()">
+                        </td>
                         <td class="no-print"></td>
                     </tr>
                     <tr style="background: #d6e6f0;">
-                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Total Package Price</td>
-                        <td id="discounted-price-cell" style="text-align: right; font-weight: bold; padding: 10px;">₱0.00</td>
+                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">On-site delivery setup & training (optional)</td>
+                        <td style="text-align: right; padding: 10px;">
+                            <input type="number" id="onsite-delivery-input" value="0" step="0.01" min="0" 
+                                   style="width: 120px; font-size: 12px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
+                                   onchange="calculateTotalFromInputs()">
+                        </td>
+                        <td class="no-print"></td>
+                    </tr>
+                    <tr style="background: #d6e6f0;">
+                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Discount</td>
+                        <td style="text-align: right; padding: 10px;">
+                            <input type="number" id="discount-input" value="0" step="0.01" min="0" 
+                                   style="width: 120px; font-size: 12px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
+                                   onchange="calculateTotalFromInputs()">
+                        </td>
+                        <td class="no-print"></td>
+                    </tr>
+                    <tr style="background: #d6e6f0;">
+                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px; font-size: 13px;">Total Package Price</td>
+                        <td style="text-align: right; padding: 10px;">
+                            <input type="number" id="total-package-price-input" value="0" step="0.01" min="0" 
+                                   style="width: 120px; font-size: 13px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
+                                   onchange="validateTotalPackagePrice()">
+                        </td>
                         <td class="no-print"></td>
                     </tr>
                 </tfoot>
@@ -515,12 +541,18 @@
                 <ol class="terms-list" style="margin-left: 25px; font-size: 11px; color: #000; font-weight: 500;">
                     <li style="margin-bottom: 3px;">Payment Terms:
                         <div style="margin-left: 40px; margin-top: 3px;">
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="30000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> down payment (non refundable) upon confirmation of order</div>
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="40000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> upon delivery and completion</div>
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="45000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> upon delivery and completion (30 days PDC)</div>
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="39000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> full payment upon agreement</div>
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="20000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> – upon agreement (non refundable)</div>
-                            <div class="payment-term-line"><strong>₱<input type="text" class="payment-amount-input" value="25000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> – upon delivery & completion (cash/on date check)</div>
+                            <div class="payment-term-line">
+                                <strong>₱<input type="text" class="payment-amount-input" value="30000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
+                                <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc;">down payment (non refundable) upon confirmation of order</span>
+                            </div>
+                            <div class="payment-term-line">
+                                <strong>₱<input type="text" class="payment-amount-input" value="40000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
+                                <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc;">upon delivery and completion (Cash/on date check)</span>
+                            </div>
+                            <div class="payment-term-line">
+                                <strong>₱<input type="text" class="payment-amount-input" value="45000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
+                                <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc;">upon delivery and completion (30 days PDC)</span>
+                            </div>
                         </div>
                         <div style="margin-left: 15px; margin-top: 5px;">
                             For check payments, please make check payable to <strong><em>LAP I.T. SOLUTIONS</em></strong>
@@ -530,7 +562,7 @@
                     <li style="margin-bottom: 3px;">Grand Total is <strong>VAT exclusive.</strong></li>
                     <li style="margin-bottom: 3px;">Initial, partial and down payments are considered binding and non-refundable.</li>
                     <li style="margin-bottom: 3px;">For Davao City clients, delivery of goods and services will be 3 to 5 days upon date of down payment.</li>
-                    <li style="margin-bottom: 3px;">For clients outside Davao City, delivery of goods and services will be 5 to 7 days upon date of down payment. Delivery and other related expenses will be shouldered by the client.</li>
+                    <li style="margin-bottom: 3px;">For clients outside Davao City, delivery of goods and services will be 5 to 7 days upon date of down payment. <span style="background-color: yellow; font-weight: bold;">Delivery and other related expenses will be shouldered by the client.</span></li>
                     <li style="margin-bottom: 3px;">Internet Connection is required for license activation and online support purposes.</li>
                     <li style="margin-bottom: 3px;">Any fortuitous event may void the warranty. However, certain consideration will be given to the client.</li>
                     <li style="margin-bottom: 3px;">Any form of hacking or cracking of our software may void the contract.</li>

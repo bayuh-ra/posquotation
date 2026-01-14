@@ -295,6 +295,18 @@ table tfoot td {
     color: #1a5276;
 }
 
+/* Contenteditable payment descriptions - show dashed underline when editing */
+[contenteditable="true"] {
+    border-bottom: 1px dashed #ccc;
+    outline: none;
+    cursor: text;
+}
+
+[contenteditable="true"]:focus {
+    border-bottom: 1px dashed #667eea;
+    background-color: #f8f9fa;
+}
+
 /* Terms and Conditions */
 .terms-section {
     background: white;
@@ -645,6 +657,14 @@ table tfoot td {
         color: #000 !important;
     }
     
+    /* Contenteditable spans should not show border in print */
+    [contenteditable="true"] {
+        border: none !important;
+        outline: none !important;
+        border-bottom: none !important;
+        background: transparent !important;
+    }
+    
     /* Hide placeholder text in print */
     input::placeholder {
         color: transparent !important;
@@ -684,11 +704,10 @@ table tfoot td {
         color: #000 !important;
     }
     
-    /* Ensure colors print correctly */
+    /* Ensure colors print correctly - including yellow highlights */
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-        color-adjust: exact !important;
     }
     
     /* Format table cells for print */

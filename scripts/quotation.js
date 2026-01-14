@@ -209,7 +209,7 @@ function populatePackageTypes() {
     // Add "Customize" option at the top
     const customizeOption = document.createElement('option');
     customizeOption.value = 'CUSTOMIZE';
-    customizeOption.textContent = 'Customize';
+    customizeOption.textContent = 'Customize (Build your own)';
     customizeOption.dataset.inclusions = 'Build your own custom package by selecting individual products below.';
     packageTypeSelect.appendChild(customizeOption);
 
@@ -580,9 +580,10 @@ function calculateTotals() {
         }
     }
     
-    const subtotalCell = document.getElementById('subtotal-cell');
-    if (subtotalCell) {
-        subtotalCell.textContent = `₱${subtotal.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    // Update subtotal input
+    const subtotalInput = document.getElementById('subtotal-input');
+    if (subtotalInput) {
+        subtotalInput.value = subtotal.toFixed(2);
     }
     
     // Get on-site delivery and discount values
@@ -593,16 +594,54 @@ function calculateTotals() {
     const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
     
     // Calculate final total: subtotal + on-site delivery - discount
-    const finalTotal = subtotal + onsiteDelivery - discount;
+    const totalPackagePrice = subtotal + onsiteDelivery - discount;
     
-    // Update discounted price (final total)
-    const discountedCell = document.getElementById('discounted-price-cell');
-    if (discountedCell) {
-        discountedCell.textContent = `₱${finalTotal.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    // Update total package price input
+    const totalPackagePriceInput = document.getElementById('total-package-price-input');
+    if (totalPackagePriceInput) {
+        totalPackagePriceInput.value = totalPackagePrice.toFixed(2);
     }
     
     // Update total items count
     updateTotalItemsCount();
+}
+
+// Calculate total when inputs are manually changed
+function calculateTotalFromInputs() {
+    const subtotalInput = document.getElementById('subtotal-input');
+    const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
+    const discountInput = document.getElementById('discount-input');
+    const totalPackagePriceInput = document.getElementById('total-package-price-input');
+    
+    const subtotal = subtotalInput ? parseFloat(subtotalInput.value) || 0 : 0;
+    const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
+    const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
+    
+    // Calculate total: subtotal + on-site delivery - discount
+    const totalPackagePrice = subtotal + onsiteDelivery - discount;
+    
+    if (totalPackagePriceInput) {
+        totalPackagePriceInput.value = totalPackagePrice.toFixed(2);
+    }
+}
+
+// Validate that total package price makes sense (optional warning)
+function validateTotalPackagePrice() {
+    const subtotalInput = document.getElementById('subtotal-input');
+    const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
+    const discountInput = document.getElementById('discount-input');
+    const totalPackagePriceInput = document.getElementById('total-package-price-input');
+    
+    const subtotal = subtotalInput ? parseFloat(subtotalInput.value) || 0 : 0;
+    const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
+    const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
+    const totalPackagePrice = totalPackagePriceInput ? parseFloat(totalPackagePriceInput.value) || 0 : 0;
+    
+    const expectedTotal = subtotal + onsiteDelivery - discount;
+    
+    // If manually edited total doesn't match calculation, just accept it
+    // (User may have a specific reason for the custom total)
+    console.log('Expected total:', expectedTotal, 'Actual total:', totalPackagePrice);
 }
 
 // Update total items count in the "No. of Items" cell
@@ -669,9 +708,18 @@ async function saveQuotation() {
         // Get quotation date
         const quotationDate = document.getElementById('quote-date').textContent;
         
-        // Get total amount
-        const subtotalText = document.getElementById('subtotal-cell').textContent;
-        const total = parseFloat(subtotalText.replace(/[₱,]/g, '')) || 0;
+        // Get total amounts
+        const subtotalInput = document.getElementById('subtotal-input');
+        const subtotal = subtotalInput ? parseFloat(subtotalInput.value) || 0 : 0;
+        
+        const totalPackagePriceInput = document.getElementById('total-package-price-input');
+        const totalPackagePrice = totalPackagePriceInput ? parseFloat(totalPackagePriceInput.value) || 0 : 0;
+        
+        // Get onsite delivery and discount
+        const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
+        const discountInput = document.getElementById('discount-input');
+        const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
+        const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
         
         console.log('Saving quotation with employee_name:', employeeName);
         console.log('Package type:', packageType);
@@ -685,8 +733,8 @@ async function saveQuotation() {
             contact_person: contactPerson,
             contact_number: contactNumber,
             package_type: packageType,
-            total: total,
-            discount: 0,
+            total: totalPackagePrice,
+            discount: discount,
             employee_name: employeeName,
             status: 'pending'
         };
@@ -863,9 +911,18 @@ async function saveAndPrintPDF() {
         // Get quotation date
         const quotationDate = document.getElementById('quote-date').textContent;
         
-        // Get total amount
-        const subtotalText = document.getElementById('subtotal-cell').textContent;
-        const total = parseFloat(subtotalText.replace(/[₱,]/g, '')) || 0;
+        // Get total amounts
+        const subtotalInput = document.getElementById('subtotal-input');
+        const subtotal = subtotalInput ? parseFloat(subtotalInput.value) || 0 : 0;
+        
+        const totalPackagePriceInput = document.getElementById('total-package-price-input');
+        const totalPackagePrice = totalPackagePriceInput ? parseFloat(totalPackagePriceInput.value) || 0 : 0;
+        
+        // Get onsite delivery and discount
+        const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
+        const discountInput = document.getElementById('discount-input');
+        const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
+        const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
         
         console.log('Saving quotation with employee_name:', employeeName);
         console.log('Package type:', packageType);
@@ -879,8 +936,8 @@ async function saveAndPrintPDF() {
             contact_person: contactPerson,
             contact_number: contactNumber,
             package_type: packageType,
-            total: total,
-            discount: 0,
+            total: totalPackagePrice,
+            discount: discount,
             employee_name: employeeName,
             status: 'pending'
         };
