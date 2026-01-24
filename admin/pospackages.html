@@ -1,0 +1,300 @@
+<link rel="stylesheet" href="admin/shared.css">
+
+<style>
+/* Sub-navigation styles */
+.sub-navigation {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0;
+}
+
+.sub-tab {
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-weight: 600;
+    color: #718096;
+    transition: all 0.3s;
+}
+
+.sub-tab:hover {
+    color: #667eea;
+}
+
+.sub-tab.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+}
+</style>
+
+<h2>Manage POS Packages</h2>
+
+<!-- Sub-navigation -->
+<div class="sub-navigation">
+    <button class="sub-tab active" onclick="switchPOSSubTab('pgtype')">
+        Package Types
+    </button>
+    <button class="sub-tab" onclick="switchPOSSubTab('pgproducts')">
+        Package Products
+    </button>
+</div>
+
+<!-- Content container for dynamically loaded sub-tabs -->
+<div id="pos-sub-content">
+    <div class="loading">Loading...</div>
+</div>
+
+<!-- PACKAGE TYPES MODALS -->
+
+<!-- Add Package Type Modal -->
+<div id="addPackageTypeModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add New Package Type</h3>
+            <button class="close-btn" onclick="closeAddPackageTypeModal()">&times;</button>
+        </div>
+        <div id="add-package-type-message"></div>
+        <div class="form-group">
+            <label>Package Name *</label>
+            <input type="text" id="add-package-name" placeholder="e.g., Standard POS Retail Package">
+        </div>
+        <div class="form-group">
+            <label>Description/Inclusions</label>
+            <textarea id="add-package-description" placeholder="Package inclusions and details"></textarea>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="addPackageType()" style="flex: 1;">Add Package Type</button>
+            <button class="btn btn-secondary" onclick="closeAddPackageTypeModal()" style="flex: 1;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Package Type Modal -->
+<div id="editPackageModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Package Type</h3>
+            <button class="close-btn" onclick="closeEditPackageModal()">&times;</button>
+        </div>
+        <div id="edit-package-message"></div>
+        <input type="hidden" id="edit-package-old-name">
+        <div class="form-group">
+            <label>Package Name *</label>
+            <input type="text" id="edit-package-name">
+        </div>
+        <div class="form-group">
+            <label>Description/Inclusions</label>
+            <textarea id="edit-package-description"></textarea>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="updatePackageType()">Update</button>
+            <button class="btn btn-secondary" onclick="closeEditPackageModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Package Type Detail Modal -->
+<div id="detailPackageModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Package Type Details</h3>
+            <button class="close-btn" onclick="closeDetailPackageModal()">&times;</button>
+        </div>
+        <div style="padding: 10px 0;">
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">NAME</label>
+                <div id="detail-package-name" style="font-size: 18px; font-weight: bold; color: #2d3748; margin-top: 5px;"></div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">DESCRIPTION</label>
+                <div id="detail-package-description" style="font-size: 14px; color: #2d3748; margin-top: 5px; line-height: 1.6;"></div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+            <button class="btn btn-warning" onclick="editPackageFromDetail()" style="flex: 1;">Edit</button>
+            <button class="btn btn-danger" onclick="deletePackageFromDetail()" style="flex: 1;">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- PACKAGE PRODUCTS MODALS -->
+
+<!-- Package Products Detail Modal -->
+<div id="packageProductsModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="package-products-modal-title">Package Products</h3>
+            <button class="close-btn" onclick="closePackageProductsModal()">&times;</button>
+        </div>
+        <div class="table-container" id="package-products-modal-content">
+            <div class="loading">Loading...</div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+            <button class="btn btn-secondary" onclick="closePackageProductsModal()" style="flex: 1;">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Package Products Modal -->
+<div id="editPackageProductsModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3>Edit Package Product</h3>
+            <button class="close-btn" onclick="closeEditPackageProductModal()">&times;</button>
+        </div>
+        <div id="edit-package-product-message"></div>
+
+        <div class="form-group">
+            <label>Package Name:</label>
+            <div id="edit-pkg-name" style="padding: 10px; background: #f7fafc; border-radius: 8px; font-weight: 600; color: #2d3748;"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Current Product:</label>
+            <div id="edit-pkg-current-product" style="padding: 10px; background: #f7fafc; border-radius: 8px; color: #2d3748;"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Select New Product (to replace current):</label>
+            <select id="edit-pkg-product-select">
+                <option value="">-- Keep Current Product --</option>
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 25px;">
+            <button class="btn btn-primary" onclick="updatePackageProductChange()" style="flex: 1;">Replace Product</button>
+            <button class="btn btn-danger" onclick="deleteCurrentEditProduct()" style="flex: 1;">Delete</button>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button class="btn btn-secondary" onclick="closeEditPackageProductModal()" style="flex: 1;">Cancel</button>
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+            <h4 style="margin-bottom: 15px; color: #2d3748;">Or Add More Products to Package</h4>
+            <div class="product-checkbox-list" id="edit-pkg-products-list">
+                <div class="loading">Loading products...</div>
+            </div>
+            <button class="btn btn-success" onclick="addMoreProductsToPackage()" style="width: 100%; margin-top: 15px;">Add Selected Products</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Package Product Modal -->
+<div id="addPackageProductModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3>Add Products to Package</h3>
+            <button class="close-btn" onclick="closeAddPackageProductModal()">&times;</button>
+        </div>
+        <div id="add-package-product-message"></div>
+        
+        <div class="form-group">
+            <label>Select Package Type *</label>
+            <select id="pp-package-type-select">
+                <option value="">Select a package type</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Selected Package: <strong id="selected-package-name-new" style="color: #667eea;">None</strong></label>
+        </div>
+
+        <div class="form-group">
+            <label>Select Products (Check all that apply):</label>
+            <div class="product-checkbox-list" id="products-checkbox-list-new">
+                <div class="loading">Please select a package type first...</div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-primary" onclick="addMultipleProductsNew()" style="flex: 1;">Add Selected Products</button>
+            <button class="btn btn-secondary" onclick="closeAddPackageProductModal()" style="flex: 1;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Package Product Filter Modal -->
+<div id="packageProductFilterModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3>Filter Package Products</h3>
+            <button class="close-btn" onclick="closePackageProductFilterModal()">&times;</button>
+        </div>
+        <div class="form-group">
+            <label>Filter by Package Type</label>
+            <select id="filter-package-type">
+                <option value="">All Package Types</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Filter by Product</label>
+            <select id="filter-product">
+                <option value="">All Products</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-primary" onclick="applyPackageProductFilter()" style="flex: 1;">Apply Filter</button>
+            <button class="btn btn-secondary" onclick="clearPackageProductFilters()" style="flex: 1;">Clear All</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    let currentSubTab = null;
+
+    // Function to load sub-tab content dynamically
+    async function loadSubTabContent(filePath) {
+        const container = document.getElementById('pos-sub-content');
+        
+        try {
+            const response = await fetch(filePath);
+            if (!response.ok) {
+                throw new Error(`Failed to load ${filePath}`);
+            }
+            
+            const html = await response.text();
+            container.innerHTML = html;
+            
+            // Execute scripts in the loaded content
+            const scripts = container.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                try {
+                    const scriptContent = oldScript.innerHTML;
+                    const scriptFunction = new Function(scriptContent);
+                    scriptFunction();
+                } catch (error) {
+                    console.error('Error executing sub-tab script:', error);
+                }
+            });
+        } catch (error) {
+            container.innerHTML = '<p class="error">Error loading sub-tab: ' + error.message + '</p>';
+            console.error('Error loading sub-tab:', error);
+        }
+    }
+
+    // Function to switch between sub-tabs
+    window.switchPOSSubTab = async function(subTabName) {
+        // Don't reload if already on this tab
+        if (currentSubTab === subTabName) return;
+        
+        currentSubTab = subTabName;
+        
+        // Update active state on buttons
+        document.querySelectorAll('.sub-tab').forEach(tab => tab.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        // Load the corresponding HTML file
+        const filePath = `admin/${subTabName}.html`;
+        await loadSubTabContent(filePath);
+    };
+
+    // Load the default tab (Package Types) on page load
+    loadSubTabContent('admin/pgtype.html');
+})();
+</script>

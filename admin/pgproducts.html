@@ -1,0 +1,594 @@
+<link rel="stylesheet" href="admin/shared.css">
+
+<style>
+.package-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 10px 0;
+}
+
+.package-card {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.package-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.15);
+    transform: translateY(-2px);
+}
+
+.package-card-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+
+.package-card-count {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.package-card-count-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.package-card-count-label {
+    font-size: 14px;
+    color: #718096;
+}
+
+.product-checkbox-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.product-checkbox-item {
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #f7fafc;
+}
+
+.product-checkbox-item:last-child {
+    border-bottom: none;
+}
+
+.product-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.product-checkbox-item label {
+    cursor: pointer;
+    flex: 1;
+}
+</style>
+
+<h2>Manage Package Products</h2>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap;">
+    <button class="btn btn-primary" onclick="openAddPackageProductModal()">+ Add Products to Package</button>
+    <div style="display: flex; gap: 10px; align-items: center; flex: 1; max-width: 500px;">
+        <input type="text" id="search-package-product" placeholder="🔍 Search package products..." onkeyup="searchPackageProducts()" style="flex: 1; padding: 10px 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
+        <button class="btn btn-secondary" onclick="openPackageProductFilterModal()">Filter</button>
+    </div>
+</div>
+<div id="package-products-message"></div>
+<div id="package-products-list">
+    <div class="loading">Loading...</div>
+</div>
+
+<!-- Package Products Detail Modal -->
+<div id="packageProductsModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="package-products-modal-title">Package Products</h3>
+            <button class="close-btn" onclick="closePackageProductsModal()">&times;</button>
+        </div>
+        <div class="table-container" id="package-products-modal-content">
+            <div class="loading">Loading...</div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+            <button class="btn btn-secondary" onclick="closePackageProductsModal()" style="flex: 1;">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Package Products Modal -->
+<div id="editPackageProductsModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3>Edit Package Product</h3>
+            <button class="close-btn" onclick="closeEditPackageProductModal()">&times;</button>
+        </div>
+        <div id="edit-package-product-message"></div>
+
+        <div class="form-group">
+            <label>Package Name:</label>
+            <div id="edit-pkg-name" style="padding: 10px; background: #f7fafc; border-radius: 8px; font-weight: 600; color: #2d3748;"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Current Product:</label>
+            <div id="edit-pkg-current-product" style="padding: 10px; background: #f7fafc; border-radius: 8px; color: #2d3748;"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Select New Product (to replace current):</label>
+            <select id="edit-pkg-product-select">
+                <option value="">-- Keep Current Product --</option>
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 25px;">
+            <button class="btn btn-primary" onclick="updatePackageProductChange()" style="flex: 1;">Replace Product</button>
+            <button class="btn btn-danger" onclick="deleteCurrentEditProduct()" style="flex: 1;">Delete</button>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button class="btn btn-secondary" onclick="closeEditPackageProductModal()" style="flex: 1;">Cancel</button>
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+            <h4 style="margin-bottom: 15px; color: #2d3748;">Or Add More Products to Package</h4>
+            <div class="product-checkbox-list" id="edit-pkg-products-list">
+                <div class="loading">Loading products...</div>
+            </div>
+            <button class="btn btn-success" onclick="addMoreProductsToPackage()" style="width: 100%; margin-top: 15px;">Add Selected Products</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Package Product Modal -->
+<div id="addPackageProductModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3>Add Products to Package</h3>
+            <button class="close-btn" onclick="closeAddPackageProductModal()">&times;</button>
+        </div>
+        <div id="add-package-product-message"></div>
+        
+        <div class="form-group">
+            <label>Select Package Type *</label>
+            <select id="pp-package-type-select">
+                <option value="">Select a package type</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Selected Package: <strong id="selected-package-name-new" style="color: #667eea;">None</strong></label>
+        </div>
+
+        <div class="form-group">
+            <label>Select Products (Check all that apply):</label>
+            <div class="product-checkbox-list" id="products-checkbox-list-new">
+                <div class="loading">Please select a package type first...</div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-primary" onclick="addMultipleProductsNew()" style="flex: 1;">Add Selected Products</button>
+            <button class="btn btn-secondary" onclick="closeAddPackageProductModal()" style="flex: 1;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Package Product Filter Modal -->
+<div id="packageProductFilterModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3>Filter Package Products</h3>
+            <button class="close-btn" onclick="closePackageProductFilterModal()">&times;</button>
+        </div>
+        <div class="form-group">
+            <label>Filter by Package Type</label>
+            <select id="filter-package-type">
+                <option value="">All Package Types</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Filter by Product</label>
+            <select id="filter-product">
+                <option value="">All Products</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-primary" onclick="applyPackageProductFilter()" style="flex: 1;">Apply Filter</button>
+            <button class="btn btn-secondary" onclick="clearPackageProductFilters()" style="flex: 1;">Clear All</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Access the globally available supabaseClient
+    const supabase = window.supabaseClient || window.lapSupabaseClient;
+    
+    let allPackageProducts = [];
+    let currentEditPackageName = null;
+    let currentEditProductName = null;
+    let currentEditProductId = null;
+
+    window.loadPackageProducts = async function() {
+        const container = document.getElementById('package-products-list');
+        const { data, error } = await supabase
+            .from('package_type_products')
+            .select('*')
+            .order('package_type_name');
+        
+        if (error) {
+            container.innerHTML = '<p class="error">Error loading package products: ' + error.message + '</p>';
+            return;
+        }
+        
+        allPackageProducts = data;
+        displayPackageProducts(data);
+    };
+
+    function displayPackageProducts(packageProducts) {
+        const container = document.getElementById('package-products-list');
+        
+        if (packageProducts.length === 0) {
+            container.innerHTML = '<p style="text-align: center; padding: 20px; color: #718096;">No package products found matching your filters.</p>';
+            return;
+        }
+        
+        // Group products by package type
+        const groupedByPackage = {};
+        packageProducts.forEach(pp => {
+            if (!groupedByPackage[pp.package_type_name]) {
+                groupedByPackage[pp.package_type_name] = [];
+            }
+            groupedByPackage[pp.package_type_name].push(pp);
+        });
+        
+        let html = '<div class="package-cards-container">';
+        
+        // Create cards for each package type
+        Object.keys(groupedByPackage).sort().forEach(packageName => {
+            const products = groupedByPackage[packageName];
+            const productCount = products.length;
+            const escapedPackageName = packageName.replace(/'/g, "\\'");
+            
+            html += `
+            <div class="package-card" onclick="showPackageProductsModal('${escapedPackageName}')">
+                <h3 class="package-card-title">${packageName}</h3>
+                <div class="package-card-count">
+                    <span class="package-card-count-number">${productCount}</span>
+                    <span class="package-card-count-label">product${productCount !== 1 ? 's' : ''}</span>
+                </div>
+            </div>
+            `;
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
+        
+        // Store the grouped data for modal display
+        window.packageProductsData = groupedByPackage;
+    }
+
+    window.showPackageProductsModal = function(packageName) {
+        const products = window.packageProductsData[packageName] || [];
+        const modal = document.getElementById('packageProductsModal');
+
+        document.getElementById('package-products-modal-title').textContent = packageName;
+
+        let html = `<table><tr><th>Product Name</th></tr>`;
+        products.forEach(pp => {
+            const escapedProductName = pp.product_name.replace(/'/g, "\\'");
+            html += `<tr>
+                <td style="cursor: pointer;" onclick="editProductFromModal('${escapedProductName}')">
+                    ${pp.product_name}
+                </td>
+            </tr>`;
+        });
+        html += '</table>';
+
+        document.getElementById('package-products-modal-content').innerHTML = html;
+        modal.classList.add('active');
+    };
+
+    window.closePackageProductsModal = function() {
+        document.getElementById('packageProductsModal').classList.remove('active');
+    };
+
+    window.editProductFromModal = function(productName) {
+        const packageName = document.getElementById('package-products-modal-title').textContent;
+        currentEditPackageName = packageName;
+        currentEditProductName = productName;
+
+        supabase.from('products').select('*').order('name').then(({ data: allProducts, error: productsError }) => {
+            if (productsError) {
+                showMessage('edit-package-product-message', 'Error loading products: ' + productsError.message, true);
+                return;
+            }
+
+            supabase.from('package_type_products').select('*').eq('package_type_name', packageName).eq('product_name', productName).single().then(({ data: packageProduct }) => {
+                if (packageProduct) currentEditProductId = packageProduct.id;
+
+                document.getElementById('edit-pkg-name').textContent = packageName;
+                document.getElementById('edit-pkg-current-product').textContent = productName;
+
+                const select = document.getElementById('edit-pkg-product-select');
+                select.innerHTML = '<option value="">-- Keep Current Product --</option>';
+                if (allProducts) {
+                    allProducts.forEach(prod => {
+                        if (prod.name !== productName) {
+                            select.innerHTML += `<option value="${prod.name}">${prod.name}</option>`;
+                        }
+                    });
+                }
+
+                const checkboxList = document.getElementById('edit-pkg-products-list');
+                checkboxList.innerHTML = '';
+                if (allProducts) {
+                    allProducts.forEach((prod, idx) => {
+                        if (prod.name !== productName) {
+                            const item = document.createElement('div');
+                            item.className = 'product-checkbox-item';
+                            item.innerHTML = `<input type="checkbox" id="edit-pkg-prod-${idx}" value="${prod.name}"><label for="edit-pkg-prod-${idx}">${prod.name}</label>`;
+                            checkboxList.appendChild(item);
+                        }
+                    });
+                }
+
+                document.getElementById('editPackageProductsModal').classList.add('active');
+            });
+        });
+    };
+
+    window.closeEditPackageProductModal = function() {
+        document.getElementById('editPackageProductsModal').classList.remove('active');
+        document.getElementById('edit-package-product-message').innerHTML = '';
+    };
+
+    window.deleteCurrentEditProduct = async function() {
+        if (!confirm(`Delete "${currentEditProductName}" from package "${currentEditPackageName}"?`)) return;
+        
+        const { error } = await supabase
+            .from('package_type_products')
+            .delete()
+            .eq('id', currentEditProductId);
+        
+        if (error) {
+            showMessage('edit-package-product-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('package-products-message', 'Product removed from package successfully!');
+        closeEditPackageProductModal();
+        loadPackageProducts();
+    };
+
+    window.updatePackageProductChange = async function() {
+        const selectedProduct = document.getElementById('edit-pkg-product-select').value;
+        
+        if (!selectedProduct) {
+            showMessage('edit-package-product-message', 'Please select a new product', true);
+            return;
+        }
+        
+        if (selectedProduct === currentEditProductName) {
+            showMessage('edit-package-product-message', 'Please select a different product', true);
+            return;
+        }
+        
+        // Delete old product
+        await supabase
+            .from('package_type_products')
+            .delete()
+            .eq('id', currentEditProductId);
+        
+        // Add new product
+        const { error } = await supabase.from('package_type_products').insert([{
+            package_type_name: currentEditPackageName,
+            product_name: selectedProduct
+        }]);
+        
+        if (error) {
+            showMessage('edit-package-product-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('package-products-message', 'Product replaced successfully!');
+        closeEditPackageProductModal();
+        loadPackageProducts();
+    };
+
+    window.addMoreProductsToPackage = async function() {
+        const checkboxes = document.querySelectorAll('#edit-pkg-products-list input[type="checkbox"]:checked');
+        
+        if (checkboxes.length === 0) {
+            showMessage('edit-package-product-message', 'Please select at least one product', true);
+            return;
+        }
+        
+        const productsToAdd = Array.from(checkboxes).map(cb => ({
+            package_type_name: currentEditPackageName,
+            product_name: cb.value
+        }));
+        
+        const { error } = await supabase.from('package_type_products').insert(productsToAdd);
+        
+        if (error) {
+            showMessage('edit-package-product-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('package-products-message', `Successfully added ${checkboxes.length} product(s)!`);
+        closeEditPackageProductModal();
+        loadPackageProducts();
+    };
+
+    window.searchPackageProducts = function() {
+        const searchQuery = document.getElementById('search-package-product').value.toLowerCase();
+        
+        const filtered = allPackageProducts.filter(pp => {
+            const matchesSearch = !searchQuery || 
+                pp.package_type_name.toLowerCase().includes(searchQuery) || 
+                pp.product_name.toLowerCase().includes(searchQuery);
+            return matchesSearch;
+        });
+        
+        displayPackageProducts(filtered);
+    };
+
+    window.filterPackageProducts = function() {
+        const packageFilter = document.getElementById('filter-package-type').value.toLowerCase();
+        const productFilter = document.getElementById('filter-product').value.toLowerCase();
+        
+        const filtered = allPackageProducts.filter(pp => {
+            const matchesPackage = !packageFilter || pp.package_type_name.toLowerCase() === packageFilter;
+            const matchesProduct = !productFilter || pp.product_name.toLowerCase() === productFilter;
+            return matchesPackage && matchesProduct;
+        });
+        
+        displayPackageProducts(filtered);
+    };
+
+    window.openPackageProductFilterModal = async function() {
+        const { data: packages } = await supabase.from('package_type').select('*').order('name');
+        const { data: products } = await supabase.from('products').select('*').order('name');
+        
+        const filterPkgSelect = document.getElementById('filter-package-type');
+        filterPkgSelect.innerHTML = '<option value="">All Package Types</option>';
+        if (packages) {
+            packages.forEach(pkg => {
+                filterPkgSelect.innerHTML += `<option value="${pkg.name}">${pkg.name}</option>`;
+            });
+        }
+        
+        const filterProdSelect = document.getElementById('filter-product');
+        filterProdSelect.innerHTML = '<option value="">All Products</option>';
+        if (products) {
+            products.forEach(prod => {
+                filterProdSelect.innerHTML += `<option value="${prod.name}">${prod.name}</option>`;
+            });
+        }
+        
+        document.getElementById('packageProductFilterModal').classList.add('active');
+    };
+
+    window.closePackageProductFilterModal = function() {
+        document.getElementById('packageProductFilterModal').classList.remove('active');
+    };
+
+    window.applyPackageProductFilter = function() {
+        filterPackageProducts();
+        closePackageProductFilterModal();
+    };
+
+    window.clearPackageProductFilters = function() {
+        document.getElementById('filter-package-type').value = '';
+        document.getElementById('filter-product').value = '';
+        document.getElementById('search-package-product').value = '';
+        displayPackageProducts(allPackageProducts);
+        closePackageProductFilterModal();
+    };
+
+    window.openAddPackageProductModal = async function() {
+        const { data: packages } = await supabase.from('package_type').select('*').order('name');
+        const pkgSelect = document.getElementById('pp-package-type-select');
+        pkgSelect.innerHTML = '<option value="">Select a package type</option>';
+        if (packages) {
+            packages.forEach(pkg => {
+                pkgSelect.innerHTML += `<option value="${pkg.name}">${pkg.name}</option>`;
+            });
+        }
+        
+        pkgSelect.onchange = async function() {
+            if (this.value) {
+                document.getElementById('selected-package-name-new').textContent = this.value;
+                
+                const { data: products, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .order('name');
+                
+                if (error) {
+                    alert('Error loading products: ' + error.message);
+                    return;
+                }
+                
+                const checkboxList = document.getElementById('products-checkbox-list-new');
+                checkboxList.innerHTML = '';
+                products.forEach(prod => {
+                    const item = document.createElement('div');
+                    item.className = 'product-checkbox-item';
+                    item.innerHTML = `<input type="checkbox" id="prod-new-${prod.id}" value="${prod.name}"><label for="prod-new-${prod.id}">${prod.name}</label>`;
+                    checkboxList.appendChild(item);
+                });
+            } else {
+                document.getElementById('selected-package-name-new').textContent = 'None';
+                document.getElementById('products-checkbox-list-new').innerHTML = '<div class="loading">Please select a package type first...</div>';
+            }
+        };
+        
+        document.getElementById('addPackageProductModal').classList.add('active');
+    };
+
+    window.closeAddPackageProductModal = function() {
+        document.getElementById('addPackageProductModal').classList.remove('active');
+        document.getElementById('add-package-product-message').innerHTML = '';
+        document.getElementById('pp-package-type-select').value = '';
+        document.getElementById('selected-package-name-new').textContent = 'None';
+        document.getElementById('products-checkbox-list-new').innerHTML = '<div class="loading">Please select a package type first...</div>';
+    };
+
+    window.addMultipleProductsNew = async function() {
+        const packageSelect = document.getElementById('pp-package-type-select');
+        const selectedPackage = packageSelect.value;
+        
+        if (!selectedPackage) {
+            showMessage('add-package-product-message', 'Please select a package type first', true);
+            return;
+        }
+        
+        const checkboxes = document.querySelectorAll('#products-checkbox-list-new input[type="checkbox"]:checked');
+        
+        if (checkboxes.length === 0) {
+            showMessage('add-package-product-message', 'Please select at least one product', true);
+            return;
+        }
+        
+        const productsToAdd = Array.from(checkboxes).map(cb => ({
+            package_type_name: selectedPackage,
+            product_name: cb.value
+        }));
+        
+        const { error } = await supabase
+            .from('package_type_products')
+            .insert(productsToAdd);
+        
+        if (error) {
+            showMessage('add-package-product-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('package-products-message', `Successfully added ${checkboxes.length} product(s) to package!`);
+        closeAddPackageProductModal();
+        loadPackageProducts();
+    };
+
+    // Load data when this tab loads
+    loadPackageProducts();
+})();
+</script>

@@ -1,0 +1,206 @@
+<link rel="stylesheet" href="admin/shared.css">
+
+<h2>Manage Product Categories</h2>
+<div style="margin-bottom: 20px;">
+    <button class="btn btn-primary" onclick="openAddCategoryModal()">+ Add New Category</button>
+</div>
+<div id="categories-message"></div>
+<div class="table-container" id="categories-list">
+    <div class="loading">Loading...</div>
+</div>
+
+<!-- Add Category Modal -->
+<div id="addCategoryModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3>Add New Category</h3>
+            <button class="close-btn" onclick="closeAddCategoryModal()">&times;</button>
+        </div>
+        <div id="add-category-message"></div>
+        <div class="form-group">
+            <label>Category Name</label>
+            <input type="text" id="add-category-name" placeholder="e.g., POS Software, Hardware">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="addCategory()" style="flex: 1;">Add Category</button>
+            <button class="btn btn-secondary" onclick="closeAddCategoryModal()" style="flex: 1;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div id="editCategoryModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Category</h3>
+            <button class="close-btn" onclick="closeEditCategoryModal()">&times;</button>
+        </div>
+        <div id="edit-category-message"></div>
+        <input type="hidden" id="edit-category-old-name">
+        <div class="form-group">
+            <label>Category Name</label>
+            <input type="text" id="edit-category-name">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="updateCategory()">Update</button>
+            <button class="btn btn-secondary" onclick="closeEditCategoryModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Category Detail Modal -->
+<div id="detailCategoryModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3>Category Details</h3>
+            <button class="close-btn" onclick="closeDetailCategoryModal()">&times;</button>
+        </div>
+        <div style="padding: 10px 0;">
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">NAME</label>
+                <div id="detail-category-name" style="font-size: 18px; font-weight: bold; color: #2d3748; margin-top: 5px;"></div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+            <button class="btn btn-warning" onclick="editCategoryFromDetail()" style="flex: 1;">Edit</button>
+            <button class="btn btn-danger" onclick="deleteCategoryFromDetail()" style="flex: 1;">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Access the globally available supabaseClient
+    const supabase = window.supabaseClient || window.lapSupabaseClient;
+
+    window.loadCategories = async function() {
+        const container = document.getElementById('categories-list');
+        const { data, error } = await supabase.from('product_categories').select('*').order('name');
+        
+        if (error) {
+            container.innerHTML = '<p class="error">Error loading categories: ' + error.message + '</p>';
+            return;
+        }
+        
+        let html = '<table><tr><th>Name</th></tr>';
+        data.forEach((cat, index) => {
+            const rowId = `category-row-${index}`;
+            html += `<tr id="${rowId}" style="cursor: pointer;" data-name="${encodeURIComponent(cat.name)}">
+                <td>${cat.name}</td>
+            </tr>`;
+        });
+        html += '</table>';
+        container.innerHTML = html;
+        
+        // Add click listeners
+        data.forEach((cat, index) => {
+            const row = document.getElementById(`category-row-${index}`);
+            if (row) {
+                row.addEventListener('click', function() {
+                    showCategoryDetail(decodeURIComponent(this.dataset.name));
+                });
+            }
+        });
+    };
+
+    window.showCategoryDetail = function(name) {
+        document.getElementById('detail-category-name').textContent = name;
+        document.getElementById('detailCategoryModal').dataset.name = name;
+        document.getElementById('detailCategoryModal').classList.add('active');
+    };
+
+    window.closeDetailCategoryModal = function() {
+        document.getElementById('detailCategoryModal').classList.remove('active');
+    };
+
+    window.editCategoryFromDetail = function() {
+        const modal = document.getElementById('detailCategoryModal');
+        editCategory(modal.dataset.name);
+        closeDetailCategoryModal();
+    };
+
+    window.deleteCategoryFromDetail = function() {
+        const modal = document.getElementById('detailCategoryModal');
+        deleteCategory(modal.dataset.name);
+        closeDetailCategoryModal();
+    };
+
+    window.addCategory = async function() {
+        const name = document.getElementById('add-category-name').value.trim();
+        if (!name) {
+            showMessage('add-category-message', 'Please enter a category name', true);
+            return;
+        }
+        
+        const { error } = await supabase.from('product_categories').insert([{ name }]);
+        if (error) {
+            showMessage('add-category-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('categories-message', 'Category added successfully!');
+        document.getElementById('add-category-name').value = '';
+        closeAddCategoryModal();
+        loadCategories();
+    };
+
+    window.openAddCategoryModal = function() {
+        document.getElementById('addCategoryModal').classList.add('active');
+    };
+
+    window.closeAddCategoryModal = function() {
+        document.getElementById('addCategoryModal').classList.remove('active');
+        document.getElementById('add-category-message').innerHTML = '';
+    };
+
+    window.editCategory = function(name) {
+        document.getElementById('edit-category-old-name').value = name;
+        document.getElementById('edit-category-name').value = name;
+        document.getElementById('editCategoryModal').classList.add('active');
+    };
+
+    window.closeEditCategoryModal = function() {
+        document.getElementById('editCategoryModal').classList.remove('active');
+    };
+
+    window.updateCategory = async function() {
+        const oldName = document.getElementById('edit-category-old-name').value;
+        const newName = document.getElementById('edit-category-name').value.trim();
+        
+        if (!newName) {
+            showMessage('edit-category-message', 'Please enter a category name', true);
+            return;
+        }
+        
+        const { error } = await supabase
+            .from('product_categories')
+            .update({ name: newName })
+            .eq('name', oldName);
+        
+        if (error) {
+            showMessage('edit-category-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('categories-message', 'Category updated successfully!');
+        closeEditCategoryModal();
+        loadCategories();
+    };
+
+    window.deleteCategory = async function(name) {
+        if (!confirm(`Delete category "${name}"?`)) return;
+        
+        const { error } = await supabase.from('product_categories').delete().eq('name', name);
+        if (error) {
+            alert('Error: ' + error.message);
+            return;
+        }
+        
+        showMessage('categories-message', 'Category deleted successfully!');
+        loadCategories();
+    };
+
+    // Load data when this tab loads
+    loadCategories();
+})();
+</script>

@@ -1,0 +1,300 @@
+<link rel="stylesheet" href="admin/shared.css">
+
+<h2>Manage Employees</h2>
+<div style="margin-bottom: 20px;">
+    <button class="btn btn-primary" onclick="openAddEmployeeModal()">+ Add New Employee</button>
+</div>
+<div id="employees-message"></div>
+<div class="table-container" id="employees-list">
+    <div class="loading">Loading...</div>
+</div>
+
+<!-- Add Employee Modal -->
+<div id="addEmployeeModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add New Employee</h3>
+            <button class="close-btn" onclick="closeAddEmployeeModal()">&times;</button>
+        </div>
+        <form onsubmit="event.preventDefault(); addEmployee();" autocomplete="off">
+            <div id="add-employee-message"></div>
+            <div class="form-group">
+                <label>Employee Code</label>
+                <input type="text" id="add-employee-code" placeholder="e.g., EMP001" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="add-employee-name" placeholder="e.g., John Doe" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="add-employee-password" placeholder="Enter password" autocomplete="new-password">
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="add-employee-status">
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Add Employee</button>
+                <button type="button" class="btn btn-secondary" onclick="closeAddEmployeeModal()" style="flex: 1;">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Employee Modal -->
+<div id="editEmployeeModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Employee</h3>
+            <button class="close-btn" onclick="closeEditEmployeeModal()">&times;</button>
+        </div>
+        <form onsubmit="event.preventDefault(); updateEmployee();" autocomplete="off">
+            <div id="edit-employee-message"></div>
+            <input type="hidden" id="edit-employee-id">
+            <div class="form-group">
+                <label>Employee Code</label>
+                <input type="text" id="edit-employee-code" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="edit-employee-fullname" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>New Password (leave blank to keep current)</label>
+                <input type="password" id="edit-employee-password" autocomplete="new-password">
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="edit-employee-active">
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEditEmployeeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Employee Detail Modal -->
+<div id="detailEmployeeModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Employee Details</h3>
+            <button class="close-btn" onclick="closeDetailEmployeeModal()">&times;</button>
+        </div>
+        <div style="padding: 10px 0;">
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">EMPLOYEE CODE</label>
+                <div id="detail-employee-code" style="font-size: 18px; font-weight: bold; color: #2d3748; margin-top: 5px;"></div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">FULL NAME</label>
+                <div id="detail-employee-name" style="font-size: 16px; color: #2d3748; margin-top: 5px;"></div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">STATUS</label>
+                <div id="detail-employee-status" style="font-size: 14px; margin-top: 5px;"></div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+            <button class="btn btn-warning" onclick="editEmployeeFromDetail()" style="flex: 1;">Edit</button>
+            <button class="btn btn-danger" onclick="deleteEmployeeFromDetail()" style="flex: 1;">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Access the globally available supabaseClient
+    const supabase = window.supabaseClient || window.lapSupabaseClient;
+
+    window.loadEmployees = async function() {
+        const container = document.getElementById('employees-list');
+        const { data, error } = await supabase.from('employees').select('*').order('employee_code');
+        
+        if (error) {
+            container.innerHTML = '<p class="error">Error loading employees: ' + error.message + '</p>';
+            return;
+        }
+        
+        let html = '<table><tr><th>Employee Code</th><th>Full Name</th><th>Status</th></tr>';
+        data.forEach((emp, index) => {
+            const rowId = `employee-row-${index}`;
+            html += `<tr id="${rowId}" style="cursor: pointer;" 
+                data-id="${emp.id}" 
+                data-code="${encodeURIComponent(emp.employee_code)}" 
+                data-name="${encodeURIComponent(emp.full_name)}" 
+                data-active="${emp.is_active}">
+                <td>${emp.employee_code}</td>
+                <td>${emp.full_name}</td>
+                <td>${emp.is_active ? '<span style="color: green;">Active</span>' : '<span style="color: red;">Inactive</span>'}</td>
+            </tr>`;
+        });
+        html += '</table>';
+        container.innerHTML = html;
+        
+        // Add click listeners
+        data.forEach((emp, index) => {
+            const row = document.getElementById(`employee-row-${index}`);
+            if (row) {
+                row.addEventListener('click', function() {
+                    showEmployeeDetail(
+                        this.dataset.id,
+                        decodeURIComponent(this.dataset.code),
+                        decodeURIComponent(this.dataset.name),
+                        this.dataset.active === 'true'
+                    );
+                });
+            }
+        });
+    };
+
+    window.showEmployeeDetail = function(id, code, name, isActive) {
+        document.getElementById('detail-employee-code').textContent = code;
+        document.getElementById('detail-employee-name').textContent = name;
+        const statusHtml = isActive ? '<span style="color: green; font-weight: bold;">Active</span>' : '<span style="color: red; font-weight: bold;">Inactive</span>';
+        document.getElementById('detail-employee-status').innerHTML = statusHtml;
+        
+        document.getElementById('detailEmployeeModal').dataset.id = id;
+        document.getElementById('detailEmployeeModal').dataset.code = code;
+        document.getElementById('detailEmployeeModal').dataset.name = name;
+        document.getElementById('detailEmployeeModal').dataset.active = isActive;
+        document.getElementById('detailEmployeeModal').classList.add('active');
+    };
+
+    window.closeDetailEmployeeModal = function() {
+        document.getElementById('detailEmployeeModal').classList.remove('active');
+    };
+
+    window.editEmployeeFromDetail = function() {
+        const modal = document.getElementById('detailEmployeeModal');
+        editEmployee(
+            modal.dataset.id,
+            modal.dataset.code,
+            modal.dataset.name,
+            modal.dataset.active === 'true'
+        );
+        closeDetailEmployeeModal();
+    };
+
+    window.deleteEmployeeFromDetail = function() {
+        const modal = document.getElementById('detailEmployeeModal');
+        deleteEmployee(modal.dataset.id, modal.dataset.name);
+        closeDetailEmployeeModal();
+    };
+
+    window.addEmployee = async function() {
+        const code = document.getElementById('add-employee-code').value.trim();
+        const name = document.getElementById('add-employee-name').value.trim();
+        const password = document.getElementById('add-employee-password').value;
+        const isActive = document.getElementById('add-employee-status').value === 'true';
+        
+        if (!code || !name || !password) {
+            showMessage('add-employee-message', 'Please fill in all fields', true);
+            return;
+        }
+        
+        const { error } = await supabase.from('employees').insert([{
+            employee_code: code,
+            full_name: name,
+            password_hash: password,
+            is_active: isActive
+        }]);
+        
+        if (error) {
+            showMessage('add-employee-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('employees-message', 'Employee added successfully!');
+        document.getElementById('add-employee-code').value = '';
+        document.getElementById('add-employee-name').value = '';
+        document.getElementById('add-employee-password').value = '';
+        closeAddEmployeeModal();
+        loadEmployees();
+    };
+
+    window.openAddEmployeeModal = function() {
+        document.getElementById('addEmployeeModal').classList.add('active');
+    };
+
+    window.closeAddEmployeeModal = function() {
+        document.getElementById('addEmployeeModal').classList.remove('active');
+        document.getElementById('add-employee-message').innerHTML = '';
+    };
+
+    window.editEmployee = function(id, code, name, isActive) {
+        document.getElementById('edit-employee-id').value = id;
+        document.getElementById('edit-employee-code').value = code;
+        document.getElementById('edit-employee-fullname').value = name;
+        document.getElementById('edit-employee-password').value = '';
+        document.getElementById('edit-employee-active').value = isActive.toString();
+        document.getElementById('editEmployeeModal').classList.add('active');
+    };
+
+    window.closeEditEmployeeModal = function() {
+        document.getElementById('editEmployeeModal').classList.remove('active');
+    };
+
+    window.updateEmployee = async function() {
+        const id = document.getElementById('edit-employee-id').value;
+        const code = document.getElementById('edit-employee-code').value.trim();
+        const name = document.getElementById('edit-employee-fullname').value.trim();
+        const password = document.getElementById('edit-employee-password').value;
+        const isActive = document.getElementById('edit-employee-active').value === 'true';
+        
+        if (!code || !name) {
+            showMessage('edit-employee-message', 'Please fill in all required fields', true);
+            return;
+        }
+        
+        const updateData = {
+            employee_code: code,
+            full_name: name,
+            is_active: isActive
+        };
+        
+        // Only update password if a new one is provided
+        if (password) {
+            updateData.password_hash = password;
+        }
+        
+        const { error } = await supabase
+            .from('employees')
+            .update(updateData)
+            .eq('id', id);
+        
+        if (error) {
+            showMessage('edit-employee-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('employees-message', 'Employee updated successfully!');
+        closeEditEmployeeModal();
+        loadEmployees();
+    };
+
+    window.deleteEmployee = async function(id, name) {
+        if (!confirm(`Delete employee "${name}"?`)) return;
+        
+        const { error } = await supabase.from('employees').delete().eq('id', id);
+        if (error) {
+            alert('Error: ' + error.message);
+            return;
+        }
+        
+        showMessage('employees-message', 'Employee deleted successfully!');
+        loadEmployees();
+    };
+
+    // Load data when this tab loads
+    loadEmployees();
+})();
+</script>

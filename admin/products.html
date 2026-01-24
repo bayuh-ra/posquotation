@@ -1,0 +1,470 @@
+<link rel="stylesheet" href="admin/shared.css">
+
+<h2>Manage Products</h2>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap;">
+    <button class="btn btn-primary" onclick="openAddProductModal()">+ Add New Product</button>
+    <div style="display: flex; gap: 10px; align-items: center; flex: 1; max-width: 500px;">
+        <input type="text" id="search-product-name" placeholder="🔍 Search products..." onkeyup="searchProducts()" style="flex: 1; padding: 10px 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
+        <button class="btn btn-secondary" onclick="openProductFilterModal()">Filter</button>
+    </div>
+</div>
+<div id="products-message"></div>
+<div class="table-container" id="products-list">
+    <div class="loading">Loading...</div>
+</div>
+
+<!-- Add Product Modal -->
+<div id="addProductModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add New Product</h3>
+            <button class="close-btn" onclick="closeAddProductModal()">&times;</button>
+        </div>
+        <div id="add-product-message"></div>
+        <div class="form-group">
+            <label>Product Name *</label>
+            <input type="text" id="add-product-name" placeholder="e.g., IBS XPOS RETAIL POS">
+        </div>
+        <div class="form-group">
+            <label>Category *</label>
+            <select id="add-product-category">
+                <option value="">Select category</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Unit *</label>
+            <select id="add-product-unit">
+                <option value="">Select unit</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="add-product-description" placeholder="Product description"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Base Price</label>
+            <input type="number" id="add-product-price" placeholder="0.00" step="0.01">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="addProduct()" style="flex: 1;">Add Product</button>
+            <button class="btn btn-secondary" onclick="closeAddProductModal()" style="flex: 1;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div id="editProductModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Product</h3>
+            <button class="close-btn" onclick="closeEditProductModal()">&times;</button>
+        </div>
+        <div id="edit-product-message"></div>
+        <input type="hidden" id="edit-product-old-name">
+        <div class="form-group">
+            <label>Product Name *</label>
+            <input type="text" id="edit-product-name">
+        </div>
+        <div class="form-group">
+            <label>Category *</label>
+            <select id="edit-product-category"></select>
+        </div>
+        <div class="form-group">
+            <label>Unit *</label>
+            <select id="edit-product-unit">
+                <option value="">Select unit</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="edit-product-description"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Base Price</label>
+            <input type="number" id="edit-product-price" step="0.01">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="updateProduct()">Update</button>
+            <button class="btn btn-secondary" onclick="closeEditProductModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Product Detail Modal -->
+<div id="detailProductModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Product Details</h3>
+            <button class="close-btn" onclick="closeDetailProductModal()">&times;</button>
+        </div>
+        <div style="padding: 10px 0;">
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">NAME</label>
+                <div id="detail-product-name" style="font-size: 18px; font-weight: bold; color: #2d3748; margin-top: 5px;"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <label style="font-weight: 600; color: #4a5568; font-size: 12px;">CATEGORY</label>
+                    <div id="detail-product-category" style="font-size: 14px; color: #2d3748; margin-top: 5px;"></div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; color: #4a5568; font-size: 12px;">UNIT</label>
+                    <div id="detail-product-unit" style="font-size: 14px; color: #2d3748; margin-top: 5px;"></div>
+                </div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">DESCRIPTION</label>
+                <div id="detail-product-description" style="font-size: 14px; color: #2d3748; margin-top: 5px; line-height: 1.6;"></div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">PRICE</label>
+                <div id="detail-product-price" style="font-size: 20px; font-weight: bold; color: #667eea; margin-top: 5px;"></div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+            <button class="btn btn-warning" onclick="editFromDetail()" style="flex: 1;">Edit</button>
+            <button class="btn btn-danger" onclick="deleteFromDetail()" style="flex: 1;">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Product Filter Modal -->
+<div id="productFilterModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3>Filter Products</h3>
+            <button class="close-btn" onclick="closeProductFilterModal()">&times;</button>
+        </div>
+        <div class="form-group">
+            <label>Filter by Category</label>
+            <select id="filter-product-category">
+                <option value="">All Categories</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Search by Name</label>
+            <input type="text" id="filter-product-name" placeholder="Type to search...">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-primary" onclick="applyProductFilter()" style="flex: 1;">Apply Filter</button>
+            <button class="btn btn-secondary" onclick="clearProductFilters()" style="flex: 1;">Clear All</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Access the globally available supabaseClient
+    const supabase = window.supabaseClient || window.lapSupabaseClient;
+    
+    let allProducts = []; // Store all products for filtering
+
+    window.loadProducts = async function() {
+        const container = document.getElementById('products-list');
+        const { data, error } = await supabase
+            .from('products')
+            .select('*, category:product_categories(name)')
+            .order('name');
+        
+        if (error) {
+            container.innerHTML = '<p class="error">Error loading products: ' + error.message + '</p>';
+            return;
+        }
+        
+        allProducts = data; // Store for filtering
+        displayProducts(data);
+    };
+
+    function displayProducts(products) {
+        const container = document.getElementById('products-list');
+        
+        if (products.length === 0) {
+            container.innerHTML = '<p style="text-align: center; padding: 20px; color: #718096;">No products found matching your filters.</p>';
+            return;
+        }
+        
+        let html = '<table><tr><th>Name</th><th>Category</th><th>Unit</th><th>Description</th><th>Price</th></tr>';
+        products.forEach((prod, index) => {
+            const rowId = `product-row-${index}`;
+            html += `<tr id="${rowId}" style="cursor: pointer;" 
+                data-name="${encodeURIComponent(prod.name)}" 
+                data-category="${encodeURIComponent(prod.category ? prod.category.name : '')}" 
+                data-unit="${encodeURIComponent(prod.unit || '')}" 
+                data-description="${encodeURIComponent(prod.description || '')}" 
+                data-price="${prod.base_price || 0}">
+                <td>${prod.name}</td>
+                <td>${prod.category ? prod.category.name : 'N/A'}</td>
+                <td>${prod.unit || 'N/A'}</td>
+                <td>${prod.description || ''}</td>
+                <td>₱${parseFloat(prod.base_price || 0).toFixed(2)}</td>
+            </tr>`;
+        });
+        html += '</table>';
+        container.innerHTML = html;
+        
+        // Add click listeners after HTML is inserted
+        products.forEach((prod, index) => {
+            const row = document.getElementById(`product-row-${index}`);
+            if (row) {
+                row.addEventListener('click', function() {
+                    showProductDetail(
+                        decodeURIComponent(this.dataset.name),
+                        decodeURIComponent(this.dataset.category),
+                        decodeURIComponent(this.dataset.unit),
+                        decodeURIComponent(this.dataset.description),
+                        this.dataset.price
+                    );
+                });
+            }
+        });
+    }
+
+    window.showProductDetail = function(name, category, unit, description, price) {
+        document.getElementById('detail-product-name').textContent = name;
+        document.getElementById('detail-product-category').textContent = category || 'N/A';
+        document.getElementById('detail-product-unit').textContent = unit || 'N/A';
+        document.getElementById('detail-product-description').textContent = description || 'No description';
+        document.getElementById('detail-product-price').textContent = '₱' + parseFloat(price || 0).toFixed(2);
+        
+        // Store data for edit/delete
+        document.getElementById('detailProductModal').dataset.name = name;
+        document.getElementById('detailProductModal').dataset.category = category;
+        document.getElementById('detailProductModal').dataset.unit = unit;
+        document.getElementById('detailProductModal').dataset.description = description;
+        document.getElementById('detailProductModal').dataset.price = price;
+        
+        document.getElementById('detailProductModal').classList.add('active');
+    };
+
+    window.closeDetailProductModal = function() {
+        document.getElementById('detailProductModal').classList.remove('active');
+    };
+
+    window.editFromDetail = function() {
+        const modal = document.getElementById('detailProductModal');
+        editProduct(
+            modal.dataset.name,
+            modal.dataset.category,
+            modal.dataset.unit,
+            modal.dataset.description,
+            modal.dataset.price
+        );
+        closeDetailProductModal();
+    };
+
+    window.deleteFromDetail = function() {
+        const modal = document.getElementById('detailProductModal');
+        deleteProduct(modal.dataset.name);
+        closeDetailProductModal();
+    };
+
+    window.searchProducts = function() {
+        const searchQuery = document.getElementById('search-product-name').value.toLowerCase();
+        
+        const filtered = allProducts.filter(prod => {
+            const matchesSearch = !searchQuery || 
+                prod.name.toLowerCase().includes(searchQuery) || 
+                (prod.description && prod.description.toLowerCase().includes(searchQuery));
+            return matchesSearch;
+        });
+        
+        displayProducts(filtered);
+    };
+
+    window.filterProducts = function() {
+        const categoryFilter = document.getElementById('filter-product-category').value.toLowerCase();
+        const nameFilter = document.getElementById('filter-product-name').value.toLowerCase();
+        
+        const filtered = allProducts.filter(prod => {
+            const matchesCategory = !categoryFilter || (prod.category && prod.category.name.toLowerCase() === categoryFilter);
+            const matchesName = !nameFilter || prod.name.toLowerCase().includes(nameFilter);
+            return matchesCategory && matchesName;
+        });
+        
+        displayProducts(filtered);
+    };
+
+    window.openProductFilterModal = async function() {
+        // Load categories for filter
+        const { data: categories } = await supabase.from('product_categories').select('*').order('name');
+        const filterSelect = document.getElementById('filter-product-category');
+        filterSelect.innerHTML = '<option value="">All Categories</option>';
+        if (categories) {
+            categories.forEach(cat => {
+                filterSelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
+            });
+        }
+        
+        document.getElementById('productFilterModal').classList.add('active');
+    };
+
+    window.closeProductFilterModal = function() {
+        document.getElementById('productFilterModal').classList.remove('active');
+    };
+
+    window.applyProductFilter = function() {
+        filterProducts();
+        closeProductFilterModal();
+    };
+
+    window.clearProductFilters = function() {
+        document.getElementById('filter-product-category').value = '';
+        document.getElementById('filter-product-name').value = '';
+        document.getElementById('search-product-name').value = '';
+        displayProducts(allProducts);
+        closeProductFilterModal();
+    };
+
+    window.addProduct = async function() {
+        const name = document.getElementById('add-product-name').value.trim();
+        const category = document.getElementById('add-product-category').value;
+        const unit = document.getElementById('add-product-unit').value;
+        const description = document.getElementById('add-product-description').value.trim();
+        const price = parseFloat(document.getElementById('add-product-price').value) || 0;
+        
+        if (!name || !category || !unit) {
+            showMessage('add-product-message', 'Please fill in all required fields (name, category, and unit)', true);
+            return;
+        }
+        
+        const { error } = await supabase.from('products').insert([{
+            name,
+            category,
+            unit,
+            description,
+            base_price: price
+        }]);
+        
+        if (error) {
+            showMessage('add-product-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('products-message', 'Product added successfully!');
+        document.getElementById('add-product-name').value = '';
+        document.getElementById('add-product-category').value = '';
+        document.getElementById('add-product-unit').value = '';
+        document.getElementById('add-product-description').value = '';
+        document.getElementById('add-product-price').value = '';
+        closeAddProductModal();
+        loadProducts();
+    };
+
+    window.openAddProductModal = async function() {
+        // Load categories and units
+        const { data: categories } = await supabase.from('product_categories').select('*').order('name');
+        const { data: units } = await supabase.from('units').select('*').order('name');
+        
+        const catSelect = document.getElementById('add-product-category');
+        catSelect.innerHTML = '<option value="">Select category</option>';
+        if (categories) {
+            categories.forEach(cat => {
+                catSelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
+            });
+        }
+        
+        const unitSelect = document.getElementById('add-product-unit');
+        unitSelect.innerHTML = '<option value="">Select unit</option>';
+        if (units) {
+            units.forEach(unit => {
+                unitSelect.innerHTML += `<option value="${unit.name}">${unit.name}</option>`;
+            });
+        }
+        
+        document.getElementById('addProductModal').classList.add('active');
+    };
+
+    window.closeAddProductModal = function() {
+        document.getElementById('addProductModal').classList.remove('active');
+        document.getElementById('add-product-message').innerHTML = '';
+    };
+
+    window.editProduct = async function(name, category, unit, description, price) {
+        document.getElementById('edit-product-old-name').value = name;
+        document.getElementById('edit-product-name').value = name;
+        document.getElementById('edit-product-description').value = description;
+        document.getElementById('edit-product-price').value = price;
+        
+        // Load categories and units for edit modal
+        const { data: categories } = await supabase.from('product_categories').select('*').order('name');
+        const { data: units } = await supabase.from('units').select('*').order('name');
+        
+        // Populate category dropdown
+        const select = document.getElementById('edit-product-category');
+        select.innerHTML = '<option value="">Select category</option>';
+        if (categories) {
+            categories.forEach(cat => {
+                const selected = cat.name === category ? 'selected' : '';
+                select.innerHTML += `<option value="${cat.name}" ${selected}>${cat.name}</option>`;
+            });
+        }
+        
+        // Populate unit dropdown
+        const unitSelect = document.getElementById('edit-product-unit');
+        unitSelect.innerHTML = '<option value="">Select unit</option>';
+        if (units) {
+            units.forEach(u => {
+                const selected = u.name === unit ? 'selected' : '';
+                unitSelect.innerHTML += `<option value="${u.name}" ${selected}>${u.name}</option>`;
+            });
+        }
+        
+        document.getElementById('editProductModal').classList.add('active');
+    };
+
+    window.closeEditProductModal = function() {
+        document.getElementById('editProductModal').classList.remove('active');
+    };
+
+    window.updateProduct = async function() {
+        const oldName = document.getElementById('edit-product-old-name').value;
+        const newName = document.getElementById('edit-product-name').value.trim();
+        const category = document.getElementById('edit-product-category').value;
+        const unit = document.getElementById('edit-product-unit').value;
+        const description = document.getElementById('edit-product-description').value.trim();
+        const price = parseFloat(document.getElementById('edit-product-price').value) || 0;
+        
+        if (!newName || !category || !unit) {
+            showMessage('edit-product-message', 'Please fill in all required fields (name, category, and unit)', true);
+            return;
+        }
+        
+        const { error } = await supabase
+            .from('products')
+            .update({
+                name: newName,
+                category,
+                unit,
+                description,
+                base_price: price
+            })
+            .eq('name', oldName);
+        
+        if (error) {
+            showMessage('edit-product-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('products-message', 'Product updated successfully!');
+        closeEditProductModal();
+        loadProducts();
+    };
+
+    window.deleteProduct = async function(name) {
+        if (!confirm(`Delete product "${name}"?`)) return;
+        
+        const { error } = await supabase.from('products').delete().eq('name', name);
+        if (error) {
+            alert('Error: ' + error.message);
+            return;
+        }
+        
+        showMessage('products-message', 'Product deleted successfully!');
+        loadProducts();
+    };
+
+    // Load data when this tab loads
+    loadProducts();
+})();
+</script>

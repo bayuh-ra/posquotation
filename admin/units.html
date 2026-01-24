@@ -1,0 +1,206 @@
+<link rel="stylesheet" href="admin/shared.css">
+
+<h2>Manage Units</h2>
+<div style="margin-bottom: 20px;">
+    <button class="btn btn-primary" onclick="openAddUnitModal()">+ Add New Unit</button>
+</div>
+<div id="units-message"></div>
+<div class="table-container" id="units-list">
+    <div class="loading">Loading...</div>
+</div>
+
+<!-- Add Unit Modal -->
+<div id="addUnitModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3>Add New Unit</h3>
+            <button class="close-btn" onclick="closeAddUnitModal()">&times;</button>
+        </div>
+        <div id="add-unit-message"></div>
+        <div class="form-group">
+            <label>Unit Name</label>
+            <input type="text" id="add-unit-name" placeholder="e.g., License, PC, Set">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="addUnit()" style="flex: 1;">Add Unit</button>
+            <button class="btn btn-secondary" onclick="closeAddUnitModal()" style="flex: 1;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Unit Modal -->
+<div id="editUnitModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Unit</h3>
+            <button class="close-btn" onclick="closeEditUnitModal()">&times;</button>
+        </div>
+        <div id="edit-unit-message"></div>
+        <input type="hidden" id="edit-unit-old-name">
+        <div class="form-group">
+            <label>Unit Name</label>
+            <input type="text" id="edit-unit-name">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="updateUnit()">Update</button>
+            <button class="btn btn-secondary" onclick="closeEditUnitModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Unit Detail Modal -->
+<div id="detailUnitModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3>Unit Details</h3>
+            <button class="close-btn" onclick="closeDetailUnitModal()">&times;</button>
+        </div>
+        <div style="padding: 10px 0;">
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">NAME</label>
+                <div id="detail-unit-name" style="font-size: 18px; font-weight: bold; color: #2d3748; margin-top: 5px;"></div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+            <button class="btn btn-warning" onclick="editUnitFromDetail()" style="flex: 1;">Edit</button>
+            <button class="btn btn-danger" onclick="deleteUnitFromDetail()" style="flex: 1;">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Access the globally available supabaseClient
+    const supabase = window.supabaseClient || window.lapSupabaseClient;
+
+    window.loadUnits = async function() {
+        const container = document.getElementById('units-list');
+        const { data, error } = await supabase.from('units').select('*').order('name');
+        
+        if (error) {
+            container.innerHTML = '<p class="error">Error loading units: ' + error.message + '</p>';
+            return;
+        }
+        
+        let html = '<table><tr><th>Name</th></tr>';
+        data.forEach((unit, index) => {
+            const rowId = `unit-row-${index}`;
+            html += `<tr id="${rowId}" style="cursor: pointer;" data-name="${encodeURIComponent(unit.name)}">
+                <td>${unit.name}</td>
+            </tr>`;
+        });
+        html += '</table>';
+        container.innerHTML = html;
+        
+        // Add click listeners
+        data.forEach((unit, index) => {
+            const row = document.getElementById(`unit-row-${index}`);
+            if (row) {
+                row.addEventListener('click', function() {
+                    showUnitDetail(decodeURIComponent(this.dataset.name));
+                });
+            }
+        });
+    };
+
+    window.showUnitDetail = function(name) {
+        document.getElementById('detail-unit-name').textContent = name;
+        document.getElementById('detailUnitModal').dataset.name = name;
+        document.getElementById('detailUnitModal').classList.add('active');
+    };
+
+    window.closeDetailUnitModal = function() {
+        document.getElementById('detailUnitModal').classList.remove('active');
+    };
+
+    window.editUnitFromDetail = function() {
+        const modal = document.getElementById('detailUnitModal');
+        editUnit(modal.dataset.name);
+        closeDetailUnitModal();
+    };
+
+    window.deleteUnitFromDetail = function() {
+        const modal = document.getElementById('detailUnitModal');
+        deleteUnit(modal.dataset.name);
+        closeDetailUnitModal();
+    };
+
+    window.addUnit = async function() {
+        const name = document.getElementById('add-unit-name').value.trim();
+        if (!name) {
+            showMessage('add-unit-message', 'Please enter a unit name', true);
+            return;
+        }
+        
+        const { error } = await supabase.from('units').insert([{ name }]);
+        if (error) {
+            showMessage('add-unit-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('units-message', 'Unit added successfully!');
+        document.getElementById('add-unit-name').value = '';
+        closeAddUnitModal();
+        loadUnits();
+    };
+
+    window.openAddUnitModal = function() {
+        document.getElementById('addUnitModal').classList.add('active');
+    };
+
+    window.closeAddUnitModal = function() {
+        document.getElementById('addUnitModal').classList.remove('active');
+        document.getElementById('add-unit-message').innerHTML = '';
+    };
+
+    window.editUnit = function(name) {
+        document.getElementById('edit-unit-old-name').value = name;
+        document.getElementById('edit-unit-name').value = name;
+        document.getElementById('editUnitModal').classList.add('active');
+    };
+
+    window.closeEditUnitModal = function() {
+        document.getElementById('editUnitModal').classList.remove('active');
+    };
+
+    window.updateUnit = async function() {
+        const oldName = document.getElementById('edit-unit-old-name').value;
+        const newName = document.getElementById('edit-unit-name').value.trim();
+        
+        if (!newName) {
+            showMessage('edit-unit-message', 'Please enter a unit name', true);
+            return;
+        }
+        
+        const { error } = await supabase
+            .from('units')
+            .update({ name: newName })
+            .eq('name', oldName);
+        
+        if (error) {
+            showMessage('edit-unit-message', 'Error: ' + error.message, true);
+            return;
+        }
+        
+        showMessage('units-message', 'Unit updated successfully!');
+        closeEditUnitModal();
+        loadUnits();
+    };
+
+    window.deleteUnit = async function(name) {
+        if (!confirm(`Delete unit "${name}"?`)) return;
+        
+        const { error } = await supabase.from('units').delete().eq('name', name);
+        if (error) {
+            alert('Error: ' + error.message);
+            return;
+        }
+        
+        showMessage('units-message', 'Unit deleted successfully!');
+        loadUnits();
+    };
+
+    // Load data when this tab loads
+    loadUnits();
+})();
+</script>
