@@ -102,59 +102,32 @@
             <h3 id="package-products-modal-title">Package Products</h3>
             <button class="close-btn" onclick="closePackageProductsModal()">&times;</button>
         </div>
-        <div class="table-container" id="package-products-modal-content">
-            <div class="loading">Loading...</div>
+        
+        <!-- View Mode -->
+        <div id="view-mode-content">
+            <div class="table-container" id="package-products-modal-content">
+                <div class="loading">Loading...</div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+                <button class="btn btn-primary" onclick="enterEditMode()" style="flex: 1;">Edit Products</button>
+                <button class="btn btn-secondary" onclick="closePackageProductsModal()" style="flex: 1;">Close</button>
+            </div>
         </div>
-        <div style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
-            <button class="btn btn-secondary" onclick="closePackageProductsModal()" style="flex: 1;">Close</button>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Package Products Modal -->
-<div id="editPackageProductsModal" class="modal-overlay">
-    <div class="modal-content" style="max-width: 600px;">
-        <div class="modal-header">
-            <h3>Edit Package Product</h3>
-            <button class="close-btn" onclick="closeEditPackageProductModal()">&times;</button>
-        </div>
-        <div id="edit-package-product-message"></div>
-
-        <div class="form-group">
-            <label>Package Name:</label>
-            <div id="edit-pkg-name" style="padding: 10px; background: #f7fafc; border-radius: 8px; font-weight: 600; color: #2d3748;"></div>
-        </div>
-
-        <div class="form-group">
-            <label>Current Product:</label>
-            <div id="edit-pkg-current-product" style="padding: 10px; background: #f7fafc; border-radius: 8px; color: #2d3748;"></div>
-        </div>
-
-        <div class="form-group">
-            <label>Select New Product (to replace current):</label>
-            <select id="edit-pkg-product-select">
-                <option value="">-- Keep Current Product --</option>
-            </select>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-top: 25px;">
-            <button class="btn btn-primary" onclick="updatePackageProductChange()" style="flex: 1;">Replace Product</button>
-            <button class="btn btn-danger" onclick="deleteCurrentEditProduct()" style="flex: 1;">Delete</button>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <button class="btn btn-secondary" onclick="closeEditPackageProductModal()" style="flex: 1;">Cancel</button>
-        </div>
-
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
-            <h4 style="margin-bottom: 15px; color: #2d3748;">Or Add More Products to Package</h4>
-            <div class="product-checkbox-list" id="edit-pkg-products-list">
+        
+        <!-- Edit Mode -->
+        <div id="edit-mode-content" style="display: none;">
+            <div id="edit-mode-message"></div>
+            <div class="product-checkbox-list" id="edit-mode-products-list" style="max-height: 400px;">
                 <div class="loading">Loading products...</div>
             </div>
-            <button class="btn btn-success" onclick="addMoreProductsToPackage()" style="width: 100%; margin-top: 15px;">Add Selected Products</button>
+            <div style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+                <button class="btn btn-success" onclick="savePackageProducts()" style="flex: 1;">Save Changes</button>
+                <button class="btn btn-secondary" onclick="cancelEditMode()" style="flex: 1;">Cancel</button>
+            </div>
         </div>
     </div>
 </div>
+
 
 <!-- Add Package Product Modal -->
 <div id="addPackageProductModal" class="modal-overlay">
@@ -222,9 +195,6 @@
     const supabase = window.supabaseClient || window.lapSupabaseClient;
     
     let allPackageProducts = [];
-    let currentEditPackageName = null;
-    let currentEditProductName = null;
-    let currentEditProductId = null;
 
     window.loadPackageProducts = async function() {
         const container = document.getElementById('package-products-list');
@@ -290,15 +260,17 @@
         const modal = document.getElementById('packageProductsModal');
 
         document.getElementById('package-products-modal-title').textContent = packageName;
+        
+        // Store current package name for edit mode
+        modal.dataset.currentPackage = packageName;
+
+        // Show view mode, hide edit mode
+        document.getElementById('view-mode-content').style.display = 'block';
+        document.getElementById('edit-mode-content').style.display = 'none';
 
         let html = `<table><tr><th>Product Name</th></tr>`;
         products.forEach(pp => {
-            const escapedProductName = pp.product_name.replace(/'/g, "\\'");
-            html += `<tr>
-                <td style="cursor: pointer;" onclick="editProductFromModal('${escapedProductName}')">
-                    ${pp.product_name}
-                </td>
-            </tr>`;
+            html += `<tr><td>${pp.product_name}</td></tr>`;
         });
         html += '</table>';
 
@@ -308,134 +280,113 @@
 
     window.closePackageProductsModal = function() {
         document.getElementById('packageProductsModal').classList.remove('active');
+        // Reset to view mode
+        document.getElementById('view-mode-content').style.display = 'block';
+        document.getElementById('edit-mode-content').style.display = 'none';
     };
 
-    window.editProductFromModal = function(productName) {
-        const packageName = document.getElementById('package-products-modal-title').textContent;
-        currentEditPackageName = packageName;
-        currentEditProductName = productName;
-
-        supabase.from('products').select('*').order('name').then(({ data: allProducts, error: productsError }) => {
-            if (productsError) {
-                showMessage('edit-package-product-message', 'Error loading products: ' + productsError.message, true);
-                return;
-            }
-
-            supabase.from('package_type_products').select('*').eq('package_type_name', packageName).eq('product_name', productName).single().then(({ data: packageProduct }) => {
-                if (packageProduct) currentEditProductId = packageProduct.id;
-
-                document.getElementById('edit-pkg-name').textContent = packageName;
-                document.getElementById('edit-pkg-current-product').textContent = productName;
-
-                const select = document.getElementById('edit-pkg-product-select');
-                select.innerHTML = '<option value="">-- Keep Current Product --</option>';
-                if (allProducts) {
-                    allProducts.forEach(prod => {
-                        if (prod.name !== productName) {
-                            select.innerHTML += `<option value="${prod.name}">${prod.name}</option>`;
-                        }
-                    });
-                }
-
-                const checkboxList = document.getElementById('edit-pkg-products-list');
-                checkboxList.innerHTML = '';
-                if (allProducts) {
-                    allProducts.forEach((prod, idx) => {
-                        if (prod.name !== productName) {
-                            const item = document.createElement('div');
-                            item.className = 'product-checkbox-item';
-                            item.innerHTML = `<input type="checkbox" id="edit-pkg-prod-${idx}" value="${prod.name}"><label for="edit-pkg-prod-${idx}">${prod.name}</label>`;
-                            checkboxList.appendChild(item);
-                        }
-                    });
-                }
-
-                document.getElementById('editPackageProductsModal').classList.add('active');
-            });
+    window.enterEditMode = async function() {
+        const modal = document.getElementById('packageProductsModal');
+        const packageName = modal.dataset.currentPackage;
+        
+        // Get current products in package
+        const currentProducts = window.packageProductsData[packageName] || [];
+        const currentProductNames = currentProducts.map(p => p.product_name);
+        
+        // Get all products from database
+        const { data: allProducts, error } = await supabase
+            .from('products')
+            .select('*')
+            .order('name');
+        
+        if (error) {
+            alert('Error loading products: ' + error.message);
+            return;
+        }
+        
+        // Build checkbox list
+        const checkboxList = document.getElementById('edit-mode-products-list');
+        checkboxList.innerHTML = '';
+        
+        allProducts.forEach((prod, idx) => {
+            const isChecked = currentProductNames.includes(prod.name);
+            const item = document.createElement('div');
+            item.className = 'product-checkbox-item';
+            item.innerHTML = `
+                <input type="checkbox" 
+                       id="edit-mode-prod-${idx}" 
+                       value="${prod.name}" 
+                       ${isChecked ? 'checked' : ''}>
+                <label for="edit-mode-prod-${idx}">${prod.name}</label>
+            `;
+            checkboxList.appendChild(item);
         });
+        
+        // Show edit mode, hide view mode
+        document.getElementById('view-mode-content').style.display = 'none';
+        document.getElementById('edit-mode-content').style.display = 'block';
     };
 
-    window.closeEditPackageProductModal = function() {
-        document.getElementById('editPackageProductsModal').classList.remove('active');
-        document.getElementById('edit-package-product-message').innerHTML = '';
+    window.cancelEditMode = function() {
+        // Return to view mode
+        document.getElementById('view-mode-content').style.display = 'block';
+        document.getElementById('edit-mode-content').style.display = 'none';
+        document.getElementById('edit-mode-message').innerHTML = '';
     };
 
-    window.deleteCurrentEditProduct = async function() {
-        if (!confirm(`Delete "${currentEditProductName}" from package "${currentEditPackageName}"?`)) return;
+    window.savePackageProducts = async function() {
+        const modal = document.getElementById('packageProductsModal');
+        const packageName = modal.dataset.currentPackage;
         
-        const { error } = await supabase
-            .from('package_type_products')
-            .delete()
-            .eq('id', currentEditProductId);
+        // Get currently checked products
+        const checkboxes = document.querySelectorAll('#edit-mode-products-list input[type="checkbox"]');
+        const selectedProducts = Array.from(checkboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
         
-        if (error) {
-            showMessage('edit-package-product-message', 'Error: ' + error.message, true);
-            return;
+        // Get current products in package
+        const currentProducts = window.packageProductsData[packageName] || [];
+        const currentProductNames = currentProducts.map(p => p.product_name);
+        
+        // Determine which products to add and which to remove
+        const productsToAdd = selectedProducts.filter(p => !currentProductNames.includes(p));
+        const productsToRemove = currentProductNames.filter(p => !selectedProducts.includes(p));
+        
+        try {
+            // Remove unchecked products
+            if (productsToRemove.length > 0) {
+                const { error: deleteError } = await supabase
+                    .from('package_type_products')
+                    .delete()
+                    .eq('package_type_name', packageName)
+                    .in('product_name', productsToRemove);
+                
+                if (deleteError) throw deleteError;
+            }
+            
+            // Add newly checked products
+            if (productsToAdd.length > 0) {
+                const newProducts = productsToAdd.map(productName => ({
+                    package_type_name: packageName,
+                    product_name: productName
+                }));
+                
+                const { error: insertError } = await supabase
+                    .from('package_type_products')
+                    .insert(newProducts);
+                
+                if (insertError) throw insertError;
+            }
+            
+            showMessage('package-products-message', 'Package products updated successfully!');
+            
+            // Reload package products and close modal
+            await loadPackageProducts();
+            closePackageProductsModal();
+            
+        } catch (error) {
+            showMessage('edit-mode-message', 'Error: ' + error.message, true);
         }
-        
-        showMessage('package-products-message', 'Product removed from package successfully!');
-        closeEditPackageProductModal();
-        loadPackageProducts();
-    };
-
-    window.updatePackageProductChange = async function() {
-        const selectedProduct = document.getElementById('edit-pkg-product-select').value;
-        
-        if (!selectedProduct) {
-            showMessage('edit-package-product-message', 'Please select a new product', true);
-            return;
-        }
-        
-        if (selectedProduct === currentEditProductName) {
-            showMessage('edit-package-product-message', 'Please select a different product', true);
-            return;
-        }
-        
-        // Delete old product
-        await supabase
-            .from('package_type_products')
-            .delete()
-            .eq('id', currentEditProductId);
-        
-        // Add new product
-        const { error } = await supabase.from('package_type_products').insert([{
-            package_type_name: currentEditPackageName,
-            product_name: selectedProduct
-        }]);
-        
-        if (error) {
-            showMessage('edit-package-product-message', 'Error: ' + error.message, true);
-            return;
-        }
-        
-        showMessage('package-products-message', 'Product replaced successfully!');
-        closeEditPackageProductModal();
-        loadPackageProducts();
-    };
-
-    window.addMoreProductsToPackage = async function() {
-        const checkboxes = document.querySelectorAll('#edit-pkg-products-list input[type="checkbox"]:checked');
-        
-        if (checkboxes.length === 0) {
-            showMessage('edit-package-product-message', 'Please select at least one product', true);
-            return;
-        }
-        
-        const productsToAdd = Array.from(checkboxes).map(cb => ({
-            package_type_name: currentEditPackageName,
-            product_name: cb.value
-        }));
-        
-        const { error } = await supabase.from('package_type_products').insert(productsToAdd);
-        
-        if (error) {
-            showMessage('edit-package-product-message', 'Error: ' + error.message, true);
-            return;
-        }
-        
-        showMessage('package-products-message', `Successfully added ${checkboxes.length} product(s)!`);
-        closeEditPackageProductModal();
-        loadPackageProducts();
     };
 
     window.searchPackageProducts = function() {
