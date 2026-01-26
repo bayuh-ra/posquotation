@@ -120,9 +120,33 @@ function handleDropdownSelection(selectElement) {
 // Get frequently used products based on actual usage in quotations
 async function getFrequentlyUsedProducts() {
     try {
-        // Query to get products used most frequently in quotations
-        // Join quotation_items with products and count occurrences
-        const { data, error } = await supabaseClient
+        // STRATEGY 1: Try to get manually configured frequently used products
+        const { data: manualProducts, error: manualError } = await supabaseClient
+            .from('frequently_used_products')
+            .select(`
+                product_id,
+                display_order,
+                product:products (
+                    id,
+                    name,
+                    description,
+                    unit,
+                    base_price
+                )
+            `)
+            .eq('is_active', true)
+            .order('display_order', { ascending: true });
+        
+        // If manual list exists and has products, use it
+        if (!manualError && manualProducts && manualProducts.length > 0) {
+            console.log('Using manually configured frequently used products');
+            return manualProducts.map(item => item.product);
+        }
+        
+        console.log('No manual frequently used products found, calculating from usage...');
+        
+        // STRATEGY 2: Fall back to usage-based calculation
+        const { data: usageData, error: usageError } = await supabaseClient
             .from('quotation_items')
             .select(`
                 product_id,
@@ -134,21 +158,21 @@ async function getFrequentlyUsedProducts() {
                     base_price
                 )
             `)
-            .not('product_id', 'is', null); // Exclude delivery rows (which have null product_id)
+            .not('product_id', 'is', null); // Exclude delivery rows
         
-        if (error) {
-            console.error('Error fetching product usage:', error);
+        if (usageError) {
+            console.error('Error fetching product usage:', usageError);
             return [];
         }
         
-        if (!data || data.length === 0) {
+        if (!usageData || usageData.length === 0) {
             console.log('No product usage data found');
             return [];
         }
         
         // Count occurrences of each product
         const productCount = {};
-        data.forEach(item => {
+        usageData.forEach(item => {
             if (item.product && item.product.id) {
                 const productId = item.product.id;
                 if (!productCount[productId]) {
@@ -167,7 +191,7 @@ async function getFrequentlyUsedProducts() {
             .slice(0, 10) // Get top 10 most used products
             .map(item => item.product);
         
-        console.log('Frequently used products (by usage):', sortedProducts);
+        console.log('Using usage-based frequently used products:', sortedProducts.length);
         return sortedProducts;
         
     } catch (error) {
@@ -175,6 +199,7 @@ async function getFrequentlyUsedProducts() {
         return [];
     }
 }
+
 
 // Load all data from Supabase
 async function loadData() {
@@ -342,7 +367,7 @@ async function loadProductsForPackageType(packageTypeName) {
             
             // Update description - replace the placeholder div content
             const descriptionDiv = document.getElementById('description-display');
-            
+
             if (descriptionDiv) {
                 // Build description HTML with product name and checkmarks
                 let descriptionHTML = `<div style="font-weight: bold; font-size: 10px; margin-bottom: 4px;">${firstItem.product_name}</div>`;
@@ -361,6 +386,10 @@ async function loadProductsForPackageType(packageTypeName) {
                 descriptionDiv.innerHTML = descriptionHTML;
                 descriptionDiv.style.color = '#000';
                 descriptionDiv.style.fontStyle = 'normal';
+                
+                // ⭐ ADD THESE LINES - Store product info in the row
+                packageRow.dataset.productId = firstItem.product ? firstItem.product.id : '';
+                packageRow.dataset.productName = firstItem.product_name;
             }
             
             // Update price
@@ -384,6 +413,8 @@ async function loadProductsForPackageType(packageTypeName) {
             // Create new product row
             const newRow = document.createElement('tr');
             newRow.className = 'product-row';
+            newRow.dataset.productId = item.product ? item.product.id : '';
+            newRow.dataset.productName = item.product_name;
             
             // Build description HTML with checkmarks
             let descriptionHTML = `<div style="font-weight: bold; font-size: 10px; padding: 5px;">${item.product_name}</div>`;
@@ -761,21 +792,23 @@ async function saveQuotation() {
             const packagePrice = parseFloat(packageRow.querySelector('.price-input')?.value) || 0;
             const packageTotal = parseFloat(packageRow.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
             
-            // Get the selected product name from description dropdown
-            const packageDesc = document.getElementById('descriptionDropdown');
-            const packageProductName = packageDesc?.options[packageDesc.selectedIndex]?.value || '';
+            // Get product_id from the row's dataset (stored when package was loaded)
+            let packageProductId = packageRow.dataset.productId ? parseInt(packageRow.dataset.productId) : null;
             
-            // Look up product_id from product name
-            let packageProductId = null;
-            if (packageProductName) {
-                const { data: productData, error: productError } = await supabaseClient
-                    .from('products')
-                    .select('id')
-                    .eq('name', packageProductName)
-                    .single();
+            // Fallback: If no productId in dataset, try to look it up by name
+            if (!packageProductId) {
+                const packageProductName = packageRow.dataset.productName || '';
                 
-                if (!productError && productData) {
-                    packageProductId = productData.id;
+                if (packageProductName) {
+                    const { data: productData, error: productError } = await supabaseClient
+                        .from('products')
+                        .select('id')
+                        .eq('name', packageProductName)
+                        .single();
+                    
+                    if (!productError && productData) {
+                        packageProductId = productData.id;
+                    }
                 }
             }
             
@@ -797,28 +830,32 @@ async function saveQuotation() {
             
             // Only save rows that have a quantity > 0
             if (qty > 0) {
-                const dropdown = row.querySelector('.product-dropdown');
-                const productName = dropdown?.options[dropdown.selectedIndex]?.value || '';
-                const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
-                const total = parseFloat(row.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
+                // Get product_id from the row's dataset (stored when product was selected)
+                const productId = row.dataset.productId ? parseInt(row.dataset.productId) : null;
                 
-                // Look up product_id from product name
-                let productId = null;
-                if (productName) {
-                    const { data: productData, error: productError } = await supabaseClient
-                        .from('products')
-                        .select('id')
-                        .eq('name', productName)
-                        .single();
-                    
-                    if (!productError && productData) {
-                        productId = productData.id;
+                // If no productId in dataset, try to look it up by name (fallback)
+                let finalProductId = productId;
+                if (!finalProductId) {
+                    const productName = row.dataset.productName || '';
+                    if (productName) {
+                        const { data: productData, error: productError } = await supabaseClient
+                            .from('products')
+                            .select('id')
+                            .eq('name', productName)
+                            .single();
+                        
+                        if (!productError && productData) {
+                            finalProductId = productData.id;
+                        }
                     }
                 }
                 
+                const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
+                const total = parseFloat(row.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
+                
                 items.push({
                     quotation_id: quotation.id,
-                    product_id: productId,
+                    product_id: finalProductId,  // ← Now this will have the actual product ID!
                     row_type: 'product',
                     quantity: qty,
                     price: price,

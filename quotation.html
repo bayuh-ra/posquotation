@@ -343,6 +343,9 @@
             position: relative;
             padding-bottom: 0.7in; /* Make room for footer */
         }
+        .hide-zero-in-print {
+            visibility: hidden !important;
+        }
     </style>
 </head>
 <body>
@@ -352,11 +355,8 @@
             <button onclick="goBack()" style="background: #6c757d; color: white;">
                 ← Back to Home
             </button>
-            <button onclick="saveQuotation()" style="background: #1a5276; color: white;">
-                Save Quotation
-            </button>
-            <button onclick="window.print()" style="background: #28a745; color: white;">
-                Save as PDF
+            <button onclick="saveAndPrintQuotation()" style="background: #28a745; color: white;">
+                💾 Save & Print as PDF
             </button>
         </div>
     </div>
@@ -697,16 +697,16 @@
                     // Add separator
                     const separator = document.createElement('option');
                     separator.disabled = true;
-                    separator.textContent = '──────────────────';
+                    // separator.textContent = '──────────────────';
                     packageTypeSelect.appendChild(separator);
                     
                     // Add Customize option
-                    const customizeOption = document.createElement('option');
-                    customizeOption.value = 'CUSTOMIZE';
-                    customizeOption.textContent = '✨ Customize (Start Fresh)';
-                    customizeOption.style.fontWeight = 'bold';
-                    customizeOption.style.color = '#667eea';
-                    packageTypeSelect.appendChild(customizeOption);
+                    // const customizeOption = document.createElement('option');
+                    // customizeOption.value = 'CUSTOMIZE';
+                    // customizeOption.textContent = '✨ Customize (Start Fresh)';
+                    // customizeOption.style.fontWeight = 'bold';
+                    // customizeOption.style.color = '#667eea';
+                    // packageTypeSelect.appendChild(customizeOption);
                 }
             }, 1000);
             
@@ -733,202 +733,266 @@
         }
         
         // Add product row function
-        async function addProductRow() {
-            const tbody = document.getElementById('quotation-tbody');
-            const deliveryRow = document.getElementById('delivery-row');
+async function addProductRow() {
+    const tbody = document.getElementById('quotation-tbody');
+    const deliveryRow = document.getElementById('delivery-row');
+    
+    const newRow = document.createElement('tr');
+    newRow.className = 'product-row';
+    
+    newRow.innerHTML = `
+        <td></td>
+        <td><input type="number" value="0" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+        <td><input type="text" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
+        <td>
+            <div class="searchable-dropdown-container" style="position: relative; padding: 5px;"></div>
+        </td>
+        <td><input type="number" class="price-input" value="" step="0.01" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+        <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
+        <td class="no-print"><button onclick="deleteRow(this)" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button></td>
+    `;
+    
+    // Insert before the delivery row
+    tbody.insertBefore(newRow, deliveryRow);
+    
+    // Create searchable dropdown
+    const container = newRow.querySelector('.searchable-dropdown-container');
+    
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = '🔍 Type to search products...';
+    searchInput.autocomplete = 'off';
+    searchInput.style.cssText = `
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 11px;
+        box-sizing: border-box;
+    `;
+    
+    const dropdownList = document.createElement('div');
+    dropdownList.style.cssText = `
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 5px;
+        right: 5px;
+        max-height: 300px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 1000;
+        margin-top: 2px;
+    `;
+    
+    // Fetch products
+    console.log('Fetching products for dropdown...');
+    const allProducts = await getProducts();
+    console.log('All products loaded:', allProducts ? allProducts.length : 0);
+    
+    const frequentlyUsed = await getFrequentlyUsedProducts();
+    console.log('Frequently used loaded:', frequentlyUsed ? frequentlyUsed.length : 0);
+    console.log('Frequently used products:', frequentlyUsed);
+    
+    let allProductsList = [];
+    
+    if (allProducts && allProducts.length > 0) {
+        // Add frequently used section
+        if (frequentlyUsed && frequentlyUsed.length > 0) {
+            const freqHeader = document.createElement('div');
+            freqHeader.textContent = '⭐ FREQUENTLY USED';
+            freqHeader.dataset.section = 'frequent-header';
+            freqHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+            dropdownList.appendChild(freqHeader);
             
-            const newRow = document.createElement('tr');
-            newRow.className = 'product-row';
-            
-            newRow.innerHTML = `
-                <td></td>
-                <td><input type="number" value="0" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                <td><input type="text" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
-                <td>
-                    <div class="searchable-dropdown-container" style="position: relative; padding: 5px;"></div>
-                </td>
-                <td><input type="number" class="price-input" value="" step="0.01" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
-                <td class="no-print"><button onclick="deleteRow(this)" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button></td>
-            `;
-            
-            // Insert before the delivery row
-            tbody.insertBefore(newRow, deliveryRow);
-            
-            // Create searchable dropdown
-            const container = newRow.querySelector('.searchable-dropdown-container');
-            
-            const searchInput = document.createElement('input');
-            searchInput.type = 'text';
-            searchInput.placeholder = '🔍 Type to search products...';
-            searchInput.autocomplete = 'off';
-            searchInput.style.cssText = `
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                font-size: 11px;
-                box-sizing: border-box;
-            `;
-            
-            const dropdownList = document.createElement('div');
-            dropdownList.style.cssText = `
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 5px;
-                right: 5px;
-                max-height: 300px;
-                overflow-y: auto;
-                background: white;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                z-index: 1000;
-                margin-top: 2px;
-            `;
-            
-            // Fetch products
-            const allProducts = await getProducts();
-            const frequentlyUsed = await getFrequentlyUsedProducts();
-            let allProductsList = [];
-            
-            if (allProducts && allProducts.length > 0) {
-                // Add frequently used
-                if (frequentlyUsed && frequentlyUsed.length > 0) {
-                    const freqHeader = document.createElement('div');
-                    freqHeader.textContent = '⭐ FREQUENTLY USED';
-                    freqHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
-                    dropdownList.appendChild(freqHeader);
-                    
-                    frequentlyUsed.forEach(product => {
-                        const item = createDropdownItem(product, true);
-                        dropdownList.appendChild(item);
-                        allProductsList.push({ element: item, name: product.name.toLowerCase() });
-                    });
-                    
-                    const separator = document.createElement('div');
-                    separator.style.cssText = 'padding: 4px; background: #f0f0f0; border-bottom: 1px solid #ddd;';
-                    dropdownList.appendChild(separator);
-                    
-                    const allHeader = document.createElement('div');
-                    allHeader.textContent = '📦 ALL PRODUCTS';
-                    allHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
-                    dropdownList.appendChild(allHeader);
-                }
-                
-                // Add all products
-                allProducts.forEach(product => {
-                    const item = createDropdownItem(product, false);
-                    dropdownList.appendChild(item);
-                    allProductsList.push({ element: item, name: product.name.toLowerCase() });
+            frequentlyUsed.forEach(product => {
+                const item = createDropdownItem(product, true);
+                dropdownList.appendChild(item);
+                allProductsList.push({ 
+                    element: item, 
+                    name: product.name.toLowerCase(),
+                    isFrequent: true 
                 });
-            }
-            
-            function createDropdownItem(product, isFrequent) {
-                const item = document.createElement('div');
-                item.textContent = (isFrequent ? '⭐ ' : '') + product.name;
-                item.style.cssText = 'padding: 8px; cursor: pointer; font-size: 11px; border-bottom: 1px solid #f0f0f0;';
-                item.dataset.name = product.name;
-                item.dataset.unit = product.unit || '';
-                item.dataset.price = product.base_price || 0;
-                
-                item.addEventListener('mouseenter', function() {
-                    this.style.background = '#e3f2fd';
-                });
-                item.addEventListener('mouseleave', function() {
-                    this.style.background = 'white';
-                });
-                item.addEventListener('click', function() {
-                    selectProduct(this.dataset);
-                });
-                
-                return item;
-            }
-            
-            function selectProduct(productData) {
-                searchInput.value = '';
-                dropdownList.style.display = 'none';
-                
-                // Set quantity to 1
-                const qtyInput = newRow.querySelector('.qty-input');
-                if (qtyInput) qtyInput.value = 1;
-                
-                // Set unit
-                const unitDisplay = newRow.querySelector('.unit-display');
-                if (unitDisplay) unitDisplay.value = productData.unit;
-                
-                // Set price
-                const priceInput = newRow.querySelector('.price-input');
-                if (priceInput) priceInput.value = productData.price;
-                
-                // Show product name and description
-                const displayDiv = document.createElement('div');
-                displayDiv.className = 'selected-product-display';
-                displayDiv.style.cssText = 'margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e0e0e0;';
-                
-                // Find the full product data to get description
-                const fullProduct = allProducts.find(p => p.name === productData.name);
-                
-                // Build display HTML
-                let displayHTML = `<div style="font-weight: bold; font-size: 11px; color: #000; margin-bottom: 4px;">${productData.name}</div>`;
-                
-                if (fullProduct && fullProduct.description) {
-                    const descLines = fullProduct.description.split('\n').filter(line => line.trim());
-                    if (descLines.length > 0) {
-                        displayHTML += '<div style="font-size: 9px; color: #666;">';
-                        descLines.forEach(line => {
-                            displayHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
-                        });
-                        displayHTML += '</div>';
-                    }
-                }
-                
-                displayDiv.innerHTML = displayHTML;
-                
-                // Remove existing display if any
-                const existingDisplay = container.querySelector('.selected-product-display');
-                if (existingDisplay) existingDisplay.remove();
-                
-                container.appendChild(displayDiv);
-                
-                calculateRowTotal(newRow);
-                calculateTotals();
-                updateTotalItemsCount();
-            }
-            
-            // Show dropdown on focus
-            searchInput.addEventListener('focus', function() {
-                dropdownList.style.display = 'block';
             });
             
-            // Search functionality
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                dropdownList.style.display = 'block';
-                
-                if (searchTerm === '') {
-                    allProductsList.forEach(item => item.element.style.display = 'block');
-                } else {
-                    allProductsList.forEach(item => {
-                        item.element.style.display = item.name.includes(searchTerm) ? 'block' : 'none';
-                    });
-                }
-            });
+            const separator = document.createElement('div');
+            separator.dataset.section = 'separator';
+            separator.style.cssText = 'padding: 4px; background: #f0f0f0; border-bottom: 1px solid #ddd;';
+            dropdownList.appendChild(separator);
             
-            // Hide dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!container.contains(e.target)) {
-                    dropdownList.style.display = 'none';
-                }
-            });
-            
-            container.appendChild(searchInput);
-            container.appendChild(dropdownList);
-            
-            // Add event listeners
-            setupRowEventListeners(newRow);
+            const allHeader = document.createElement('div');
+            allHeader.textContent = '📦 ALL PRODUCTS';
+            allHeader.dataset.section = 'all-header';
+            allHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+            dropdownList.appendChild(allHeader);
         }
+        
+        // Add all products
+        allProducts.forEach(product => {
+            const item = createDropdownItem(product, false);
+            dropdownList.appendChild(item);
+            allProductsList.push({ 
+                element: item, 
+                name: product.name.toLowerCase(),
+                isFrequent: false 
+            });
+        });
+        
+        console.log('Total products in dropdown:', allProductsList.length);
+    }
+    
+    function createDropdownItem(product, isFrequent) {
+        const item = document.createElement('div');
+        item.textContent = (isFrequent ? '⭐ ' : '') + product.name;
+        item.style.cssText = 'padding: 8px; cursor: pointer; font-size: 11px; border-bottom: 1px solid #f0f0f0;';
+        item.dataset.name = product.name;
+        item.dataset.id = product.id;  // ← ADD THIS LINE - Store product ID!
+        item.dataset.unit = product.unit || '';
+        item.dataset.price = product.base_price || 0;
+        item.dataset.frequent = isFrequent ? 'true' : 'false';
+        
+        item.addEventListener('mouseenter', function() {
+            this.style.background = '#e3f2fd';
+        });
+        item.addEventListener('mouseleave', function() {
+            this.style.background = 'white';
+        });
+        item.addEventListener('click', function() {
+            selectProduct(this.dataset);
+        });
+        
+        return item;
+    }
+    
+    function selectProduct(productData) {
+        searchInput.value = '';
+        dropdownList.style.display = 'none';
+        
+        // Set quantity to 1
+        const qtyInput = newRow.querySelector('.qty-input');
+        if (qtyInput) qtyInput.value = 1;
+        
+        // Set unit
+        const unitDisplay = newRow.querySelector('.unit-display');
+        if (unitDisplay) unitDisplay.value = productData.unit;
+        
+        // Set price
+        const priceInput = newRow.querySelector('.price-input');
+        if (priceInput) priceInput.value = productData.price;
+        
+        // ⭐ ADD THIS LINE - Store product_id in the row for later retrieval
+        newRow.dataset.productId = productData.id;
+        newRow.dataset.productName = productData.name;
+        
+        // Show product name and description
+        const displayDiv = document.createElement('div');
+        displayDiv.className = 'selected-product-display';
+        displayDiv.style.cssText = 'margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e0e0e0;';
+        
+        // Find the full product data to get description
+        const fullProduct = allProducts.find(p => p.name === productData.name);
+        
+        // Build display HTML
+        let displayHTML = `<div style="font-weight: bold; font-size: 11px; color: #000; margin-bottom: 4px;">${productData.name}</div>`;
+        
+        if (fullProduct && fullProduct.description) {
+            const descLines = fullProduct.description.split('\n').filter(line => line.trim());
+            if (descLines.length > 0) {
+                displayHTML += '<div style="font-size: 9px; color: #666;">';
+                descLines.forEach(line => {
+                    displayHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
+                });
+                displayHTML += '</div>';
+            }
+        }
+        
+        displayDiv.innerHTML = displayHTML;
+        
+        // Remove existing display if any
+        const existingDisplay = container.querySelector('.selected-product-display');
+        if (existingDisplay) existingDisplay.remove();
+        
+        container.appendChild(displayDiv);
+        
+        calculateRowTotal(newRow);
+        calculateTotals();
+        updateTotalItemsCount();
+    }    
+    // Show dropdown on focus
+    searchInput.addEventListener('focus', function() {
+        console.log('Search input focused');
+        dropdownList.style.display = 'block';
+        // Reset all items to visible
+        allProductsList.forEach(item => item.element.style.display = 'block');
+        // Show all headers
+        const headers = dropdownList.querySelectorAll('[data-section]');
+        headers.forEach(h => h.style.display = 'block');
+    });
+    
+    // IMPROVED Search functionality - KEEPS FREQUENTLY USED AT TOP
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        console.log('Searching for:', searchTerm);
+        dropdownList.style.display = 'block';
+        
+        if (searchTerm === '') {
+            // Show all items in original order
+            allProductsList.forEach(item => item.element.style.display = 'block');
+            
+            // Show all headers
+            const headers = dropdownList.querySelectorAll('[data-section]');
+            headers.forEach(h => h.style.display = 'block');
+        } else {
+            // Filter items but maintain separation
+            let frequentMatchCount = 0;
+            let allMatchCount = 0;
+            
+            allProductsList.forEach(item => {
+                const matches = item.name.includes(searchTerm);
+                
+                if (matches) {
+                    item.element.style.display = 'block';
+                    
+                    // Count matches in each section
+                    if (item.isFrequent) {
+                        frequentMatchCount++;
+                    } else {
+                        allMatchCount++;
+                    }
+                } else {
+                    item.element.style.display = 'none';
+                }
+            });
+            
+            console.log('Frequent matches:', frequentMatchCount, 'All matches:', allMatchCount);
+            
+            // Show/hide section headers based on matches
+            const freqHeader = dropdownList.querySelector('[data-section="frequent-header"]');
+            const allHeader = dropdownList.querySelector('[data-section="all-header"]');
+            const separator = dropdownList.querySelector('[data-section="separator"]');
+            
+            if (freqHeader) freqHeader.style.display = frequentMatchCount > 0 ? 'block' : 'none';
+            if (separator) separator.style.display = (frequentMatchCount > 0 && allMatchCount > 0) ? 'block' : 'none';
+            if (allHeader) allHeader.style.display = allMatchCount > 0 ? 'block' : 'none';
+        }
+    });
+    
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!container.contains(e.target)) {
+            dropdownList.style.display = 'none';
+        }
+    });
+    
+    container.appendChild(searchInput);
+    container.appendChild(dropdownList);
+    
+    // Add event listeners
+    setupRowEventListeners(newRow);
+}
         
         // Delete row function
         let rowToDelete = null;
@@ -1686,6 +1750,248 @@
                 td.style.display = 'none';
             });
         }
+
+        // Combined Save & Print function
+        async function saveAndPrintQuotation() {
+            try {
+                // Get employee name
+                const employeeName = localStorage.getItem('selectedEmployeeName');
+                const quotationNo = localStorage.getItem('currentQuotationNumber');
+                
+                if (!employeeName) {
+                    alert('Error: No employee selected. Please go back to home and select an employee.');
+                    return;
+                }
+
+                if (!quotationNo) {
+                    alert('Error: No quotation number generated. Please refresh the page.');
+                    return;
+                }
+
+                // Get client information
+                const clientName = document.querySelector('.client-info input[placeholder="Enter recipient name"]').value;
+                const officeAddress = document.querySelector('.client-info input[placeholder="Enter office address"]').value;
+                const contactPerson = document.querySelector('.client-info input[placeholder="Enter contact person"]').value;
+                const contactNumber = document.querySelector('.client-info input[placeholder="Enter contact number"]').value;
+                
+                if (!clientName || !officeAddress || !contactPerson || !contactNumber) {
+                    alert('Please fill in all client information fields.');
+                    return;
+                }
+                
+                // Get package type
+                const packageTypeSelect = document.getElementById('packageType');
+                const packageType = packageTypeSelect.options[packageTypeSelect.selectedIndex]?.text || '';
+                
+                const quotationDate = document.getElementById('quote-date').textContent;
+                
+                const subtotalInput = document.getElementById('subtotal-input');
+                const subtotal = subtotalInput ? parseFloat(subtotalInput.value) || 0 : 0;
+                
+                const totalPackagePriceInput = document.getElementById('total-package-price-input');
+                const totalPackagePrice = totalPackagePriceInput ? parseFloat(totalPackagePriceInput.value) || 0 : 0;
+                
+                const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
+                const discountInput = document.getElementById('discount-input');
+                const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
+                const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
+                
+                console.log('Saving quotation with employee_name:', employeeName);
+                console.log('Package type:', packageType);
+                
+                // STEP 1: Save the main quotation
+                const quotationPayload = {
+                    quotation_no: quotationNo,
+                    quotation_date: quotationDate,
+                    client_name: clientName,
+                    office_address: officeAddress,
+                    contact_person: contactPerson,
+                    contact_number: contactNumber,
+                    package_type: packageType,
+                    total: totalPackagePrice,
+                    discount: discount,
+                    employee_name: employeeName,
+                    status: 'pending'
+                };
+
+                console.log('Quotation payload:', quotationPayload);
+
+                const quotation = await createQuotation(quotationPayload);
+                
+                if (!quotation || !quotation.id) {
+                    alert('Error: Failed to save quotation. No response from server.');
+                    return;
+                }
+                
+                console.log('Quotation saved successfully:', quotation);
+                
+                // STEP 2: Collect all quotation items with product_id lookup
+                const items = [];
+                let rowOrder = 0;
+                
+                // Get package type row (first row)
+                const packageRow = document.getElementById('package-type-row');
+                if (packageRow) {
+                    const packageQty = parseFloat(packageRow.querySelector('.qty-input')?.value) || 0;
+                    const packagePrice = parseFloat(packageRow.querySelector('.price-input')?.value) || 0;
+                    const packageTotal = parseFloat(packageRow.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
+                    
+                    let packageProductId = packageRow.dataset.productId ? parseInt(packageRow.dataset.productId) : null;
+                    
+                    if (!packageProductId) {
+                        const packageProductName = packageRow.dataset.productName || '';
+                        if (packageProductName) {
+                            const { data: productData, error: productError } = await supabaseClient
+                                .from('products')
+                                .select('id')
+                                .eq('name', packageProductName)
+                                .single();
+                            
+                            if (!productError && productData) {
+                                packageProductId = productData.id;
+                            }
+                        }
+                    }
+                    
+                    items.push({
+                        quotation_id: quotation.id,
+                        product_id: packageProductId,
+                        row_type: 'package',
+                        quantity: packageQty,
+                        price: packagePrice,
+                        total: packageTotal,
+                        row_order: rowOrder++
+                    });
+                }
+                
+                // Get all product rows
+                const productRows = document.querySelectorAll('.product-row');
+                for (const row of productRows) {
+                    const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+                    
+                    if (qty > 0) {
+                        const productId = row.dataset.productId ? parseInt(row.dataset.productId) : null;
+                        
+                        let finalProductId = productId;
+                        if (!finalProductId) {
+                            const productName = row.dataset.productName || '';
+                            if (productName) {
+                                const { data: productData, error: productError } = await supabaseClient
+                                    .from('products')
+                                    .select('id')
+                                    .eq('name', productName)
+                                    .single();
+                                
+                                if (!productError && productData) {
+                                    finalProductId = productData.id;
+                                }
+                            }
+                        }
+                        
+                        const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
+                        const total = parseFloat(row.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
+                        
+                        items.push({
+                            quotation_id: quotation.id,
+                            product_id: finalProductId,
+                            row_type: 'product',
+                            quantity: qty,
+                            price: price,
+                            total: total,
+                            row_order: rowOrder++
+                        });
+                    }
+                }
+                
+                // Get delivery row
+                const deliveryRow = document.getElementById('delivery-row');
+                if (deliveryRow) {
+                    const deliveryPrice = parseFloat(deliveryRow.querySelector('.delivery-price-input')?.value) || 0;
+                    const deliveryTotal = deliveryRow.querySelector('.delivery-total-cell')?.textContent || 'FREE';
+                    const deliveryTotalNum = deliveryTotal === 'FREE' ? 0 : parseFloat(deliveryTotal.replace(/[₱,]/g, '')) || 0;
+                    
+                    items.push({
+                        quotation_id: quotation.id,
+                        product_id: null,
+                        row_type: 'delivery',
+                        quantity: 1,
+                        price: deliveryPrice,
+                        total: deliveryTotalNum,
+                        row_order: rowOrder++
+                    });
+                }
+                
+                console.log('Items to save:', items);
+                
+                // STEP 3: Save all items to database
+                if (items.length > 0) {
+                    const { data: savedItems, error: itemsError } = await supabaseClient
+                        .from('quotation_items')
+                        .insert(items)
+                        .select();
+                    
+                    if (itemsError) {
+                        console.error('Error saving quotation items:', itemsError);
+                        alert('Quotation saved, but failed to save items: ' + itemsError.message);
+                        return;
+                    }
+                    
+                    console.log('Items saved successfully:', savedItems);
+                }
+                
+                // Clear the stored quotation number
+                localStorage.removeItem('currentQuotationNumber');
+                
+                // STEP 4: Mark zero values to hide in print
+                markZeroValuesForPrint();
+                
+                // STEP 5: Trigger print dialog
+                console.log('Quotation saved successfully. Opening print dialog...');
+                setTimeout(() => {
+                    window.print();
+                    
+                    // After printing, show success message and option to go back
+                    setTimeout(() => {
+                        const goToList = confirm(`Quotation saved successfully!\n\nQuotation No: ${quotation.quotation_no || quotationNo}\nClient: ${clientName}\n\nWould you like to go to the quotations list?`);
+                        
+                        if (goToList) {
+                            window.location.href = 'quotationlist.html';
+                        } else {
+                            window.location.href = 'index.html';
+                        }
+                    }, 500);
+                }, 500);
+                
+            } catch (error) {
+                console.error('Error in saveAndPrintQuotation:', error);
+                alert('Error saving quotation: ' + (error.message || 'Unknown error'));
+            }
+        }
+
+        // Function to mark zero values to hide in print
+        function markZeroValuesForPrint() {
+            // Hide zero price inputs
+            document.querySelectorAll('.price-input').forEach(input => {
+                const value = parseFloat(input.value) || 0;
+                if (value === 0) {
+                    input.classList.add('hide-zero-in-print');
+                }
+            });
+            
+            // Hide zero total cells that show ₱0.00
+            document.querySelectorAll('.total-cell').forEach(cell => {
+                if (cell.textContent.trim() === '₱0.00') {
+                    cell.classList.add('hide-zero-in-print');
+                }
+            });
+        }
+
+        // Clean up zero value classes after print
+        window.addEventListener('afterprint', function() {
+            document.querySelectorAll('.hide-zero-in-print').forEach(element => {
+                element.classList.remove('hide-zero-in-print');
+            });
+        });
         
     </script>
 
