@@ -14,6 +14,28 @@
     <link rel="stylesheet" href="styles/quotation.css">
     
     <style>
+        @page {
+            size: A4 portrait;
+            margin: 0.5in;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            .page {
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
+            
+            /* Prevent page breaks inside critical sections */
+            table, tr, td, th {
+                page-break-inside: avoid;
+            }
+        }
+        
         /* Mobile responsive button styles */
         .no-print {
             text-align: center;
