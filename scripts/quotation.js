@@ -687,7 +687,10 @@ function updateTotalItemsCount() {
     rows.forEach(row => {
         const qtyInput = row.querySelector('.qty-input');
         if (qtyInput) {
-            totalItems += parseFloat(qtyInput.value) || 0;
+            const qty = parseFloat(qtyInput.value) || 0;
+            if (qty > 0) {
+                totalItems++; // ✅ Count items with qty > 0
+            }
         }
     });
     
