@@ -303,6 +303,11 @@ function populatePackageTypes() {
 }
 
 // Load products associated with a package type
+// ============================================
+// FIX: Show Product Descriptions for All Rows
+// Replace the loadProductsForPackageType() function in quotation.js (around line 306)
+// ============================================
+
 async function loadProductsForPackageType(packageTypeName) {
     const tbody = document.getElementById('quotation-tbody');
     const packageRow = document.getElementById('package-type-row');
@@ -387,7 +392,7 @@ async function loadProductsForPackageType(packageTypeName) {
                 descriptionDiv.style.color = '#000';
                 descriptionDiv.style.fontStyle = 'normal';
                 
-                // ⭐ ADD THESE LINES - Store product info in the row
+                // Store product info in the row
                 packageRow.dataset.productId = firstItem.product ? firstItem.product.id : '';
                 packageRow.dataset.productName = firstItem.product_name;
             }
@@ -416,12 +421,14 @@ async function loadProductsForPackageType(packageTypeName) {
             newRow.dataset.productId = item.product ? item.product.id : '';
             newRow.dataset.productName = item.product_name;
             
-            // Build description HTML with checkmarks
+            // ✅ BUILD DESCRIPTION HTML WITH NAME + CHECKMARKS (THIS IS THE FIX!)
             let descriptionHTML = `<div style="font-weight: bold; font-size: 10px; padding: 5px;">${item.product_name}</div>`;
+            
+            // ✅ ADD THE DESCRIPTION WITH BULLET POINTS
             if (item.product && item.product.description) {
                 const descLines = item.product.description.split('\n').filter(line => line.trim());
                 if (descLines.length > 0) {
-                    descriptionHTML += '<div style="font-size: 9px; color: #666; margin-top: 4px;">';
+                    descriptionHTML += '<div style="font-size: 9px; color: #666; padding: 2px 5px;">';
                     descLines.forEach(line => {
                         descriptionHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
                     });
