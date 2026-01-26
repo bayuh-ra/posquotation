@@ -363,6 +363,28 @@
         .hide-zero-in-print {
             visibility: hidden !important;
         }
+        /* Editable content styling */
+        [contenteditable="true"] {
+            cursor: text;
+            transition: all 0.2s ease;
+        }
+
+        [contenteditable="true"]:hover {
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+
+        [contenteditable="true"]:focus {
+            background-color: rgba(76, 175, 80, 0.1);
+            outline: none;
+        }
+
+        /* Hide edit borders when printing */
+        @media print {
+            [contenteditable="true"] {
+                border: none !important;
+                background: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -554,41 +576,117 @@
         <div class="page page-break">
             <!-- Terms and Conditions -->
             <div class="terms-section">
-                <h3 style="font-weight: bold; margin-bottom: 12px; font-size: 13px; color: #000;">Terms and Conditions:</h3>
+                <h3 contenteditable="true" style="font-weight: bold; margin-bottom: 12px; font-size: 13px; color: #000; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                    onfocus="this.style.border='1px solid #4CAF50'" 
+                    onblur="this.style.border='1px solid transparent'">
+                    Terms and Conditions:
+                </h3>
+                
                 <ol class="terms-list" style="margin-left: 25px; font-size: 11px; color: #000; font-weight: 500;">
-                    <li style="margin-bottom: 3px;">Payment Terms:
-                        <div style="margin-left: 40px; margin-top: 3px;">
-                            <div class="payment-term-line">
-                                <strong>₱<input type="text" class="payment-amount-input" value="30000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
-                                <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc;">down payment (non refundable) upon confirmation of order</span>
-                            </div>
-                            <div class="payment-term-line">
-                                <strong>₱<input type="text" class="payment-amount-input" value="40000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
-                                <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc;">upon delivery and completion (Cash/on date check)</span>
-                            </div>
-                            <div class="payment-term-line">
-                                <strong>₱<input type="text" class="payment-amount-input" value="45000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
-                                <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc;">upon delivery and completion (30 days PDC)</span>
-                            </div>
-                        </div>
-                        <div style="margin-left: 15px; margin-top: 5px;">
-                            For check payments, please make check payable to <strong><em>LAP I.T. SOLUTIONS</em></strong>
-                        </div>
+                    <!-- Payment Terms -->
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        Payment Terms:
                     </li>
-                    <li style="margin-bottom: 3px;">All prices quoted are valid for 7 days from the date of quotation.</li>
-                    <li style="margin-bottom: 3px;">Grand Total is <strong>VAT exclusive.</strong></li>
-                    <li style="margin-bottom: 3px;">Initial, partial and down payments are considered binding and non-refundable.</li>
-                    <li style="margin-bottom: 3px;">For Davao City clients, delivery of goods and services will be 3 to 5 days upon date of down payment.</li>
-                    <li style="margin-bottom: 3px;">For clients outside Davao City, delivery of goods and services will be 5 to 7 days upon date of down payment. <span style="background-color: yellow; font-weight: bold;">Delivery and other related expenses will be shouldered by the client.</span></li>
-                    <li style="margin-bottom: 3px;">Internet Connection is required for license activation and online support purposes.</li>
-                    <li style="margin-bottom: 3px;">Any fortuitous event may void the warranty. However, certain consideration will be given to the client.</li>
-                    <li style="margin-bottom: 3px;">Any form of hacking or cracking of our software may void the contract.</li>
-                    <li style="margin-bottom: 3px;">If within Davao City, on site visit will be conducted 1 to 3 business days upon request.</li>
-                    <li style="margin-bottom: 3px;">If outside Davao City, on site visit will be 3 to 10 business days upon request and all expenses such as transportation, accommodation and other related cost must be shouldered by the client.</li>
-                    <li style="margin-bottom: 3px;">LAP I.T. Solutions may ask the client to provide some documents (hard or soft copy) to complete the implementation.</li>
-                    <li style="margin-bottom: 3px;">Customization and system enhancement is not included in the quotation therefore, charges may apply.</li>
-                    <li style="margin-bottom: 3px;">The aforementioned POS package is covered by hardware warranty for a period of twelve (12) months from date of delivery. The provision of this warranty and maintenance shall not cover direct or indirect loss of the unit resulting from any of the following:
-                        <div style="margin-left: 40px; margin-top: 5px;">
+                    <div style="margin-left: 40px; margin-top: 3px;">
+                        <div class="payment-term-line">
+                            <strong>₱<input type="text" class="payment-amount-input" value="30000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
+                            <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc; outline: none;">down payment (non refundable) upon confirmation of order</span>
+                        </div>
+                        <div class="payment-term-line">
+                            <strong>₱<input type="text" class="payment-amount-input" value="40000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
+                            <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc; outline: none;">upon delivery and completion (Cash/on date check)</span>
+                        </div>
+                        <div class="payment-term-line">
+                            <strong>₱<input type="text" class="payment-amount-input" value="45000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
+                            <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc; outline: none;">upon delivery and completion (30 days PDC)</span>
+                        </div>
+                    </div>
+                    <div contenteditable="true" style="margin-left: 15px; margin-top: 5px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                         onfocus="this.style.border='1px solid #4CAF50'" 
+                         onblur="this.style.border='1px solid transparent'">
+                        For check payments, please make check payable to <strong><em>LAP I.T. SOLUTIONS</em></strong>
+                    </div>
+                    
+                    <!-- All other terms - fully editable -->
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        All prices quoted are valid for 7 days from the date of quotation.
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        Grand Total is <strong>VAT exclusive.</strong>
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        Initial, partial and down payments are considered binding and non-refundable.
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        For Davao City clients, delivery of goods and services will be 3 to 5 days upon date of down payment.
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        For clients outside Davao City, delivery of goods and services will be 5 to 7 days upon date of down payment. <span style="background-color: yellow; font-weight: bold;">Delivery and other related expenses will be shouldered by the client.</span>
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        Internet Connection is required for license activation and online support purposes.
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        Any fortuitous event may void the warranty. However, certain consideration will be given to the client.
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        Any form of hacking or cracking of our software may void the contract.
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        If within Davao City, on site visit will be conducted 1 to 3 business days upon request.
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        If outside Davao City, on site visit will be 3 to 10 business days upon request and all expenses such as transportation, accommodation and other related cost must be shouldered by the client.
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        LAP I.T. Solutions may ask the client to provide some documents (hard or soft copy) to complete the implementation.
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        Customization and system enhancement is not included in the quotation therefore, charges may apply.
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        The aforementioned POS package is covered by hardware warranty for a period of twelve (12) months from date of delivery. The provision of this warranty and maintenance shall not cover direct or indirect loss of the unit resulting from any of the following:
+                        <div contenteditable="true" style="margin-left: 40px; margin-top: 5px; outline: none;">
                             14.1 Normal wear and tear, improper use of the unit and in-adherence to prescribed<br>
                             <span style="margin-left: 28px;">instructions for normal operation and maintenance of the unit;</span><br>
                             14.2 Faulty electrical wiring and improper grounding within the buyer's premises;<br>
@@ -601,25 +699,62 @@
                     </li>
                 </ol>
                 
-                <p style="font-weight: bold; margin-top: 15px; margin-bottom: 8px; font-size: 11px; color: #000;">Support & Warranty:</p>
+                <!-- Support & Warranty Section -->
+                <p contenteditable="true" style="font-weight: bold; margin-top: 15px; margin-bottom: 8px; font-size: 11px; color: #000; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                   onfocus="this.style.border='1px solid #4CAF50'" 
+                   onblur="this.style.border='1px solid transparent'">
+                    Support & Warranty:
+                </p>
+                
                 <ul style="margin-left: 25px; font-size: 11px; color: #000; list-style-type: circle; font-weight: 500;">
-                    <li style="margin-bottom: 8px;">Guaranteed Technical support for 12 months via text message, voice call, email, chat via messenger and online support via anydesk or teamviewer.</li>
-                    <li style="margin-bottom: 8px;">After one (1) year, client is encourage to pay ₱1,000/month for continued technical support</li>
-                    <li style="margin-bottom: 8px;">Software use is covered by Service License Agreement (SLA) and End User License Agreement (EULA).</li>
+                    <li contenteditable="true" style="margin-bottom: 8px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        Guaranteed Technical support for 12 months via text message, voice call, email, chat via messenger and online support via anydesk or teamviewer.
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 8px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        After one (1) year, client is encourage to pay ₱1,000/month for continued technical support
+                    </li>
+                    
+                    <li contenteditable="true" style="margin-bottom: 8px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                        onfocus="this.style.border='1px solid #4CAF50'" 
+                        onblur="this.style.border='1px solid transparent'">
+                        Software use is covered by Service License Agreement (SLA) and End User License Agreement (EULA).
+                    </li>
                 </ul>
                 
-                <p style="margin-top: 15px; font-size: 11px; color: #000; font-weight: 500;">Our warranty is absolutely limited to the specified parts and services mentioned above.</p>
+                <!-- Final paragraphs -->
+                <p contenteditable="true" style="margin-top: 15px; font-size: 11px; color: #000; font-weight: 500; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                   onfocus="this.style.border='1px solid #4CAF50'" 
+                   onblur="this.style.border='1px solid transparent'">
+                    Our warranty is absolutely limited to the specified parts and services mentioned above.
+                </p>
                 
-                <p style="margin-top: 15px; font-size: 11px; color: #000; font-weight: 500;">This document serves as a contract agreement as well as acknowledgement receipt. If all is in order, kindly sign Below.</p>
+                <p contenteditable="true" style="margin-top: 15px; font-size: 11px; color: #000; font-weight: 500; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                   onfocus="this.style.border='1px solid #4CAF50'" 
+                   onblur="this.style.border='1px solid transparent'">
+                    This document serves as a contract agreement as well as acknowledgement receipt. If all is in order, kindly sign Below.
+                </p>
             </div>
             
             <!-- Signature Section -->
             <div class="signature-section" style="margin-top: 25px;">
                 <div style="display: flex; align-items: flex-end;">
-                    <p style="font-weight: bold; font-size: 11px; color: #000; margin: 0; margin-right: 15px; padding-bottom: 20px;">CONFORME:</p>
+                    <p contenteditable="true" style="font-weight: bold; font-size: 11px; color: #000; margin: 0; margin-right: 15px; padding-bottom: 20px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                       onfocus="this.style.border='1px solid #4CAF50'" 
+                       onblur="this.style.border='1px solid transparent'">
+                        CONFORME:
+                    </p>
                     <div>
                         <div style="width: 200px; border-bottom: 1px solid #000; margin-bottom: 3px;"></div>
-                        <div style="font-size: 10px; color: #000; text-align: center;">Signature over Printed Name</div>
+                        <div contenteditable="true" style="font-size: 10px; color: #000; text-align: center; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
+                             onfocus="this.style.border='1px solid #4CAF50'" 
+                             onblur="this.style.border='1px solid transparent'">
+                            Signature over Printed Name
+                        </div>
                     </div>
                 </div>
             </div>
