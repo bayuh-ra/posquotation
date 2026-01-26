@@ -160,16 +160,52 @@ async function updatePackageTypeByName(oldName, newName, description) {
 
 // ===== PACKAGE ITEMS =====
 async function getPackageItems(packageName) {
-  const { data, error } = await supabaseClient
+  console.log('getPackageItems called for:', packageName);
+  
+  // First, get the package type products
+  const { data: packageProducts, error: packageError } = await supabaseClient
     .from('package_type_products')
-    .select(`
-      *,
-      product:products!package_type_products_product_name_fkey(name, base_price, description, unit)
-    `)
+    .select('*')
     .eq('package_type_name', packageName);
   
-  if (error) console.error('Error fetching package items:', error);
-  return data || [];
+  if (packageError) {
+    console.error('Error fetching package products:', packageError);
+    return [];
+  }
+  
+  if (!packageProducts || packageProducts.length === 0) {
+    console.log('No products found for package:', packageName);
+    return [];
+  }
+  
+  console.log('Package products:', packageProducts);
+  
+  // Now fetch the full product details for each product_name
+  const productNames = packageProducts.map(pp => pp.product_name);
+  
+  const { data: products, error: productsError } = await supabaseClient
+    .from('products')
+    .select('*')
+    .in('name', productNames);
+  
+  if (productsError) {
+    console.error('Error fetching product details:', productsError);
+    return [];
+  }
+  
+  // Combine the data
+  const result = packageProducts.map(pp => {
+    const product = products.find(p => p.name === pp.product_name);
+    return {
+      ...pp,
+      product: product || null
+    };
+  });
+  
+  console.log('Package items loaded:', result.length);
+  console.log('Package items data:', result);
+  
+  return result;
 }
 
 // ===== QUOTATIONS =====
