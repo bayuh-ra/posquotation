@@ -1765,6 +1765,21 @@
             console.log('Package Type:', quotation.package_type);
             console.log('All quotation fields:', Object.keys(quotation));
 
+            // ========================================
+            // FIX: ENSURE PACKAGE TYPES ARE LOADED FIRST
+            // ========================================
+            if (!packageTypes || packageTypes.length === 0) {
+                console.log('Package types not loaded yet, loading now...');
+                try {
+                    await loadData();
+                    // Wait for dropdown to populate
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    console.log('Package types loaded:', packageTypes.length);
+                } catch (error) {
+                    console.error('Error loading package types:', error);
+                }
+            }
+
             // Restore Page 2 content (if saved)
             try {
                 const page2 = document.getElementById('page2-content');
@@ -1816,6 +1831,70 @@
                     quoteDate.textContent = formatted;
                 }
             }
+
+            // ========================================
+            // FIX: SET PACKAGE TYPE DROPDOWN VALUE
+            // ========================================
+            const packageTypeSelect = document.getElementById('packageType');
+            if (packageTypeSelect && quotation.package_type) {
+                console.log('Setting package type dropdown to:', quotation.package_type);
+                console.log('Available options:', Array.from(packageTypeSelect.options).map(o => ({
+                    value: o.value,
+                    text: o.text
+                })));
+
+                // Try to find and select the matching option
+                let optionFound = false;
+                for (let i = 0; i < packageTypeSelect.options.length; i++) {
+                    const option = packageTypeSelect.options[i];
+                    // Match by text content OR value
+                    if (option.text.trim() === quotation.package_type.trim() ||
+                        option.value.trim() === quotation.package_type.trim()) {
+                        packageTypeSelect.selectedIndex = i;
+                        optionFound = true;
+                        console.log('✓ Package type selected:', option.text);
+                        break;
+                    }
+                }
+
+                if (!optionFound) {
+                    console.warn('⚠ Package type not found in dropdown:', quotation.package_type);
+
+                    // FALLBACK: Display package type as styled text
+                    const packageTypeRow = packageTypeSelect.closest('tr');
+                    const packageTypeCell = packageTypeSelect.closest('td');
+
+                    if (packageTypeCell) {
+                        // Create a nice display for the package type
+                        const displayDiv = document.createElement('div');
+                        displayDiv.className = 'package-type-display-viewmode';
+                        displayDiv.style.cssText = `
+                            font-size: 12px;
+                            font-weight: bold;
+                            padding: 12px 15px;
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+                            margin-top: 8px;
+                            display: inline-block;
+                            min-width: 250px;
+                        `;
+                        displayDiv.innerHTML = `📦 ${quotation.package_type}`;
+
+                        // Hide the dropdown and show our custom display
+                        packageTypeSelect.style.display = 'none';
+                        packageTypeCell.appendChild(displayDiv);
+
+                        console.log('✓ Created custom package type display');
+                    }
+                }
+            } else {
+                console.warn('Package type select not found or no package type in quotation');
+            }
+            // ========================================
+            // END OF PACKAGE TYPE FIX
+            // ========================================
 
             // LOAD QUOTATION ITEMS WITH PRODUCT DATA USING JOIN
             try {
@@ -1902,7 +1981,6 @@
             // Make page read-only
             makePageReadOnly();
         }
-
         // Function to populate the quotation items in the table
         function populateQuotationItems(items, packageType) {
             const tbody = document.getElementById('quotation-tbody');
@@ -2013,22 +2091,37 @@
             if (buttonContainer) {
                 const viewBanner = document.createElement('div');
                 viewBanner.className = 'no-print';
-                viewBanner.style.cssText = 'background: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #856404; border-radius: 8px; font-size: 16px;';
-                viewBanner.innerHTML = '🔒 VIEW MODE - This quotation is read-only. You can only print or save as PDF.';
+                viewBanner.style.cssText = 'background: #e3f2fd; border: 2px solid #2196F3; padding: 15px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #1565C0; border-radius: 8px; font-size: 16px;';
+                viewBanner.innerHTML = '👁️ VIEW MODE - This is a saved quotation. You can save it as PDF or go back to the list.';
                 buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);
             }
 
-            // Update "Save Quotation" button
+            // ✅ REPLACE "Save & Print" button with "Save as PDF" button
             const buttons = document.querySelectorAll('.button-container button');
-            if (buttons[1]) { // Second button is "Save Quotation"
-                buttons[1].textContent = '🔒 View Mode (Read Only)';
-                buttons[1].style.background = '#6c757d';
-                buttons[1].style.cursor = 'not-allowed';
+            if (buttons[1]) { // Second button
+                buttons[1].textContent = '📄 Save as PDF';
+                buttons[1].style.background = '#2196F3';  // Blue color
+                buttons[1].style.color = 'white';
+                buttons[1].style.cursor = 'pointer';
+
+                // Make it trigger the print dialog (which allows saving as PDF)
                 buttons[1].onclick = function (e) {
                     e.preventDefault();
-                    alert('This quotation is in view-only mode. You cannot make changes.');
+
+                    console.log('Save as PDF clicked');
+
+                    // Mark zero values to hide in print
+                    markZeroValuesForPrint();
+
+                    // Trigger print dialog
+                    setTimeout(() => {
+                        window.print();
+                    }, 200);
+
                     return false;
                 };
+
+                console.log('✓ Save as PDF button configured');
             }
 
             // Change "Back" button text to "Back to List"
@@ -2042,6 +2135,14 @@
                 input.disabled = true;
                 input.style.cursor = 'not-allowed';
                 input.style.opacity = '0.7';
+            });
+
+            // Disable contenteditable elements
+            const editableElements = document.querySelectorAll('[contenteditable="true"]');
+            editableElements.forEach(element => {
+                element.contentEditable = 'false';
+                element.style.cursor = 'not-allowed';
+                element.style.opacity = '0.7';
             });
 
             // Hide all delete buttons
@@ -2065,8 +2166,9 @@
             actionCells.forEach(td => {
                 td.style.display = 'none';
             });
-        }
 
+            console.log('✓ Page set to read-only mode');
+        }
         // Combined Save & Print function
         async function saveAndPrintQuotation() {
             try {
