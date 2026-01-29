@@ -771,18 +771,30 @@ async function saveQuotation() {
         // Get quotation date
         const quotationDate = document.getElementById('quote-date').textContent;
 
-        // Get total amounts
+        // Get total amounts (strip ₱ and commas first)
         const subtotalInput = document.getElementById('subtotal-input');
-        const subtotal = subtotalInput ? parseFloat(subtotalInput.value) || 0 : 0;
+        const subtotal = subtotalInput
+            ? parseFloat(subtotalInput.value.replace(/[₱,]/g, '')) || 0
+            : 0;
 
         const totalPackagePriceInput = document.getElementById('total-package-price-input');
-        const totalPackagePrice = totalPackagePriceInput ? parseFloat(totalPackagePriceInput.value) || 0 : 0;
+        const totalPackagePrice = totalPackagePriceInput
+            ? parseFloat(totalPackagePriceInput.value.replace(/[₱,]/g, '')) || 0
+            : 0;
 
-        // Get onsite delivery and discount
+        // Get onsite delivery and discount (also stripping ₱ and commas)
         const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
         const discountInput = document.getElementById('discount-input');
-        const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
-        const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
+        const onsiteDelivery = onsiteDeliveryInput
+            ? parseFloat(onsiteDeliveryInput.value.replace(/[₱,]/g, '')) || 0
+            : 0;
+        const discount = discountInput
+            ? parseFloat(discountInput.value.replace(/[₱,]/g, '')) || 0
+            : 0;
+
+        // Capture PAGE 2 HTML so all edits are persisted
+        const page2Content = document.getElementById('page2-content');
+        const page2Html = page2Content ? page2Content.innerHTML : null;
 
         console.log('Saving quotation with employee_name:', employeeName);
         console.log('Package type:', packageType);
@@ -798,13 +810,26 @@ async function saveQuotation() {
             package_type: packageType,
             total: totalPackagePrice,
             discount: discount,
+            page2_html: page2Html,
             employee_name: employeeName,
             status: 'pending'
         };
 
         console.log('Quotation payload:', quotationPayload);
 
-        const quotation = await createQuotation(quotationPayload);
+        // Create quotation; fallback if `page2_html` column not added yet
+        let quotation;
+        try {
+            quotation = await createQuotation(quotationPayload);
+        } catch (e) {
+            const msg = (e && e.message) ? e.message : String(e || '');
+            if (msg.toLowerCase().includes('page2_html') || msg.toLowerCase().includes('column')) {
+                const { page2_html, ...payloadWithoutPage2 } = quotationPayload;
+                quotation = await createQuotation(payloadWithoutPage2);
+            } else {
+                throw e;
+            }
+        }
 
         if (!quotation || !quotation.id) {
             alert('Error: Failed to save quotation. No response from server.');

@@ -782,3 +782,78 @@ table tfoot td {
         }
     }
 }
+
+/* ================================================
+   Save Success Modal
+   ================================================ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-dialog {
+    background: #111827;
+    color: #f9fafb;
+    padding: 24px 28px;
+    border-radius: 12px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.modal-dialog h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-dialog p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.modal-actions {
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.modal-btn.primary {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.modal-btn.primary:hover {
+    background: #1d4ed8;
+}
+
+.modal-btn.secondary {
+    background: #374151;
+    color: #e5e7eb;
+}
+
+.modal-btn.secondary:hover {
+    background: #4b5563;
+}
+
+@media print {
+    .modal-overlay {
+        display: none !important;
+    }
+}
