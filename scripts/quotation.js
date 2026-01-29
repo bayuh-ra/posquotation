@@ -1305,12 +1305,31 @@ window.addEventListener('beforeprint', function () {
         }
     });
 
+    // Hide delivery price "0" in PDF/print
+    const deliveryPriceInput = document.querySelector('#delivery-row .delivery-price-input');
+    if (deliveryPriceInput) {
+        const deliveryPrice = parseFloat(String(deliveryPriceInput.value || '').replace(/[₱,]/g, '')) || 0;
+        if (deliveryPrice === 0) {
+            // store current value so we can restore after printing
+            deliveryPriceInput.dataset.prePrintValue = deliveryPriceInput.value;
+            deliveryPriceInput.value = '';
+        } else {
+            // ensure we don't restore stale values later
+            delete deliveryPriceInput.dataset.prePrintValue;
+        }
+    }
+
     console.log('=== END BEFORE PRINT ===');
 });
 
 // After print: restore dropdown display if needed
 window.addEventListener('afterprint', function () {
     // Optionally restore dropdowns after printing
+    const deliveryPriceInput = document.querySelector('#delivery-row .delivery-price-input');
+    if (deliveryPriceInput && Object.prototype.hasOwnProperty.call(deliveryPriceInput.dataset, 'prePrintValue')) {
+        deliveryPriceInput.value = deliveryPriceInput.dataset.prePrintValue;
+        delete deliveryPriceInput.dataset.prePrintValue;
+    }
 });
 
 // Calculate total for a single row
