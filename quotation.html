@@ -494,7 +494,8 @@
                 <tbody id="quotation-tbody">
                     <!-- First Row: Package Type Product (License) -->
                     <tr id="package-type-row">
-                        <td id="total-items-cell" style="text-align: center; font-weight: bold; font-size: 12px;">0</td>
+                        <td class="item-number-cell" style="text-align: center; font-weight: bold; font-size: 12px;">1
+                        </td>
                         <td><input type="number" value="1" min="0" class="qty-input"
                                 style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
                         </td>
@@ -1040,8 +1041,7 @@
             newRow.className = 'product-row';
 
             newRow.innerHTML = `
-        <td></td>
-        <td><input type="number" value="0" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+        <td class="item-number-cell" style="text-align: center; font-weight: bold; font-size: 12px;"></td>        <td><input type="number" value="0" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
         <td><input type="text" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
         <td>
             <div class="searchable-dropdown-container" style="position: relative; padding: 5px;"></div>
@@ -1218,7 +1218,7 @@
 
                 calculateRowTotal(newRow);
                 calculateTotals();
-                updateTotalItemsCount();
+                updateItemNumbers();
             }
             // Show dropdown on focus
             searchInput.addEventListener('focus', function () {
@@ -1651,7 +1651,7 @@
 
                             calculateRowTotal(row);
                             calculateTotals();
-                            updateTotalItemsCount();
+                            updateItemNumbers();
                         }
 
                         // Show dropdown when clicking input
@@ -1731,7 +1731,7 @@
             if (typeof calculateTotals === 'function') {
                 calculateTotals();
             }
-            updateTotalItemsCount();
+            updateItemNumbers();
 
             console.log('=== CUSTOMIZE PACKAGE COMPLETE ===');
         }
@@ -1914,15 +1914,19 @@
             // Clear existing rows
             tbody.innerHTML = '';
 
-            let isFirstProductRow = true; // Track if this is the first product (second row of package)
+            let itemNumber = 1; // Sequential counter for "No. of Items" column
 
             items.forEach((item, index) => {
                 console.log('Processing item', index, ':', item);
 
-                if (item.row_type === 'package') {
-                    // Create package type row
-                    const packageRow = document.createElement('tr');
-                    packageRow.id = 'package-type-row';
+                if (item.row_type === 'package' || item.row_type === 'product') {
+                    // Create product/package row
+                    const row = document.createElement('tr');
+                    if (item.row_type === 'package') {
+                        row.id = 'package-type-row';
+                    } else {
+                        row.className = 'product-row';
+                    }
 
                     // Check if this is NEW structure (with product_id) or OLD structure (without)
                     const hasProductData = item.product && item.product.name;
@@ -1961,81 +1965,22 @@
                         }
                     }
 
-                    packageRow.innerHTML = `
-                        <td rowspan="2" style="vertical-align: top; font-weight: bold; font-size: 10px; padding: 8px;">
-                            ${packageType || 'Package'}
-                        </td>
+                    // ✅ CORRECT: Same 7-column structure as create mode
+                    row.innerHTML = `
+                        <td style="text-align: center; font-weight: bold; font-size: 12px;">${itemNumber}</td>
                         <td><input type="number" value="${item.quantity}" disabled class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
                         <td><input type="text" value="${unit}" disabled class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; width: 100%; text-align: center;"></td>
-                        <td>
-                            ${descriptionContent}
-                        </td>
+                        <td>${descriptionContent}</td>
                         <td><input type="number" value="${item.price}" disabled class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
                         <td class="total-cell" style="text-align: right; font-weight: bold;">₱${parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         <td class="no-print"></td>
                     `;
-                    tbody.appendChild(packageRow);
 
-                } else if (item.row_type === 'product') {
-                    // Create product row
-                    const productRow = document.createElement('tr');
-                    productRow.className = 'product-row';
-
-                    // Check if this is NEW structure (with product_id) or OLD structure (without)
-                    const hasProductData = item.product && item.product.name;
-
-                    // Get product data
-                    let productName, productDescription, unit;
-
-                    if (hasProductData) {
-                        // NEW structure: use data from product join
-                        productName = item.product.name;
-                        productDescription = item.product.description || '';
-                        unit = item.product.unit || '';
-                    } else {
-                        // OLD structure: use data saved in quotation_items
-                        productName = item.product_name || 'Unknown Product';
-                        productDescription = item.description || '';
-                        unit = item.unit || '';
-                    }
-
-                    // Format description with bullet points
-                    let descriptionHTML = '';
-                    if (productDescription) {
-                        const lines = productDescription.split('\n').filter(line => line.trim());
-                        if (lines.length > 1) {
-                            descriptionHTML = '<div style="font-size: 9px; color: #666; margin-top: 4px;">';
-                            lines.forEach(line => {
-                                descriptionHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
-                            });
-                            descriptionHTML += '</div>';
-                        } else if (productDescription.trim()) {
-                            descriptionHTML = `<div style="font-size: 9px; color: #666; margin-top: 4px;">${productDescription}</div>`;
-                        }
-                    }
-
-                    // First product row doesn't have empty <td> because package type has rowspan="2"
-                    // All other product rows need empty <td> for the Type column
-                    const firstColumnHTML = isFirstProductRow ? '' : '<td></td>';
-                    // Remove indentation - all products should align the same
-                    isFirstProductRow = false;
-
-                    productRow.innerHTML = `
-                        ${firstColumnHTML}
-                        <td><input type="number" value="${item.quantity}" disabled class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
-                        <td><input type="text" value="${unit}" disabled class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; width: 100%; text-align: center;"></td>
-                        <td>
-                            <div style="font-weight: bold; font-size: 10px; padding: 5px;">${productName}</div>
-                            ${descriptionHTML}
-                        </td>
-                        <td><input type="number" value="${item.price}" disabled class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
-                        <td class="total-cell" style="text-align: right; font-weight: bold;">₱${parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                        <td class="no-print"></td>
-                    `;
-                    tbody.appendChild(productRow);
+                    tbody.appendChild(row);
+                    itemNumber++; // Increment for next row
 
                 } else if (item.row_type === 'delivery') {
-                    // Create delivery row (delivery has no product)
+                    // Create delivery row (delivery has no item number)
                     const deliveryRow = document.createElement('tr');
                     deliveryRow.id = 'delivery-row';
                     const isFree = parseFloat(item.price) === 0 || parseFloat(item.total) === 0;
@@ -2059,21 +2004,8 @@
                 }
             });
 
-            // Update totals
-            const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
-            const subtotalCell = document.getElementById('subtotal-cell');
-            const discountedCell = document.getElementById('discounted-price-cell');
-
-            if (subtotalCell) {
-                subtotalCell.textContent = '₱' + subtotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
-            if (discountedCell) {
-                discountedCell.textContent = '₱' + subtotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
-
-            console.log('Finished populating', items.length, 'items. Subtotal:', subtotal);
+            console.log('Finished populating', items.length, 'items');
         }
-
         // Function to make entire page read-only
         function makePageReadOnly() {
             // Add visual indicator banner

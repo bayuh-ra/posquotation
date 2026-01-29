@@ -455,7 +455,7 @@ async function loadProductsForPackageType(packageTypeName) {
             }
 
             newRow.innerHTML = `
-                <td></td>
+                <td class="item-number-cell" style="text-align: center; font-weight: bold; font-size: 12px;"></td>
                 <td><input type="number" value="1" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                 <td><input type="text" value="${item.product && item.product.unit ? item.product.unit : ''}" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
                 <td>${descriptionHTML}</td>
@@ -481,7 +481,7 @@ async function loadProductsForPackageType(packageTypeName) {
 
         // Recalculate all totals
         calculateTotals();
-        updateTotalItemsCount();
+        updateItemNumbers();
 
         console.log('Finished loading', sortedItems.length, 'products');
 
@@ -660,7 +660,7 @@ function calculateTotals() {
     }
 
     // Update total items count
-    updateTotalItemsCount();
+    updateItemNumbers();
 }
 
 // Calculate total when inputs are manually changed
@@ -705,29 +705,34 @@ function validateTotalPackagePrice() {
 }
 
 // Update total items count in the "No. of Items" cell
-function updateTotalItemsCount() {
+function updateItemNumbers() {
     const tbody = document.getElementById('quotation-tbody');
     if (!tbody) return;
 
-    let totalItems = 0;
+    let itemNumber = 1;
 
     // Get all rows except delivery row
     const rows = tbody.querySelectorAll('tr:not(#delivery-row)');
+
     rows.forEach(row => {
         const qtyInput = row.querySelector('.qty-input');
-        if (qtyInput) {
+        const itemNumberCell = row.querySelector('.item-number-cell');
+
+        if (qtyInput && itemNumberCell) {
             const qty = parseFloat(qtyInput.value) || 0;
+
             if (qty > 0) {
-                totalItems++; // ✅ Count items with qty > 0
+                // Show sequential number (1, 2, 3...)
+                itemNumberCell.textContent = itemNumber;
+                itemNumberCell.style.visibility = 'visible';
+                itemNumber++;
+            } else {
+                // Hide number for items with qty = 0
+                itemNumberCell.textContent = '';
+                itemNumberCell.style.visibility = 'hidden';
             }
         }
     });
-
-    // Update the total items cell (if it exists)
-    const totalItemsCell = document.getElementById('total-items-cell');
-    if (totalItemsCell) {
-        totalItemsCell.textContent = totalItems;
-    }
 }
 
 // Save quotation to Supabase
