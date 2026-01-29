@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="backend/config.js"></script>
@@ -9,12 +10,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quotation - LAP I.T. Solutions</title>
-    
+
     <!-- External CSS -->
     <link rel="stylesheet" href="styles/quotation.css">
-    
-    <style>
 
+    <style>
         @media print {
             body {
                 margin: 0;
@@ -34,14 +34,14 @@
             background: #f8f9fa;
             border-bottom: 2px solid #dee2e6;
         }
-        
+
         .button-container {
             display: flex;
             gap: 10px;
             justify-content: center;
             flex-wrap: wrap;
         }
-        
+
         .button-container button {
             padding: 10px 20px;
             border: none;
@@ -54,18 +54,18 @@
             max-width: 200px;
             transition: all 0.3s;
         }
-        
+
         .button-container button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
-        
+
         @media (max-width: 768px) {
             .button-container {
                 flex-wrap: nowrap;
                 overflow-x: auto;
             }
-            
+
             .button-container button {
                 flex: 1;
                 min-width: 100px;
@@ -75,12 +75,12 @@
                 white-space: nowrap;
             }
         }
-        
+
         .add-product-btn {
             margin-top: 20px;
             text-align: center;
         }
-        
+
         .add-product-btn button {
             background: #667eea;
             color: white;
@@ -92,13 +92,13 @@
             font-weight: bold;
             transition: all 0.3s;
         }
-        
+
         .add-product-btn button:hover {
             background: #5568d3;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
-        
+
         /* Delete Confirmation Modal */
         .modal {
             display: none;
@@ -108,15 +108,20 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             animation: fadeIn 0.3s;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
-        
+
         .modal-content {
             background-color: #fefefe;
             margin: 15% auto;
@@ -124,21 +129,22 @@
             border-radius: 8px;
             width: 90%;
             max-width: 400px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             animation: slideDown 0.3s;
         }
-        
+
         @keyframes slideDown {
             from {
                 transform: translateY(-50px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
             }
         }
-        
+
         .modal-header {
             padding: 20px;
             background-color: #dc3545;
@@ -148,20 +154,20 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .modal-header h2 {
             margin: 0;
             font-size: 18px;
             font-weight: bold;
         }
-        
+
         .modal-body {
             padding: 30px 20px;
             text-align: center;
             font-size: 14px;
             color: #333;
         }
-        
+
         .modal-footer {
             padding: 15px 20px;
             display: flex;
@@ -169,7 +175,7 @@
             justify-content: flex-end;
             border-top: 1px solid #dee2e6;
         }
-        
+
         .modal-footer button {
             padding: 10px 20px;
             border: none;
@@ -179,25 +185,25 @@
             font-weight: bold;
             transition: all 0.3s;
         }
-        
+
         .btn-cancel {
             background: #6c757d;
             color: white;
         }
-        
+
         .btn-cancel:hover {
             background: #5a6268;
         }
-        
+
         .btn-delete {
             background: #dc3545;
             color: white;
         }
-        
+
         .btn-delete:hover {
             background: #c82333;
         }
-        
+
         /* PDF Preview Modal */
         .pdf-preview-modal {
             display: none;
@@ -207,10 +213,10 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
+            background-color: rgba(0, 0, 0, 0.8);
             animation: fadeIn 0.3s;
         }
-        
+
         .pdf-preview-content {
             background-color: #fff;
             margin: 2% auto;
@@ -220,9 +226,9 @@
             border-radius: 8px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
-        
+
         .pdf-preview-header {
             padding: 15px 20px;
             background-color: #1a5276;
@@ -232,13 +238,13 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .pdf-preview-header h2 {
             margin: 0;
             font-size: 18px;
             font-weight: bold;
         }
-        
+
         .close-preview {
             background: none;
             border: none;
@@ -254,26 +260,26 @@
             border-radius: 4px;
             transition: background 0.3s;
         }
-        
+
         .close-preview:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
         }
-        
+
         .pdf-preview-body {
             flex: 1;
             overflow: auto;
             padding: 20px;
             background: #f5f5f5;
         }
-        
+
         .pdf-preview-iframe {
             width: 100%;
             height: 100%;
             border: none;
             background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .pdf-preview-footer {
             padding: 15px 20px;
             display: flex;
@@ -283,7 +289,7 @@
             background: white;
             border-radius: 0 0 8px 8px;
         }
-        
+
         .pdf-preview-footer button {
             padding: 10px 30px;
             border: none;
@@ -293,25 +299,25 @@
             font-weight: bold;
             transition: all 0.3s;
         }
-        
+
         .btn-close-preview {
             background: #6c757d;
             color: white;
         }
-        
+
         .btn-close-preview:hover {
             background: #5a6268;
         }
-        
+
         .btn-download-pdf {
             background: #28a745;
             color: white;
         }
-        
+
         .btn-download-pdf:hover {
             background: #218838;
         }
-        
+
         /* Page number and footer styles */
         .page-footer {
             position: absolute;
@@ -323,7 +329,7 @@
             align-items: center;
             padding: 0 0.5in;
         }
-        
+
         .page-number {
             position: absolute;
             left: 0.5in;
@@ -338,26 +344,29 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .footer-link {
             font-size: 10px;
             color: #1a5276;
             text-align: center;
         }
-        
+
         .footer-link a {
             color: #1a5276;
             text-decoration: none;
         }
-        
+
         /* Ensure page has relative positioning for absolute footer */
         .page {
             position: relative;
-            padding-bottom: 0.7in; /* Make room for footer */
+            padding-bottom: 0.7in;
+            /* Make room for footer */
         }
+
         .hide-zero-in-print {
             visibility: hidden !important;
         }
+
         /* Editable content styling */
         [contenteditable="true"] {
             cursor: text;
@@ -382,6 +391,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- No-print buttons at the top -->
     <div class="no-print">
@@ -400,13 +410,16 @@
         <div class="page">
             <!-- Header -->
             <div class="header" style="align-items: flex-start;">
-                <div style="display: flex; flex-direction: column; align-items: center; margin-right: 15px; width: 130px; flex-shrink: 0;">
-                    <img src="LOGO1.png" alt="LAP I.T. Solutions Logo" style="height: 130px; width: 130px; object-fit: contain;">
+                <div
+                    style="display: flex; flex-direction: column; align-items: center; margin-right: 15px; width: 130px; flex-shrink: 0;">
+                    <img src="LOGO1.png" alt="LAP I.T. Solutions Logo"
+                        style="height: 130px; width: 130px; object-fit: contain;">
                 </div>
                 <div class="company-info" style="display: flex; align-items: flex-start; padding-top: 38px;">
-                    <div class="company-contact" style="line-height: 1.4; font-family: 'Arial', sans-serif; font-size: 10px; font-weight: normal; color: #000;">
+                    <div class="company-contact"
+                        style="line-height: 1.4; font-family: 'Arial', sans-serif; font-size: 10px; font-weight: normal; color: #000;">
                         <div>Door B-3 Marcela Building 11-A, J.Palma Gil Street, Davao<br>City, Philippines, 8000</div>
-                        <div>Landline: (082) 296-0363  Mobile: 0917-1147882</div>
+                        <div>Landline: (082) 296-0363 Mobile: 0917-1147882</div>
                         <div>Email: lapitsolutions09@gmail.com</div>
                     </div>
                 </div>
@@ -414,25 +427,29 @@
                     <h1></h1>
                 </div>
             </div>
-            
+
             <!-- Client & Quotation Info -->
             <div class="info-section">
                 <div class="client-info">
                     <div class="info-row">
                         <span class="info-label">To:</span>
-                        <input type="text" class="info-value border border-gray-300 rounded px-2 py-1" style="width: 180px;" placeholder="Enter recipient name">
+                        <input type="text" class="info-value border border-gray-300 rounded px-2 py-1"
+                            style="width: 180px;" placeholder="Enter recipient name">
                     </div>
                     <div class="info-row">
                         <span class="info-label">Office Address:</span>
-                        <input type="text" class="info-value border border-gray-300 rounded px-2 py-1" style="width: 180px;" placeholder="Enter office address">
+                        <input type="text" class="info-value border border-gray-300 rounded px-2 py-1"
+                            style="width: 180px;" placeholder="Enter office address">
                     </div>
                     <div class="info-row">
                         <span class="info-label">Contact Person:</span>
-                        <input type="text" class="info-value border border-gray-300 rounded px-2 py-1" style="width: 180px;" placeholder="Enter contact person">
+                        <input type="text" class="info-value border border-gray-300 rounded px-2 py-1"
+                            style="width: 180px;" placeholder="Enter contact person">
                     </div>
                     <div class="info-row">
                         <span class="info-label">Contact No:</span>
-                        <input type="text" class="info-value border border-gray-300 rounded px-2 py-1" style="width: 180px;" placeholder="Enter contact number">
+                        <input type="text" class="info-value border border-gray-300 rounded px-2 py-1"
+                            style="width: 180px;" placeholder="Enter contact number">
                     </div>
                 </div>
                 <div class="quote-info" style="text-align: right;">
@@ -442,7 +459,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Items Table -->
             <table>
                 <!-- Package Type Header Row -->
@@ -450,10 +467,13 @@
                     <tr style="background: #e8f4f8; border: 2px solid #1a5276;">
                         <td colspan="7" style="padding: 15px; vertical-align: middle;">
                             <div style="display: flex; align-items: center; gap: 15px;">
-                                <label style="font-weight: bold; color: #1a5276; white-space: nowrap;">Select Package Type:</label>
-                                <select id="packageType" onchange="handlePackageTypeChange(this)" style="font-weight: bold; font-size: 11px; padding: 8px; border: 2px solid #1a5276; border-radius: 4px; cursor: pointer; flex: 1; min-width: 250px;">
+                                <label style="font-weight: bold; color: #1a5276; white-space: nowrap;">Select Package
+                                    Type:</label>
+                                <select id="packageType" onchange="handlePackageTypeChange(this)"
+                                    style="font-weight: bold; font-size: 11px; padding: 8px; border: 2px solid #1a5276; border-radius: 4px; cursor: pointer; flex: 1; min-width: 250px;">
                                     <option value="" selected disabled>Select package type</option>
-                                    <option value="CUSTOMIZE" style="color: #dc3545; font-weight: bold;">🎨 CUSTOMIZE (Clear All)</option>
+                                    <option value="CUSTOMIZE" style="color: #dc3545; font-weight: bold;">🎨 CUSTOMIZE
+                                        (Clear All)</option>
                                 </select>
                             </div>
                         </td>
@@ -475,41 +495,62 @@
                     <!-- First Row: Package Type Product (License) -->
                     <tr id="package-type-row">
                         <td id="total-items-cell" style="text-align: center; font-weight: bold; font-size: 12px;">0</td>
-                        <td><input type="number" value="1" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                        <td><input type="text" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
-                        <td>
-                            <div id="description-display" style="font-weight: bold; font-size: 10px; color: #666; font-style: italic;">Select a package type above to load products</div>
+                        <td><input type="number" value="1" min="0" class="qty-input"
+                                style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
                         </td>
-                        <td><input type="number" class="price-input" value="" step="0.01" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+                        <td><input type="text" class="unit-display" readonly
+                                style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;">
+                        </td>
+                        <td>
+                            <div id="description-display"
+                                style="font-weight: bold; font-size: 10px; color: #666; font-style: italic;">Select a
+                                package type above to load products</div>
+                        </td>
+                        <td><input type="number" class="price-input" value="" step="0.01"
+                                style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
+                        </td>
                         <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
                         <td class="no-print"></td>
                     </tr>
-                    
+
                     <!-- Second Row: First Additional Product -->
                     <tr class="product-row">
                         <td></td>
-                        <td><input type="number" value="0" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                        <td><input type="text" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
-                        <td style="font-size: 10px; color: #999; font-style: italic;">Product will appear here when package is selected</td>
-                        <td><input type="number" class="price-input" value="" step="0.01" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+                        <td><input type="number" value="0" min="0" class="qty-input"
+                                style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
+                        </td>
+                        <td><input type="text" class="unit-display" readonly
+                                style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;">
+                        </td>
+                        <td style="font-size: 10px; color: #999; font-style: italic;">Product will appear here when
+                            package is selected</td>
+                        <td><input type="number" class="price-input" value="" step="0.01"
+                                style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
+                        </td>
                         <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
-                        <td class="no-print"><button onclick="deleteRow(this)" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button></td>
+                        <td class="no-print"><button onclick="deleteRow(this)"
+                                style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button>
+                        </td>
                     </tr>
-                    
+
                     <!-- Delivery Row (Always at bottom) -->
                     <tr id="delivery-row">
                         <td></td>
                         <td></td>
                         <td></td>
                         <td>
-                            <div style="font-style: italic;">
+                            <div id="delivery-text" style="font-style: italic;">
                                 <strong>Delivery, setup, installation, and training;</strong><br>
                                 <strong>Guaranteed (1) year technical support</strong><br>
                                 Via text, call and remote access
                             </div>
                         </td>
-                        <td><input type="number" class="delivery-price-input" value="0" step="0.01" placeholder="0 = FREE" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                        <td class="delivery-total-cell" style="text-align: right; font-weight: bold; color: #28a745;">FREE</td>
+                        <td><input type="number" class="delivery-price-input" value="0" step="0.01"
+                                placeholder="0 = FREE"
+                                style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
+                        </td>
+                        <td class="delivery-total-cell" style="text-align: right; font-weight: bold; color: #28a745;">
+                            FREE</td>
                         <td class="no-print"></td>
                     </tr>
                 </tbody>
@@ -517,173 +558,210 @@
                     <tr style="background: #d6e6f0;">
                         <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Subtotal</td>
                         <td style="text-align: right; padding: 10px;">
-                            <input type="number" id="subtotal-input" value="0" step="0.01" min="0" 
-                                   style="width: 120px; font-size: 12px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
-                                   onchange="calculateTotalFromInputs()">
+                            <input type="text" id="subtotal-input" value="₱0.00"
+                                style="width: 120px; font-size: 12px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
+                                onchange="calculateTotalFromInputs()">
                         </td>
                         <td class="no-print"></td>
                     </tr>
                     <tr style="background: #d6e6f0;">
-                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">On-site delivery setup & training (optional)</td>
+                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">On-site delivery
+                            setup & training (optional)</td>
                         <td style="text-align: right; padding: 10px;">
-                            <input type="number" id="onsite-delivery-input" value="0" step="0.01" min="0" 
-                                   style="width: 120px; font-size: 12px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
-                                   onchange="calculateTotalFromInputs()">
+                            <input type="text" id="onsite-delivery-input" value="₱0.00"
+                                style="width: 120px; font-size: 12px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
+                                onchange="calculateTotalFromInputs()">
                         </td>
                         <td class="no-print"></td>
                     </tr>
                     <tr style="background: #d6e6f0;">
                         <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Discount</td>
                         <td style="text-align: right; padding: 10px;">
-                            <input type="number" id="discount-input" value="0" step="0.01" min="0" 
-                                   style="width: 120px; font-size: 12px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
-                                   onchange="calculateTotalFromInputs()">
+                            <input type="text" id="discount-input" value="₱0.00"
+                                style="width: 120px; font-size: 12px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
+                                onchange="calculateTotalFromInputs()">
                         </td>
                         <td class="no-print"></td>
                     </tr>
                     <tr style="background: #d6e6f0;">
-                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px; font-size: 13px;">Total Package Price</td>
+                        <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px; font-size: 13px;">
+                            Total Package Price</td>
                         <td style="text-align: right; padding: 10px;">
-                            <input type="number" id="total-package-price-input" value="0" step="0.01" min="0" 
-                                   style="width: 120px; font-size: 13px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
-                                   onchange="validateTotalPackagePrice()">
+                            <input type="text" id="total-package-price-input" value="₱0.00"
+                                style="width: 120px; font-size: 13px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
+                                onchange="validateTotalPackagePrice()">
                         </td>
                         <td class="no-print"></td>
                     </tr>
                 </tfoot>
             </table>
-            
+
             <!-- Add Product Button -->
             <div class="no-print add-product-btn">
                 <button onclick="addProductRow()">+ Add Another Product</button>
             </div>
-            
+
             <!-- Page Footer -->
             <div class="page-footer">
                 <div class="page-number">1</div>
                 <div class="footer-link">
-                    <a href="https://www.facebook.com/lapsolutions/" target="_blank">https://www.facebook.com/lapsolutions/</a>
+                    <a href="https://www.facebook.com/lapsolutions/"
+                        target="_blank">https://www.facebook.com/lapsolutions/</a>
                 </div>
             </div>
         </div>
-        
+
         <!-- PAGE 2 -->
         <div class="page page-break">
             <!-- Terms and Conditions -->
             <div class="terms-section">
-                <h3 contenteditable="true" style="font-weight: bold; margin-bottom: 12px; font-size: 13px; color: #000; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                    onfocus="this.style.border='1px solid #4CAF50'" 
-                    onblur="this.style.border='1px solid transparent'">
+                <h3 contenteditable="true"
+                    style="font-weight: bold; margin-bottom: 12px; font-size: 13px; color: #000; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                    onfocus="this.style.border='1px solid #4CAF50'" onblur="this.style.border='1px solid transparent'">
                     Terms and Conditions:
                 </h3>
-                
+
                 <ol class="terms-list" style="margin-left: 25px; font-size: 11px; color: #000; font-weight: 500;">
                     <!-- Payment Terms -->
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
                         Payment Terms:
                     </li>
                     <div style="margin-left: 40px; margin-top: 3px;">
                         <div class="payment-term-line">
-                            <strong>₱<input type="text" class="payment-amount-input" value="30000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
-                            <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc; outline: none;">down payment (non refundable) upon confirmation of order</span>
+                            <strong>₱<input type="text" class="payment-amount-input" value="30000"
+                                    style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong>
+                            <span contenteditable="true"
+                                style="display: inline; border-bottom: 1px dashed #ccc; outline: none;">down payment
+                                (non refundable) upon confirmation of order</span>
                         </div>
                         <div class="payment-term-line">
-                            <strong>₱<input type="text" class="payment-amount-input" value="40000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
-                            <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc; outline: none;">upon delivery and completion (Cash/on date check)</span>
+                            <strong>₱<input type="text" class="payment-amount-input" value="40000"
+                                    style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong>
+                            <span contenteditable="true"
+                                style="display: inline; border-bottom: 1px dashed #ccc; outline: none;">upon delivery
+                                and completion (Cash/on date check)</span>
                         </div>
                         <div class="payment-term-line">
-                            <strong>₱<input type="text" class="payment-amount-input" value="45000" style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong> 
-                            <span contenteditable="true" style="display: inline; border-bottom: 1px dashed #ccc; outline: none;">upon delivery and completion (30 days PDC)</span>
+                            <strong>₱<input type="text" class="payment-amount-input" value="45000"
+                                    style="width: 70px; font-size: 11px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"></strong>
+                            <span contenteditable="true"
+                                style="display: inline; border-bottom: 1px dashed #ccc; outline: none;">upon delivery
+                                and completion (30 days PDC)</span>
                         </div>
                     </div>
-                    <div contenteditable="true" style="margin-left: 15px; margin-top: 5px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                         onfocus="this.style.border='1px solid #4CAF50'" 
-                         onblur="this.style.border='1px solid transparent'">
+                    <div contenteditable="true"
+                        style="margin-left: 15px; margin-top: 5px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
+                        onblur="this.style.border='1px solid transparent'">
                         For check payments, please make check payable to <strong><em>LAP I.T. SOLUTIONS</em></strong>
                     </div>
-                    
+
                     <!-- All other terms - fully editable -->
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
                         All prices quoted are valid for 7 days from the date of quotation.
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
                         Grand Total is <strong>VAT exclusive.</strong>
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
                         Initial, partial and down payments are considered binding and non-refundable.
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
-                        For Davao City clients, delivery of goods and services will be 3 to 5 days upon date of down payment.
+                        For Davao City clients, delivery of goods and services will be 3 to 5 days upon date of down
+                        payment.
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
-                        For clients outside Davao City, delivery of goods and services will be 5 to 7 days upon date of down payment. <span style="background-color: yellow; font-weight: bold;">Delivery and other related expenses will be shouldered by the client.</span>
+                        For clients outside Davao City, delivery of goods and services will be 5 to 7 days upon date of
+                        down payment. <span style="background-color: yellow; font-weight: bold;">Delivery and other
+                            related expenses will be shouldered by the client.</span>
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
                         Internet Connection is required for license activation and online support purposes.
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
-                        Any fortuitous event may void the warranty. However, certain consideration will be given to the client.
+                        Any fortuitous event may void the warranty. However, certain consideration will be given to the
+                        client.
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
                         Any form of hacking or cracking of our software may void the contract.
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
                         If within Davao City, on site visit will be conducted 1 to 3 business days upon request.
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
-                        If outside Davao City, on site visit will be 3 to 10 business days upon request and all expenses such as transportation, accommodation and other related cost must be shouldered by the client.
+                        If outside Davao City, on site visit will be 3 to 10 business days upon request and all expenses
+                        such as transportation, accommodation and other related cost must be shouldered by the client.
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
-                        LAP I.T. Solutions may ask the client to provide some documents (hard or soft copy) to complete the implementation.
+                        LAP I.T. Solutions may ask the client to provide some documents (hard or soft copy) to complete
+                        the implementation.
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
-                        Customization and system enhancement is not included in the quotation therefore, charges may apply.
+                        Customization and system enhancement is not included in the quotation therefore, charges may
+                        apply.
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 3px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
-                        The aforementioned POS package is covered by hardware warranty for a period of twelve (12) months from date of delivery. The provision of this warranty and maintenance shall not cover direct or indirect loss of the unit resulting from any of the following:
+                        The aforementioned POS package is covered by hardware warranty for a period of twelve (12)
+                        months from date of delivery. The provision of this warranty and maintenance shall not cover
+                        direct or indirect loss of the unit resulting from any of the following:
                         <div contenteditable="true" style="margin-left: 40px; margin-top: 5px; outline: none;">
                             14.1 Normal wear and tear, improper use of the unit and in-adherence to prescribed<br>
-                            <span style="margin-left: 28px;">instructions for normal operation and maintenance of the unit;</span><br>
+                            <span style="margin-left: 28px;">instructions for normal operation and maintenance of the
+                                unit;</span><br>
                             14.2 Faulty electrical wiring and improper grounding within the buyer's premises;<br>
                             14.3 Power fluctuation, operating the unit outside its required power input;<br>
                             14.4 Negligence, tampering and/or unauthorized repair of the unit;<br>
@@ -693,72 +771,81 @@
                         </div>
                     </li>
                 </ol>
-                
+
                 <!-- Support & Warranty Section -->
-                <p contenteditable="true" style="font-weight: bold; margin-top: 15px; margin-bottom: 8px; font-size: 11px; color: #000; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                   onfocus="this.style.border='1px solid #4CAF50'" 
-                   onblur="this.style.border='1px solid transparent'">
+                <p contenteditable="true"
+                    style="font-weight: bold; margin-top: 15px; margin-bottom: 8px; font-size: 11px; color: #000; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                    onfocus="this.style.border='1px solid #4CAF50'" onblur="this.style.border='1px solid transparent'">
                     Support & Warranty:
                 </p>
-                
+
                 <ul style="margin-left: 25px; font-size: 11px; color: #000; list-style-type: circle; font-weight: 500;">
-                    <li contenteditable="true" style="margin-bottom: 8px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+                    <li contenteditable="true"
+                        style="margin-bottom: 8px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
-                        Guaranteed Technical support for 12 months via text message, voice call, email, chat via messenger and online support via anydesk or teamviewer.
+                        Guaranteed Technical support for 12 months via text message, voice call, email, chat via
+                        messenger and online support via anydesk or teamviewer.
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 8px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 8px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
                         After one (1) year, client is encourage to pay ₱1,000/month for continued technical support
                     </li>
-                    
-                    <li contenteditable="true" style="margin-bottom: 8px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                        onfocus="this.style.border='1px solid #4CAF50'" 
+
+                    <li contenteditable="true"
+                        style="margin-bottom: 8px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
                         onblur="this.style.border='1px solid transparent'">
-                        Software use is covered by Service License Agreement (SLA) and End User License Agreement (EULA).
+                        Software use is covered by Service License Agreement (SLA) and End User License Agreement
+                        (EULA).
                     </li>
                 </ul>
-                
+
                 <!-- Final paragraphs -->
-                <p contenteditable="true" style="margin-top: 15px; font-size: 11px; color: #000; font-weight: 500; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                   onfocus="this.style.border='1px solid #4CAF50'" 
-                   onblur="this.style.border='1px solid transparent'">
+                <p contenteditable="true"
+                    style="margin-top: 15px; font-size: 11px; color: #000; font-weight: 500; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                    onfocus="this.style.border='1px solid #4CAF50'" onblur="this.style.border='1px solid transparent'">
                     Our warranty is absolutely limited to the specified parts and services mentioned above.
                 </p>
-                
-                <p contenteditable="true" style="margin-top: 15px; font-size: 11px; color: #000; font-weight: 500; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                   onfocus="this.style.border='1px solid #4CAF50'" 
-                   onblur="this.style.border='1px solid transparent'">
-                    This document serves as a contract agreement as well as acknowledgement receipt. If all is in order, kindly sign Below.
+
+                <p contenteditable="true"
+                    style="margin-top: 15px; font-size: 11px; color: #000; font-weight: 500; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                    onfocus="this.style.border='1px solid #4CAF50'" onblur="this.style.border='1px solid transparent'">
+                    This document serves as a contract agreement as well as acknowledgement receipt. If all is in order,
+                    kindly sign Below.
                 </p>
             </div>
-            
+
             <!-- Signature Section -->
             <div class="signature-section" style="margin-top: 25px;">
                 <div style="display: flex; align-items: flex-end;">
-                    <p contenteditable="true" style="font-weight: bold; font-size: 11px; color: #000; margin: 0; margin-right: 15px; padding-bottom: 20px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                       onfocus="this.style.border='1px solid #4CAF50'" 
-                       onblur="this.style.border='1px solid transparent'">
+                    <p contenteditable="true"
+                        style="font-weight: bold; font-size: 11px; color: #000; margin: 0; margin-right: 15px; padding-bottom: 20px; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                        onfocus="this.style.border='1px solid #4CAF50'"
+                        onblur="this.style.border='1px solid transparent'">
                         CONFORME:
                     </p>
                     <div>
                         <div style="width: 200px; border-bottom: 1px solid #000; margin-bottom: 3px;"></div>
-                        <div contenteditable="true" style="font-size: 10px; color: #000; text-align: center; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;" 
-                             onfocus="this.style.border='1px solid #4CAF50'" 
-                             onblur="this.style.border='1px solid transparent'">
+                        <div contenteditable="true"
+                            style="font-size: 10px; color: #000; text-align: center; outline: none; border: 1px solid transparent; padding: 2px; border-radius: 3px;"
+                            onfocus="this.style.border='1px solid #4CAF50'"
+                            onblur="this.style.border='1px solid transparent'">
                             Signature over Printed Name
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Page Footer -->
             <div class="page-footer">
                 <div class="page-number">2</div>
                 <div class="footer-link">
-                    <a href="https://www.facebook.com/lapsolutions/" target="_blank">https://www.facebook.com/lapsolutions/</a>
+                    <a href="https://www.facebook.com/lapsolutions/"
+                        target="_blank">https://www.facebook.com/lapsolutions/</a>
                 </div>
             </div>
         </div>
@@ -783,12 +870,13 @@
     </div>
 
     <!-- Scripts - Load in correct order -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="backend/supabase.js"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script src="backend/supabase.js"></script>
     <script src="scripts/quotation.js"></script>
-    
+
     <script>
         // Hide payment terms with zero values before printing
-        window.addEventListener('beforeprint', function() {
+        window.addEventListener('beforeprint', function () {
             const paymentLines = document.querySelectorAll('.payment-term-line');
             paymentLines.forEach(line => {
                 const input = line.querySelector('.payment-amount-input');
@@ -797,15 +885,15 @@
                 }
             });
         });
-        
+
         // Restore all payment terms after printing
-        window.addEventListener('afterprint', function() {
+        window.addEventListener('afterprint', function () {
             const paymentLines = document.querySelectorAll('.payment-term-line');
             paymentLines.forEach(line => {
                 line.style.display = '';
             });
         });
-        
+
         // Format payment amounts with comma separators
         function formatPaymentAmount(input) {
             let value = input.value.replace(/,/g, '');
@@ -814,61 +902,107 @@
                 input.value = num.toLocaleString('en-US', { maximumFractionDigits: 2 });
             }
         }
-        
+
         // Remove commas before editing
         function removeCommas(input) {
             input.value = input.value.replace(/,/g, '');
         }
-        
+
         // Initialize payment amount formatting
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const paymentInputs = document.querySelectorAll('.payment-amount-input');
             paymentInputs.forEach(input => {
                 // Format initial values
                 formatPaymentAmount(input);
-                
+
                 // Add event listeners
-                input.addEventListener('focus', function() {
+                input.addEventListener('focus', function () {
                     removeCommas(this);
                 });
-                
-                input.addEventListener('blur', function() {
+
+                input.addEventListener('blur', function () {
                     formatPaymentAmount(this);
                 });
             });
-            
+
             // Add "Customize" option to package type dropdown
-            setTimeout(function() {
+            setTimeout(function () {
                 const packageTypeSelect = document.getElementById('packageType');
                 if (packageTypeSelect && packageTypeSelect.options.length > 1) {
                     // Add separator
                     const separator = document.createElement('option');
                     separator.disabled = true;
-                    // separator.textContent = '──────────────────';
                     packageTypeSelect.appendChild(separator);
-                    
-                    // Add Customize option
-                    // const customizeOption = document.createElement('option');
-                    // customizeOption.value = 'CUSTOMIZE';
-                    // customizeOption.textContent = '✨ Customize (Start Fresh)';
-                    // customizeOption.style.fontWeight = 'bold';
-                    // customizeOption.style.color = '#667eea';
-                    // packageTypeSelect.appendChild(customizeOption);
                 }
             }, 1000);
-            
+
             // Add event listener for package type selection
             const packageTypeSelect = document.getElementById('packageType');
             if (packageTypeSelect) {
                 const originalChangeHandler = packageTypeSelect.onchange;
-                packageTypeSelect.addEventListener('change', function() {
+                packageTypeSelect.addEventListener('change', function () {
                     if (this.value === 'CUSTOMIZE') {
                         handleCustomizePackage();
                     }
                 });
             }
+
+            // FORMAT FOOTER INPUTS WITH PESO SIGN ON BLUR
+            const footerInputs = [
+                { id: 'subtotal-input', readonly: true },
+                { id: 'onsite-delivery-input', readonly: false },
+                { id: 'discount-input', readonly: false },
+                { id: 'total-package-price-input', readonly: false }
+            ];
+
+            footerInputs.forEach(config => {
+                const input = document.getElementById(config.id);
+                if (input && !config.readonly) {
+                    // Remove peso sign and commas on focus (for editing)
+                    input.addEventListener('focus', function () {
+                        const value = this.value.replace(/[₱,]/g, '');
+                        this.value = value;
+                    });
+
+                    // Add peso sign and commas on blur (when done editing)
+                    input.addEventListener('blur', function () {
+                        const value = parseFloat(this.value) || 0;
+                        this.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    });
+                }
+            });
+
+            // ✅ IMPORTANT: Format initial values for readonly inputs
+            // This ensures Subtotal shows ₱0.00 on page load
+            const subtotalInput = document.getElementById('subtotal-input');
+            const totalPackagePriceInput = document.getElementById('total-package-price-input');
+
+            if (subtotalInput && subtotalInput.value) {
+                const value = parseFloat(subtotalInput.value) || 0;
+                subtotalInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            if (totalPackagePriceInput && totalPackagePriceInput.value) {
+                const value = parseFloat(totalPackagePriceInput.value) || 0;
+                totalPackagePriceInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            // Format onsite delivery and discount if they have values
+            const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
+            const discountInput = document.getElementById('discount-input');
+
+            if (onsiteDeliveryInput && onsiteDeliveryInput.value) {
+                const value = parseFloat(onsiteDeliveryInput.value) || 0;
+                onsiteDeliveryInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            if (discountInput && discountInput.value) {
+                const value = parseFloat(discountInput.value) || 0;
+                discountInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
         });
-        
+
         function goBack() {
             // Check if we came from the quotations list
             const referrer = document.referrer;
@@ -878,16 +1012,16 @@
                 window.location.href = 'index.html';
             }
         }
-        
+
         // Add product row function
-async function addProductRow() {
-    const tbody = document.getElementById('quotation-tbody');
-    const deliveryRow = document.getElementById('delivery-row');
-    
-    const newRow = document.createElement('tr');
-    newRow.className = 'product-row';
-    
-    newRow.innerHTML = `
+        async function addProductRow() {
+            const tbody = document.getElementById('quotation-tbody');
+            const deliveryRow = document.getElementById('delivery-row');
+
+            const newRow = document.createElement('tr');
+            newRow.className = 'product-row';
+
+            newRow.innerHTML = `
         <td></td>
         <td><input type="number" value="0" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
         <td><input type="text" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
@@ -898,18 +1032,18 @@ async function addProductRow() {
         <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
         <td class="no-print"><button onclick="deleteRow(this)" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button></td>
     `;
-    
-    // Insert before the delivery row
-    tbody.insertBefore(newRow, deliveryRow);
-    
-    // Create searchable dropdown
-    const container = newRow.querySelector('.searchable-dropdown-container');
-    
-    const searchInput = document.createElement('input');
-    searchInput.type = 'text';
-    searchInput.placeholder = '🔍 Type to search products...';
-    searchInput.autocomplete = 'off';
-    searchInput.style.cssText = `
+
+            // Insert before the delivery row
+            tbody.insertBefore(newRow, deliveryRow);
+
+            // Create searchable dropdown
+            const container = newRow.querySelector('.searchable-dropdown-container');
+
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = '🔍 Type to search products...';
+            searchInput.autocomplete = 'off';
+            searchInput.style.cssText = `
         width: 100%;
         padding: 8px;
         border: 1px solid #ccc;
@@ -917,9 +1051,9 @@ async function addProductRow() {
         font-size: 11px;
         box-sizing: border-box;
     `;
-    
-    const dropdownList = document.createElement('div');
-    dropdownList.style.cssText = `
+
+            const dropdownList = document.createElement('div');
+            dropdownList.style.cssText = `
         display: none;
         position: absolute;
         top: 100%;
@@ -934,226 +1068,226 @@ async function addProductRow() {
         z-index: 1000;
         margin-top: 2px;
     `;
-    
-    // Fetch products
-    console.log('Fetching products for dropdown...');
-    const allProducts = await getProducts();
-    console.log('All products loaded:', allProducts ? allProducts.length : 0);
-    
-    const frequentlyUsed = await getFrequentlyUsedProducts();
-    console.log('Frequently used loaded:', frequentlyUsed ? frequentlyUsed.length : 0);
-    console.log('Frequently used products:', frequentlyUsed);
-    
-    let allProductsList = [];
-    
-    if (allProducts && allProducts.length > 0) {
-        // Add frequently used section
-        if (frequentlyUsed && frequentlyUsed.length > 0) {
-            const freqHeader = document.createElement('div');
-            freqHeader.textContent = '⭐ FREQUENTLY USED';
-            freqHeader.dataset.section = 'frequent-header';
-            freqHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
-            dropdownList.appendChild(freqHeader);
-            
-            frequentlyUsed.forEach(product => {
-                const item = createDropdownItem(product, true);
-                dropdownList.appendChild(item);
-                allProductsList.push({ 
-                    element: item, 
-                    name: product.name.toLowerCase(),
-                    isFrequent: true 
+
+            // Fetch products
+            console.log('Fetching products for dropdown...');
+            const allProducts = await getProducts();
+            console.log('All products loaded:', allProducts ? allProducts.length : 0);
+
+            const frequentlyUsed = await getFrequentlyUsedProducts();
+            console.log('Frequently used loaded:', frequentlyUsed ? frequentlyUsed.length : 0);
+            console.log('Frequently used products:', frequentlyUsed);
+
+            let allProductsList = [];
+
+            if (allProducts && allProducts.length > 0) {
+                // Add frequently used section
+                if (frequentlyUsed && frequentlyUsed.length > 0) {
+                    const freqHeader = document.createElement('div');
+                    freqHeader.textContent = '⭐ FREQUENTLY USED';
+                    freqHeader.dataset.section = 'frequent-header';
+                    freqHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+                    dropdownList.appendChild(freqHeader);
+
+                    frequentlyUsed.forEach(product => {
+                        const item = createDropdownItem(product, true);
+                        dropdownList.appendChild(item);
+                        allProductsList.push({
+                            element: item,
+                            name: product.name.toLowerCase(),
+                            isFrequent: true
+                        });
+                    });
+
+                    const separator = document.createElement('div');
+                    separator.dataset.section = 'separator';
+                    separator.style.cssText = 'padding: 4px; background: #f0f0f0; border-bottom: 1px solid #ddd;';
+                    dropdownList.appendChild(separator);
+
+                    const allHeader = document.createElement('div');
+                    allHeader.textContent = '📦 ALL PRODUCTS';
+                    allHeader.dataset.section = 'all-header';
+                    allHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+                    dropdownList.appendChild(allHeader);
+                }
+
+                // Add all products
+                allProducts.forEach(product => {
+                    const item = createDropdownItem(product, false);
+                    dropdownList.appendChild(item);
+                    allProductsList.push({
+                        element: item,
+                        name: product.name.toLowerCase(),
+                        isFrequent: false
+                    });
                 });
-            });
-            
-            const separator = document.createElement('div');
-            separator.dataset.section = 'separator';
-            separator.style.cssText = 'padding: 4px; background: #f0f0f0; border-bottom: 1px solid #ddd;';
-            dropdownList.appendChild(separator);
-            
-            const allHeader = document.createElement('div');
-            allHeader.textContent = '📦 ALL PRODUCTS';
-            allHeader.dataset.section = 'all-header';
-            allHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
-            dropdownList.appendChild(allHeader);
-        }
-        
-        // Add all products
-        allProducts.forEach(product => {
-            const item = createDropdownItem(product, false);
-            dropdownList.appendChild(item);
-            allProductsList.push({ 
-                element: item, 
-                name: product.name.toLowerCase(),
-                isFrequent: false 
-            });
-        });
-        
-        console.log('Total products in dropdown:', allProductsList.length);
-    }
-    
-    function createDropdownItem(product, isFrequent) {
-        const item = document.createElement('div');
-        item.textContent = (isFrequent ? '⭐ ' : '') + product.name;
-        item.style.cssText = 'padding: 8px; cursor: pointer; font-size: 11px; border-bottom: 1px solid #f0f0f0;';
-        item.dataset.name = product.name;
-        item.dataset.id = product.id;  // ← ADD THIS LINE - Store product ID!
-        item.dataset.unit = product.unit || '';
-        item.dataset.price = product.base_price || 0;
-        item.dataset.frequent = isFrequent ? 'true' : 'false';
-        
-        item.addEventListener('mouseenter', function() {
-            this.style.background = '#e3f2fd';
-        });
-        item.addEventListener('mouseleave', function() {
-            this.style.background = 'white';
-        });
-        item.addEventListener('click', function() {
-            selectProduct(this.dataset);
-        });
-        
-        return item;
-    }
-    
-    function selectProduct(productData) {
-        searchInput.value = '';
-        dropdownList.style.display = 'none';
-        
-        // Set quantity to 1
-        const qtyInput = newRow.querySelector('.qty-input');
-        if (qtyInput) qtyInput.value = 1;
-        
-        // Set unit
-        const unitDisplay = newRow.querySelector('.unit-display');
-        if (unitDisplay) unitDisplay.value = productData.unit;
-        
-        // Set price
-        const priceInput = newRow.querySelector('.price-input');
-        if (priceInput) priceInput.value = productData.price;
-        
-        // ⭐ ADD THIS LINE - Store product_id in the row for later retrieval
-        newRow.dataset.productId = productData.id;
-        newRow.dataset.productName = productData.name;
-        
-        // Show product name and description
-        const displayDiv = document.createElement('div');
-        displayDiv.className = 'selected-product-display';
-        displayDiv.style.cssText = 'margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e0e0e0;';
-        
-        // Find the full product data to get description
-        const fullProduct = allProducts.find(p => p.name === productData.name);
-        
-        // Build display HTML
-        let displayHTML = `<div style="font-weight: bold; font-size: 11px; color: #000; margin-bottom: 4px;">${productData.name}</div>`;
-        
-        if (fullProduct && fullProduct.description) {
-            const descLines = fullProduct.description.split('\n').filter(line => line.trim());
-            if (descLines.length > 0) {
-                displayHTML += '<div style="font-size: 9px; color: #666;">';
-                descLines.forEach(line => {
-                    displayHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
-                });
-                displayHTML += '</div>';
+
+                console.log('Total products in dropdown:', allProductsList.length);
             }
-        }
-        
-        displayDiv.innerHTML = displayHTML;
-        
-        // Remove existing display if any
-        const existingDisplay = container.querySelector('.selected-product-display');
-        if (existingDisplay) existingDisplay.remove();
-        
-        container.appendChild(displayDiv);
-        
-        calculateRowTotal(newRow);
-        calculateTotals();
-        updateTotalItemsCount();
-    }    
-    // Show dropdown on focus
-    searchInput.addEventListener('focus', function() {
-        console.log('Search input focused');
-        dropdownList.style.display = 'block';
-        // Reset all items to visible
-        allProductsList.forEach(item => item.element.style.display = 'block');
-        // Show all headers
-        const headers = dropdownList.querySelectorAll('[data-section]');
-        headers.forEach(h => h.style.display = 'block');
-    });
-    
-    // IMPROVED Search functionality - KEEPS FREQUENTLY USED AT TOP
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        console.log('Searching for:', searchTerm);
-        dropdownList.style.display = 'block';
-        
-        if (searchTerm === '') {
-            // Show all items in original order
-            allProductsList.forEach(item => item.element.style.display = 'block');
-            
-            // Show all headers
-            const headers = dropdownList.querySelectorAll('[data-section]');
-            headers.forEach(h => h.style.display = 'block');
-        } else {
-            // Filter items but maintain separation
-            let frequentMatchCount = 0;
-            let allMatchCount = 0;
-            
-            allProductsList.forEach(item => {
-                const matches = item.name.includes(searchTerm);
-                
-                if (matches) {
-                    item.element.style.display = 'block';
-                    
-                    // Count matches in each section
-                    if (item.isFrequent) {
-                        frequentMatchCount++;
-                    } else {
-                        allMatchCount++;
+
+            function createDropdownItem(product, isFrequent) {
+                const item = document.createElement('div');
+                item.textContent = (isFrequent ? '⭐ ' : '') + product.name;
+                item.style.cssText = 'padding: 8px; cursor: pointer; font-size: 11px; border-bottom: 1px solid #f0f0f0;';
+                item.dataset.name = product.name;
+                item.dataset.id = product.id;  // ← ADD THIS LINE - Store product ID!
+                item.dataset.unit = product.unit || '';
+                item.dataset.price = product.base_price || 0;
+                item.dataset.frequent = isFrequent ? 'true' : 'false';
+
+                item.addEventListener('mouseenter', function () {
+                    this.style.background = '#e3f2fd';
+                });
+                item.addEventListener('mouseleave', function () {
+                    this.style.background = 'white';
+                });
+                item.addEventListener('click', function () {
+                    selectProduct(this.dataset);
+                });
+
+                return item;
+            }
+
+            function selectProduct(productData) {
+                searchInput.value = '';
+                dropdownList.style.display = 'none';
+
+                // Set quantity to 1
+                const qtyInput = newRow.querySelector('.qty-input');
+                if (qtyInput) qtyInput.value = 1;
+
+                // Set unit
+                const unitDisplay = newRow.querySelector('.unit-display');
+                if (unitDisplay) unitDisplay.value = productData.unit;
+
+                // Set price
+                const priceInput = newRow.querySelector('.price-input');
+                if (priceInput) priceInput.value = productData.price;
+
+                // ⭐ ADD THIS LINE - Store product_id in the row for later retrieval
+                newRow.dataset.productId = productData.id;
+                newRow.dataset.productName = productData.name;
+
+                // Show product name and description
+                const displayDiv = document.createElement('div');
+                displayDiv.className = 'selected-product-display';
+                displayDiv.style.cssText = 'margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e0e0e0;';
+
+                // Find the full product data to get description
+                const fullProduct = allProducts.find(p => p.name === productData.name);
+
+                // Build display HTML
+                let displayHTML = `<div style="font-weight: bold; font-size: 11px; color: #000; margin-bottom: 4px;">${productData.name}</div>`;
+
+                if (fullProduct && fullProduct.description) {
+                    const descLines = fullProduct.description.split('\n').filter(line => line.trim());
+                    if (descLines.length > 0) {
+                        displayHTML += '<div style="font-size: 9px; color: #666;">';
+                        descLines.forEach(line => {
+                            displayHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
+                        });
+                        displayHTML += '</div>';
                     }
+                }
+
+                displayDiv.innerHTML = displayHTML;
+
+                // Remove existing display if any
+                const existingDisplay = container.querySelector('.selected-product-display');
+                if (existingDisplay) existingDisplay.remove();
+
+                container.appendChild(displayDiv);
+
+                calculateRowTotal(newRow);
+                calculateTotals();
+                updateTotalItemsCount();
+            }
+            // Show dropdown on focus
+            searchInput.addEventListener('focus', function () {
+                console.log('Search input focused');
+                dropdownList.style.display = 'block';
+                // Reset all items to visible
+                allProductsList.forEach(item => item.element.style.display = 'block');
+                // Show all headers
+                const headers = dropdownList.querySelectorAll('[data-section]');
+                headers.forEach(h => h.style.display = 'block');
+            });
+
+            // IMPROVED Search functionality - KEEPS FREQUENTLY USED AT TOP
+            searchInput.addEventListener('input', function () {
+                const searchTerm = this.value.toLowerCase();
+                console.log('Searching for:', searchTerm);
+                dropdownList.style.display = 'block';
+
+                if (searchTerm === '') {
+                    // Show all items in original order
+                    allProductsList.forEach(item => item.element.style.display = 'block');
+
+                    // Show all headers
+                    const headers = dropdownList.querySelectorAll('[data-section]');
+                    headers.forEach(h => h.style.display = 'block');
                 } else {
-                    item.element.style.display = 'none';
+                    // Filter items but maintain separation
+                    let frequentMatchCount = 0;
+                    let allMatchCount = 0;
+
+                    allProductsList.forEach(item => {
+                        const matches = item.name.includes(searchTerm);
+
+                        if (matches) {
+                            item.element.style.display = 'block';
+
+                            // Count matches in each section
+                            if (item.isFrequent) {
+                                frequentMatchCount++;
+                            } else {
+                                allMatchCount++;
+                            }
+                        } else {
+                            item.element.style.display = 'none';
+                        }
+                    });
+
+                    console.log('Frequent matches:', frequentMatchCount, 'All matches:', allMatchCount);
+
+                    // Show/hide section headers based on matches
+                    const freqHeader = dropdownList.querySelector('[data-section="frequent-header"]');
+                    const allHeader = dropdownList.querySelector('[data-section="all-header"]');
+                    const separator = dropdownList.querySelector('[data-section="separator"]');
+
+                    if (freqHeader) freqHeader.style.display = frequentMatchCount > 0 ? 'block' : 'none';
+                    if (separator) separator.style.display = (frequentMatchCount > 0 && allMatchCount > 0) ? 'block' : 'none';
+                    if (allHeader) allHeader.style.display = allMatchCount > 0 ? 'block' : 'none';
                 }
             });
-            
-            console.log('Frequent matches:', frequentMatchCount, 'All matches:', allMatchCount);
-            
-            // Show/hide section headers based on matches
-            const freqHeader = dropdownList.querySelector('[data-section="frequent-header"]');
-            const allHeader = dropdownList.querySelector('[data-section="all-header"]');
-            const separator = dropdownList.querySelector('[data-section="separator"]');
-            
-            if (freqHeader) freqHeader.style.display = frequentMatchCount > 0 ? 'block' : 'none';
-            if (separator) separator.style.display = (frequentMatchCount > 0 && allMatchCount > 0) ? 'block' : 'none';
-            if (allHeader) allHeader.style.display = allMatchCount > 0 ? 'block' : 'none';
+
+            // Hide dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!container.contains(e.target)) {
+                    dropdownList.style.display = 'none';
+                }
+            });
+
+            container.appendChild(searchInput);
+            container.appendChild(dropdownList);
+
+            // Add event listeners
+            setupRowEventListeners(newRow);
         }
-    });
-    
-    // Hide dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!container.contains(e.target)) {
-            dropdownList.style.display = 'none';
-        }
-    });
-    
-    container.appendChild(searchInput);
-    container.appendChild(dropdownList);
-    
-    // Add event listeners
-    setupRowEventListeners(newRow);
-}
-        
+
         // Delete row function
         let rowToDelete = null;
-        
+
         function deleteRow(button) {
             rowToDelete = button.closest('tr');
             document.getElementById('deleteModal').style.display = 'block';
         }
-        
+
         function closeDeleteModal() {
             document.getElementById('deleteModal').style.display = 'none';
             rowToDelete = null;
         }
-        
+
         function confirmDelete() {
             if (rowToDelete) {
                 rowToDelete.remove();
@@ -1161,43 +1295,43 @@ async function addProductRow() {
                 closeDeleteModal();
             }
         }
-        
+
         // Close modal when clicking outside of it
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById('deleteModal');
             if (event.target === modal) {
                 closeDeleteModal();
             }
         }
-        
+
         async function populateNewProductDropdown(dropdown) {
             // Fetch ALL products from database (not just package products)
             const allProducts = await getProducts();
-            
+
             dropdown.innerHTML = '<option value="" selected disabled>Select product</option>';
-            
+
             if (allProducts && allProducts.length > 0) {
                 // Filter to only show non-License products
                 const filteredProducts = allProducts.filter(product => {
                     if (!product.unit) return false;
                     return product.unit.toLowerCase() !== 'license';
                 });
-                
+
                 filteredProducts.forEach(product => {
                     const option = document.createElement('option');
                     option.value = product.name;
                     option.textContent = product.name;
-                    
+
                     // Set product data
                     option.dataset.unit = product.unit || '';
                     option.dataset.price = product.base_price || 0;
                     option.dataset.description = product.description || '';
-                    
+
                     dropdown.appendChild(option);
                 });
             }
         }
-        
+
         function populateUnitSelect(select) {
             select.innerHTML = '<option value="" selected disabled>Select</option>';
             if (units && units.length > 0) {
@@ -1209,94 +1343,94 @@ async function addProductRow() {
                 });
             }
         }
-        
+
         function setupRowEventListeners(row) {
             const productDropdown = row.querySelector('.product-dropdown');
             const qtyInput = row.querySelector('.qty-input');
             const priceInput = row.querySelector('.price-input');
-            
+
             if (productDropdown) {
-                productDropdown.addEventListener('change', function() {
+                productDropdown.addEventListener('change', function () {
                     const selectedOption = this.options[this.selectedIndex];
-                    
+
                     // Auto-set quantity to 1 when product is selected
                     const qtyInput = row.querySelector('.qty-input');
                     if (qtyInput && parseFloat(qtyInput.value) === 0) {
                         qtyInput.value = 1;
                     }
-                    
+
                     // Set unit display (read-only text)
                     const unitDisplay = row.querySelector('.unit-display');
                     if (unitDisplay && selectedOption.dataset.unit) {
                         unitDisplay.value = selectedOption.dataset.unit;
                     }
-                    
+
                     // Set price (but keep it editable)
                     if (priceInput && selectedOption.dataset.price) {
                         priceInput.value = selectedOption.dataset.price;
                     }
-                    
+
                     calculateRowTotal(row);
                     calculateTotals();
                 });
             }
-            
+
             if (qtyInput) {
-                qtyInput.addEventListener('input', function() {
+                qtyInput.addEventListener('input', function () {
                     calculateRowTotal(row);
                     calculateTotals();
                 });
             }
-            
+
             if (priceInput) {
-                priceInput.addEventListener('input', function() {
+                priceInput.addEventListener('input', function () {
                     calculateRowTotal(row);
                     calculateTotals();
                 });
             }
         }
-        
+
         // Calculate total for a single row
         function calculateRowTotal(row) {
             const qtyInput = row.querySelector('.qty-input');
             const priceInput = row.querySelector('.price-input');
             const totalCell = row.querySelector('.total-cell');
-            
+
             if (qtyInput && priceInput && totalCell) {
                 const qty = parseFloat(qtyInput.value) || 0;
                 const price = parseFloat(priceInput.value) || 0;
                 const total = qty * price;
-                
+
                 totalCell.textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
         }
-        
+
         // Handle package type change - intercept CUSTOMIZE option
         function handlePackageTypeChange(select) {
             if (select.value === 'CUSTOMIZE') {
                 // Call the customize function
                 handleCustomizePackage();
-                
+
                 // Keep the dropdown at CUSTOMIZE option
                 // Don't reset to placeholder
                 return;
             }
-            
+
             // For other package types, let the external script handle it
             // This will be handled by quotation.js
         }
-        
+
         // Handle Customize package type - clears all fields
         // Handle Customize package type - shows searchable dropdown with all products
         async function handleCustomizePackage() {
             console.log('=== CUSTOMIZE PACKAGE SELECTED ===');
-            
+
             // Clear all existing product rows except the first one
             const tbody = document.getElementById('quotation-tbody');
             const productRows = tbody.querySelectorAll('.product-row');
             productRows.forEach(row => row.remove());
             console.log('Cleared product rows');
-            
+
             // Update the first row to show a searchable product dropdown
             const packageTypeRow = document.getElementById('package-type-row');
             if (packageTypeRow) {
@@ -1305,32 +1439,32 @@ async function addProductRow() {
                 const unitDisplay = packageTypeRow.querySelector('.unit-display');
                 const priceInput = packageTypeRow.querySelector('.price-input');
                 const totalCell = packageTypeRow.querySelector('.total-cell');
-                
+
                 if (qtyInput) qtyInput.value = 0;
                 if (unitDisplay) unitDisplay.value = '';
                 if (priceInput) priceInput.value = '';
                 if (totalCell) totalCell.textContent = '₱0.00';
                 console.log('Reset inputs');
-                
+
                 // Create searchable dropdown in description cell
                 const descriptionDiv = document.getElementById('description-display');
                 console.log('Description div found:', descriptionDiv);
-                
+
                 if (descriptionDiv) {
                     console.log('Fetching products...');
-                    
+
                     try {
                         // Fetch all products and frequently used products
                         const allProducts = await getProducts();
                         console.log('All products loaded:', allProducts ? allProducts.length : 0);
-                        
+
                         const frequentlyUsed = await getFrequentlyUsedProducts();
                         console.log('Frequently used loaded:', frequentlyUsed ? frequentlyUsed.length : 0);
-                        
+
                         // Create a custom searchable dropdown
                         const container = document.createElement('div');
                         container.style.cssText = 'position: relative; padding: 5px;';
-                        
+
                         // Create input with dropdown functionality
                         const searchInput = document.createElement('input');
                         searchInput.type = 'text';
@@ -1344,7 +1478,7 @@ async function addProductRow() {
                             font-size: 11px;
                             box-sizing: border-box;
                         `;
-                        
+
                         // Create dropdown list
                         const dropdownList = document.createElement('div');
                         dropdownList.style.cssText = `
@@ -1362,10 +1496,10 @@ async function addProductRow() {
                             z-index: 1000;
                             margin-top: 2px;
                         `;
-                        
+
                         // Store all products for filtering
                         let allProductsList = [];
-                        
+
                         if (allProducts && allProducts.length > 0) {
                             // Add frequently used products first
                             if (frequentlyUsed && frequentlyUsed.length > 0) {
@@ -1373,7 +1507,7 @@ async function addProductRow() {
                                 freqHeader.textContent = '⭐ FREQUENTLY USED';
                                 freqHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
                                 dropdownList.appendChild(freqHeader);
-                                
+
                                 frequentlyUsed.forEach(product => {
                                     const item = document.createElement('div');
                                     item.textContent = '⭐ ' + product.name;
@@ -1382,31 +1516,31 @@ async function addProductRow() {
                                     item.dataset.unit = product.unit || '';
                                     item.dataset.price = product.base_price || 0;
                                     item.dataset.frequent = 'true';
-                                    
-                                    item.addEventListener('mouseenter', function() {
+
+                                    item.addEventListener('mouseenter', function () {
                                         this.style.background = '#e3f2fd';
                                     });
-                                    item.addEventListener('mouseleave', function() {
+                                    item.addEventListener('mouseleave', function () {
                                         this.style.background = 'white';
                                     });
-                                    item.addEventListener('click', function() {
+                                    item.addEventListener('click', function () {
                                         selectProduct(this.dataset);
                                     });
-                                    
+
                                     dropdownList.appendChild(item);
                                     allProductsList.push({ element: item, name: product.name.toLowerCase() });
                                 });
-                                
+
                                 const separator = document.createElement('div');
                                 separator.style.cssText = 'padding: 4px; background: #f0f0f0; border-bottom: 1px solid #ddd;';
                                 dropdownList.appendChild(separator);
-                                
+
                                 const allHeader = document.createElement('div');
                                 allHeader.textContent = '📦 ALL PRODUCTS';
                                 allHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
                                 dropdownList.appendChild(allHeader);
                             }
-                            
+
                             // Add all products
                             allProducts.forEach(product => {
                                 const item = document.createElement('div');
@@ -1415,21 +1549,21 @@ async function addProductRow() {
                                 item.dataset.name = product.name;
                                 item.dataset.unit = product.unit || '';
                                 item.dataset.price = product.base_price || 0;
-                                
-                                item.addEventListener('mouseenter', function() {
+
+                                item.addEventListener('mouseenter', function () {
                                     this.style.background = '#e3f2fd';
                                 });
-                                item.addEventListener('mouseleave', function() {
+                                item.addEventListener('mouseleave', function () {
                                     this.style.background = 'white';
                                 });
-                                item.addEventListener('click', function() {
+                                item.addEventListener('click', function () {
                                     selectProduct(this.dataset);
                                 });
-                                
+
                                 dropdownList.appendChild(item);
                                 allProductsList.push({ element: item, name: product.name.toLowerCase() });
                             });
-                            
+
                             console.log('Added', allProductsList.length, 'products to dropdown');
                         } else {
                             console.error('No products found!');
@@ -1438,27 +1572,27 @@ async function addProductRow() {
                             noProducts.style.cssText = 'padding: 8px; color: #999; font-size: 11px;';
                             dropdownList.appendChild(noProducts);
                         }
-                        
+
                         // Function to select a product
                         function selectProduct(productData) {
                             searchInput.value = '';
                             dropdownList.style.display = 'none';
-                            
+
                             // Get the row
                             const row = packageTypeRow;
-                            
+
                             // Set quantity to 1
                             const qtyInput = row.querySelector('.qty-input');
                             if (qtyInput) qtyInput.value = 1;
-                            
+
                             // Set unit
                             const unitDisplay = row.querySelector('.unit-display');
                             if (unitDisplay) unitDisplay.value = productData.unit;
-                            
+
                             // Set price
                             const priceInput = row.querySelector('.price-input');
                             if (priceInput) priceInput.value = productData.price;
-                            
+
                             // Update the displayed product name and description
                             const displayDiv = container.querySelector('.selected-product-display');
                             if (!displayDiv) {
@@ -1468,13 +1602,13 @@ async function addProductRow() {
                                 newDisplayDiv.style.cssText = 'margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e0e0e0;';
                                 container.appendChild(newDisplayDiv);
                             }
-                            
+
                             // Find the full product data to get description
                             const fullProduct = allProducts.find(p => p.name === productData.name);
-                            
+
                             // Build display HTML
                             let displayHTML = `<div style="font-weight: bold; font-size: 11px; color: #000; margin-bottom: 4px;">${productData.name}</div>`;
-                            
+
                             if (fullProduct && fullProduct.description) {
                                 const descLines = fullProduct.description.split('\n').filter(line => line.trim());
                                 if (descLines.length > 0) {
@@ -1485,33 +1619,33 @@ async function addProductRow() {
                                     displayHTML += '</div>';
                                 }
                             }
-                            
-                            const finalDisplayDiv = container.querySelector('.selected-product-display') || 
-                                                   (() => {
-                                                       const div = document.createElement('div');
-                                                       div.className = 'selected-product-display';
-                                                       div.style.cssText = 'margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e0e0e0;';
-                                                       container.appendChild(div);
-                                                       return div;
-                                                   })();
-                            
+
+                            const finalDisplayDiv = container.querySelector('.selected-product-display') ||
+                                (() => {
+                                    const div = document.createElement('div');
+                                    div.className = 'selected-product-display';
+                                    div.style.cssText = 'margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e0e0e0;';
+                                    container.appendChild(div);
+                                    return div;
+                                })();
+
                             finalDisplayDiv.innerHTML = displayHTML;
-                            
+
                             calculateRowTotal(row);
                             calculateTotals();
                             updateTotalItemsCount();
                         }
-                        
+
                         // Show dropdown when clicking input
-                        searchInput.addEventListener('focus', function() {
+                        searchInput.addEventListener('focus', function () {
                             dropdownList.style.display = 'block';
                         });
-                        
+
                         // Search functionality
-                        searchInput.addEventListener('input', function() {
+                        searchInput.addEventListener('input', function () {
                             const searchTerm = this.value.toLowerCase();
                             dropdownList.style.display = 'block';
-                            
+
                             if (searchTerm === '') {
                                 // Show all
                                 allProductsList.forEach(item => {
@@ -1528,22 +1662,22 @@ async function addProductRow() {
                                 });
                             }
                         });
-                        
+
                         // Hide dropdown when clicking outside
-                        document.addEventListener('click', function(e) {
+                        document.addEventListener('click', function (e) {
                             if (!container.contains(e.target)) {
                                 dropdownList.style.display = 'none';
                             }
                         });
-                        
+
                         // Append to container
                         container.appendChild(searchInput);
                         container.appendChild(dropdownList);
-                        
+
                         // Replace description div content
                         descriptionDiv.innerHTML = '';
                         descriptionDiv.appendChild(container);
-                        
+
                         console.log('Searchable dropdown added to DOM');
                     } catch (error) {
                         console.error('Error loading products:', error);
@@ -1551,7 +1685,15 @@ async function addProductRow() {
                     }
                 }
             }
-            
+
+            // ✅ NEW: MAKE DELIVERY TEXT EDITABLE
+            const deliveryText = document.getElementById('delivery-text');
+            if (deliveryText) {
+                deliveryText.setAttribute('contenteditable', 'true');
+                deliveryText.style.cursor = 'text';
+                console.log('Delivery text is now editable');
+            }
+
             // Clear delivery
             const deliveryPriceInput = document.querySelector('.delivery-price-input');
             const deliveryTotalCell = document.querySelector('.delivery-total-cell');
@@ -1560,36 +1702,35 @@ async function addProductRow() {
                 deliveryTotalCell.textContent = 'FREE';
                 deliveryTotalCell.style.color = '#28a745';
             }
-            
+
             // Clear on-site delivery and discount
             const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
             const discountInput = document.getElementById('discount-input');
             if (onsiteDeliveryInput) onsiteDeliveryInput.value = 0;
             if (discountInput) discountInput.value = 0;
-            
+
             // Recalculate totals
             if (typeof calculateTotals === 'function') {
                 calculateTotals();
             }
             updateTotalItemsCount();
-            
+
             console.log('=== CUSTOMIZE PACKAGE COMPLETE ===');
         }
-        
         // ==========================================
         // VIEW MODE FUNCTIONALITY
         // ==========================================
-        
+
         // Check if we're in view mode when page loads
-        window.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('DOMContentLoaded', function () {
             const viewMode = localStorage.getItem('viewMode');
             const quotationData = localStorage.getItem('viewQuotationData');
-            
+
             if (viewMode === 'true' && quotationData) {
                 try {
                     const quotation = JSON.parse(quotationData);
                     loadQuotationInViewMode(quotation);
-                    
+
                     // Clear the flags
                     localStorage.removeItem('viewMode');
                     localStorage.removeItem('viewQuotationData');
@@ -1598,21 +1739,21 @@ async function addProductRow() {
                 }
             }
         });
-        
+
         // Function to load quotation in view-only mode
         async function loadQuotationInViewMode(quotation) {
             console.log('Loading quotation in view mode:', quotation);
             console.log('Quotation ID:', quotation.id);
             console.log('Package Type:', quotation.package_type);
             console.log('All quotation fields:', Object.keys(quotation));
-            
+
             // Populate client information
             const clientInputs = document.querySelectorAll('.client-info input');
             if (clientInputs[0]) clientInputs[0].value = quotation.client_name || '';
             if (clientInputs[1]) clientInputs[1].value = quotation.office_address || '';
             if (clientInputs[2]) clientInputs[2].value = quotation.contact_person || '';
             if (clientInputs[3]) clientInputs[3].value = quotation.contact_number || '';
-            
+
             // Populate quotation number and date
             const quoteNumber = document.getElementById('quote-number');
             const quoteDate = document.getElementById('quote-date');
@@ -1624,7 +1765,7 @@ async function addProductRow() {
                     quoteDate.textContent = formatted;
                 }
             }
-            
+
             // LOAD QUOTATION ITEMS WITH PRODUCT DATA USING JOIN
             try {
                 const { data: items, error } = await supabaseClient
@@ -1641,14 +1782,14 @@ async function addProductRow() {
                     `)
                     .eq('quotation_id', quotation.id)
                     .order('row_order', { ascending: true });
-                
+
                 if (error) {
                     console.error('Error loading quotation items:', error);
                     alert('Error loading quotation items: ' + error.message);
                 } else if (items && items.length > 0) {
                     console.log('Loaded items with products:', items);
                     console.log('Quotation package_type:', quotation.package_type);
-                    
+
                     // Pass package_type to populate function (with fallback)
                     const packageType = quotation.package_type || 'Basic POS Package';
                     console.log('Using package type:', packageType);
@@ -1661,11 +1802,11 @@ async function addProductRow() {
                 console.error('Error fetching items:', error);
                 alert('Error fetching items: ' + error.message);
             }
-            
+
             // Make page read-only
             makePageReadOnly();
         }
-        
+
         // Function to populate the quotation items in the table
         function populateQuotationItems(items, packageType) {
             const tbody = document.getElementById('quotation-tbody');
@@ -1673,26 +1814,26 @@ async function addProductRow() {
                 console.error('Table body not found');
                 return;
             }
-            
+
             // Clear existing rows
             tbody.innerHTML = '';
-            
+
             let isFirstProductRow = true; // Track if this is the first product (second row of package)
-            
+
             items.forEach((item, index) => {
                 console.log('Processing item', index, ':', item);
-                
+
                 if (item.row_type === 'package') {
                     // Create package type row
                     const packageRow = document.createElement('tr');
                     packageRow.id = 'package-type-row';
-                    
+
                     // Check if this is NEW structure (with product_id) or OLD structure (without)
                     const hasProductData = item.product && item.product.name;
-                    
+
                     // Get product data
                     let productName, productDescription, unit;
-                    
+
                     if (hasProductData) {
                         // NEW structure: use data from product join
                         productName = item.product.name;
@@ -1704,13 +1845,13 @@ async function addProductRow() {
                         productDescription = item.description || '';
                         unit = item.unit || '';
                     }
-                    
+
                     // Format description: Product Name (bold) + bullet points
                     let descriptionContent = '';
                     if (productName || productDescription) {
                         // Product name as first line (bold)
                         descriptionContent = `<div style="font-weight: bold; font-size: 10px; padding: 5px 5px 2px 5px;">${productName}</div>`;
-                        
+
                         // Add description with bullet points if available
                         if (productDescription) {
                             const lines = productDescription.split('\n').filter(line => line.trim());
@@ -1723,7 +1864,7 @@ async function addProductRow() {
                             }
                         }
                     }
-                    
+
                     packageRow.innerHTML = `
                         <td rowspan="2" style="vertical-align: top; font-weight: bold; font-size: 10px; padding: 8px;">
                             ${packageType || 'Package'}
@@ -1738,18 +1879,18 @@ async function addProductRow() {
                         <td class="no-print"></td>
                     `;
                     tbody.appendChild(packageRow);
-                    
+
                 } else if (item.row_type === 'product') {
                     // Create product row
                     const productRow = document.createElement('tr');
                     productRow.className = 'product-row';
-                    
+
                     // Check if this is NEW structure (with product_id) or OLD structure (without)
                     const hasProductData = item.product && item.product.name;
-                    
+
                     // Get product data
                     let productName, productDescription, unit;
-                    
+
                     if (hasProductData) {
                         // NEW structure: use data from product join
                         productName = item.product.name;
@@ -1761,7 +1902,7 @@ async function addProductRow() {
                         productDescription = item.description || '';
                         unit = item.unit || '';
                     }
-                    
+
                     // Format description with bullet points
                     let descriptionHTML = '';
                     if (productDescription) {
@@ -1776,13 +1917,13 @@ async function addProductRow() {
                             descriptionHTML = `<div style="font-size: 9px; color: #666; margin-top: 4px;">${productDescription}</div>`;
                         }
                     }
-                    
+
                     // First product row doesn't have empty <td> because package type has rowspan="2"
                     // All other product rows need empty <td> for the Type column
                     const firstColumnHTML = isFirstProductRow ? '' : '<td></td>';
                     // Remove indentation - all products should align the same
                     isFirstProductRow = false;
-                    
+
                     productRow.innerHTML = `
                         ${firstColumnHTML}
                         <td><input type="number" value="${item.quantity}" disabled class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
@@ -1796,13 +1937,13 @@ async function addProductRow() {
                         <td class="no-print"></td>
                     `;
                     tbody.appendChild(productRow);
-                    
+
                 } else if (item.row_type === 'delivery') {
                     // Create delivery row (delivery has no product)
                     const deliveryRow = document.createElement('tr');
                     deliveryRow.id = 'delivery-row';
                     const isFree = parseFloat(item.price) === 0 || parseFloat(item.total) === 0;
-                    
+
                     deliveryRow.innerHTML = `
                         <td></td>
                         <td></td>
@@ -1821,22 +1962,22 @@ async function addProductRow() {
                     tbody.appendChild(deliveryRow);
                 }
             });
-            
+
             // Update totals
             const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
             const subtotalCell = document.getElementById('subtotal-cell');
             const discountedCell = document.getElementById('discounted-price-cell');
-            
+
             if (subtotalCell) {
                 subtotalCell.textContent = '₱' + subtotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
             if (discountedCell) {
                 discountedCell.textContent = '₱' + subtotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
-            
+
             console.log('Finished populating', items.length, 'items. Subtotal:', subtotal);
         }
-        
+
         // Function to make entire page read-only
         function makePageReadOnly() {
             // Add visual indicator banner
@@ -1848,25 +1989,25 @@ async function addProductRow() {
                 viewBanner.innerHTML = '🔒 VIEW MODE - This quotation is read-only. You can only print or save as PDF.';
                 buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);
             }
-            
+
             // Update "Save Quotation" button
             const buttons = document.querySelectorAll('.button-container button');
             if (buttons[1]) { // Second button is "Save Quotation"
                 buttons[1].textContent = '🔒 View Mode (Read Only)';
                 buttons[1].style.background = '#6c757d';
                 buttons[1].style.cursor = 'not-allowed';
-                buttons[1].onclick = function(e) {
+                buttons[1].onclick = function (e) {
                     e.preventDefault();
                     alert('This quotation is in view-only mode. You cannot make changes.');
                     return false;
                 };
             }
-            
+
             // Change "Back" button text to "Back to List"
             if (buttons[0]) {
                 buttons[0].textContent = '← Back to List';
             }
-            
+
             // Disable all inputs and selects
             const allInputs = document.querySelectorAll('input, select, textarea');
             allInputs.forEach(input => {
@@ -1874,24 +2015,24 @@ async function addProductRow() {
                 input.style.cursor = 'not-allowed';
                 input.style.opacity = '0.7';
             });
-            
+
             // Hide all delete buttons
             const deleteButtons = document.querySelectorAll('button[onclick*="deleteRow"]');
             deleteButtons.forEach(btn => {
                 btn.style.display = 'none';
             });
-            
+
             // Hide "Add Another Product" button
             const addProductBtn = document.querySelector('.add-product-btn');
             if (addProductBtn) {
                 addProductBtn.style.display = 'none';
             }
-            
+
             // Hide Action column header and cells
             const actionHeaders = document.querySelectorAll('th.no-print');
             actionHeaders.forEach(th => {
                 th.style.display = 'none';
-            });            
+            });
             const actionCells = document.querySelectorAll('td.no-print');
             actionCells.forEach(td => {
                 td.style.display = 'none';
@@ -1904,7 +2045,7 @@ async function addProductRow() {
                 // Get employee name
                 const employeeName = localStorage.getItem('selectedEmployeeName');
                 const quotationNo = localStorage.getItem('currentQuotationNumber');
-                
+
                 if (!employeeName) {
                     alert('Error: No employee selected. Please go back to home and select an employee.');
                     return;
@@ -1920,32 +2061,33 @@ async function addProductRow() {
                 const officeAddress = document.querySelector('.client-info input[placeholder="Enter office address"]').value;
                 const contactPerson = document.querySelector('.client-info input[placeholder="Enter contact person"]').value;
                 const contactNumber = document.querySelector('.client-info input[placeholder="Enter contact number"]').value;
-                
+
                 if (!clientName || !officeAddress || !contactPerson || !contactNumber) {
                     alert('Please fill in all client information fields.');
                     return;
                 }
-                
+
                 // Get package type
                 const packageTypeSelect = document.getElementById('packageType');
                 const packageType = packageTypeSelect.options[packageTypeSelect.selectedIndex]?.text || '';
-                
+
                 const quotationDate = document.getElementById('quote-date').textContent;
-                
+
+                // ✅ UPDATE: Remove peso sign and commas before parsing
                 const subtotalInput = document.getElementById('subtotal-input');
-                const subtotal = subtotalInput ? parseFloat(subtotalInput.value) || 0 : 0;
-                
+                const subtotal = subtotalInput ? parseFloat(subtotalInput.value.replace(/[₱,]/g, '')) || 0 : 0;
+
                 const totalPackagePriceInput = document.getElementById('total-package-price-input');
-                const totalPackagePrice = totalPackagePriceInput ? parseFloat(totalPackagePriceInput.value) || 0 : 0;
-                
+                const totalPackagePrice = totalPackagePriceInput ? parseFloat(totalPackagePriceInput.value.replace(/[₱,]/g, '')) || 0 : 0;
+
                 const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
                 const discountInput = document.getElementById('discount-input');
-                const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
-                const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
-                
+                const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value.replace(/[₱,]/g, '')) || 0 : 0;
+                const discount = discountInput ? parseFloat(discountInput.value.replace(/[₱,]/g, '')) || 0 : 0;
+
                 console.log('Saving quotation with employee_name:', employeeName);
                 console.log('Package type:', packageType);
-                
+
                 // STEP 1: Save the main quotation
                 const quotationPayload = {
                     quotation_no: quotationNo,
@@ -1964,27 +2106,27 @@ async function addProductRow() {
                 console.log('Quotation payload:', quotationPayload);
 
                 const quotation = await createQuotation(quotationPayload);
-                
+
                 if (!quotation || !quotation.id) {
                     alert('Error: Failed to save quotation. No response from server.');
                     return;
                 }
-                
+
                 console.log('Quotation saved successfully:', quotation);
-                
+
                 // STEP 2: Collect all quotation items with product_id lookup
                 const items = [];
                 let rowOrder = 0;
-                
+
                 // Get package type row (first row)
                 const packageRow = document.getElementById('package-type-row');
                 if (packageRow) {
                     const packageQty = parseFloat(packageRow.querySelector('.qty-input')?.value) || 0;
                     const packagePrice = parseFloat(packageRow.querySelector('.price-input')?.value) || 0;
                     const packageTotal = parseFloat(packageRow.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
-                    
+
                     let packageProductId = packageRow.dataset.productId ? parseInt(packageRow.dataset.productId) : null;
-                    
+
                     if (!packageProductId) {
                         const packageProductName = packageRow.dataset.productName || '';
                         if (packageProductName) {
@@ -1993,13 +2135,13 @@ async function addProductRow() {
                                 .select('id')
                                 .eq('name', packageProductName)
                                 .single();
-                            
+
                             if (!productError && productData) {
                                 packageProductId = productData.id;
                             }
                         }
                     }
-                    
+
                     items.push({
                         quotation_id: quotation.id,
                         product_id: packageProductId,
@@ -2010,15 +2152,15 @@ async function addProductRow() {
                         row_order: rowOrder++
                     });
                 }
-                
+
                 // Get all product rows
                 const productRows = document.querySelectorAll('.product-row');
                 for (const row of productRows) {
                     const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
-                    
+
                     if (qty > 0) {
                         const productId = row.dataset.productId ? parseInt(row.dataset.productId) : null;
-                        
+
                         let finalProductId = productId;
                         if (!finalProductId) {
                             const productName = row.dataset.productName || '';
@@ -2028,16 +2170,16 @@ async function addProductRow() {
                                     .select('id')
                                     .eq('name', productName)
                                     .single();
-                                
+
                                 if (!productError && productData) {
                                     finalProductId = productData.id;
                                 }
                             }
                         }
-                        
+
                         const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
                         const total = parseFloat(row.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
-                        
+
                         items.push({
                             quotation_id: quotation.id,
                             product_id: finalProductId,
@@ -2049,14 +2191,14 @@ async function addProductRow() {
                         });
                     }
                 }
-                
+
                 // Get delivery row
                 const deliveryRow = document.getElementById('delivery-row');
                 if (deliveryRow) {
                     const deliveryPrice = parseFloat(deliveryRow.querySelector('.delivery-price-input')?.value) || 0;
                     const deliveryTotal = deliveryRow.querySelector('.delivery-total-cell')?.textContent || 'FREE';
                     const deliveryTotalNum = deliveryTotal === 'FREE' ? 0 : parseFloat(deliveryTotal.replace(/[₱,]/g, '')) || 0;
-                    
+
                     items.push({
                         quotation_id: quotation.id,
                         product_id: null,
@@ -2067,40 +2209,40 @@ async function addProductRow() {
                         row_order: rowOrder++
                     });
                 }
-                
+
                 console.log('Items to save:', items);
-                
+
                 // STEP 3: Save all items to database
                 if (items.length > 0) {
                     const { data: savedItems, error: itemsError } = await supabaseClient
                         .from('quotation_items')
                         .insert(items)
                         .select();
-                    
+
                     if (itemsError) {
                         console.error('Error saving quotation items:', itemsError);
                         alert('Quotation saved, but failed to save items: ' + itemsError.message);
                         return;
                     }
-                    
+
                     console.log('Items saved successfully:', savedItems);
                 }
-                
+
                 // Clear the stored quotation number
                 localStorage.removeItem('currentQuotationNumber');
-                
+
                 // STEP 4: Mark zero values to hide in print
                 markZeroValuesForPrint();
-                
+
                 // STEP 5: Trigger print dialog
                 console.log('Quotation saved successfully. Opening print dialog...');
                 setTimeout(() => {
                     window.print();
-                    
+
                     // After printing, show success message and option to go back
                     setTimeout(() => {
                         const goToList = confirm(`Quotation saved successfully!\n\nQuotation No: ${quotation.quotation_no || quotationNo}\nClient: ${clientName}\n\nWould you like to go to the quotations list?`);
-                        
+
                         if (goToList) {
                             window.location.href = 'quotationlist.html';
                         } else {
@@ -2108,13 +2250,12 @@ async function addProductRow() {
                         }
                     }, 500);
                 }, 500);
-                
+
             } catch (error) {
                 console.error('Error in saveAndPrintQuotation:', error);
                 alert('Error saving quotation: ' + (error.message || 'Unknown error'));
             }
         }
-
         // Function to mark zero values to hide in print
         function markZeroValuesForPrint() {
             // Hide zero price inputs
@@ -2124,7 +2265,7 @@ async function addProductRow() {
                     input.classList.add('hide-zero-in-print');
                 }
             });
-            
+
             // Hide zero total cells that show ₱0.00
             document.querySelectorAll('.total-cell').forEach(cell => {
                 if (cell.textContent.trim() === '₱0.00') {
@@ -2134,13 +2275,14 @@ async function addProductRow() {
         }
 
         // Clean up zero value classes after print
-        window.addEventListener('afterprint', function() {
+        window.addEventListener('afterprint', function () {
             document.querySelectorAll('.hide-zero-in-print').forEach(element => {
                 element.classList.remove('hide-zero-in-print');
             });
         });
-        
+
     </script>
 
 </body>
+
 </html>

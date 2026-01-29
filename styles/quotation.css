@@ -23,9 +23,10 @@ body {
     margin: 20px auto;
     background: white;
     padding: 0.4in 0.5in;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     position: relative;
-    padding-bottom: 0.7in; /* Make room for footer */
+    padding-bottom: 0.7in;
+    /* Make room for footer */
 }
 
 .page-break {
@@ -77,7 +78,8 @@ body {
     gap: 15px;
 }
 
-.client-info, .quote-info {
+.client-info,
+.quote-info {
     flex: 1;
     padding: 10px;
     border-radius: 4px;
@@ -135,11 +137,30 @@ table th {
     border: 1px solid #ccc;
 }
 
-table th:nth-child(1) { width: 95px; } /* Type column */
-table th:nth-child(2) { width: 40px; text-align: left; }
-table th:nth-child(3) { width: 50px; text-align: left; }
-table th:nth-child(5) { width: 80px; text-align: right; }
-table th:nth-child(6) { width: 80px; text-align: right; }
+table th:nth-child(1) {
+    width: 95px;
+}
+
+/* Type column */
+table th:nth-child(2) {
+    width: 40px;
+    text-align: left;
+}
+
+table th:nth-child(3) {
+    width: 50px;
+    text-align: left;
+}
+
+table th:nth-child(5) {
+    width: 80px;
+    text-align: right;
+}
+
+table th:nth-child(6) {
+    width: 80px;
+    text-align: right;
+}
 
 table td {
     padding: 8px;
@@ -334,7 +355,7 @@ table tfoot td {
     line-height: 1.6;
 }
 
-.terms-list > li {
+.terms-list>li {
     margin-bottom: 8px;
     line-height: 1.6;
 }
@@ -497,13 +518,14 @@ table tfoot td {
         size: letter;
         margin: 0;
     }
-    
-    body, html {
+
+    body,
+    html {
         background: #fff !important;
         margin: 0 !important;
         padding: 0 !important;
     }
-    
+
     /* Hide elements that shouldn't print */
     .no-print,
     header,
@@ -512,13 +534,13 @@ table tfoot td {
     .footer {
         display: none !important;
     }
-    
+
     /* Hide price inputs by default in print (only those without show-in-print class) */
     .price-input:not(.show-in-print),
     .delivery-price-input {
         display: none !important;
     }
-    
+
     /* Show price inputs when they have show-in-print class */
     .price-input.show-in-print {
         display: inline-block !important;
@@ -528,7 +550,7 @@ table tfoot td {
         visibility: visible !important;
         padding: 0 !important;
     }
-    
+
     /* Ensure unit displays are visible when printing */
     .unit-display {
         display: block !important;
@@ -537,28 +559,29 @@ table tfoot td {
         background: transparent !important;
         text-align: center !important;
     }
-    
+
     .page {
         box-shadow: none !important;
         margin: 0 !important;
         width: 8.5in !important;
         min-height: 11in !important;
         padding: 0.4in 0.5in !important;
-        padding-bottom: 0.7in !important; /* Make room for footer */
+        padding-bottom: 0.7in !important;
+        /* Make room for footer */
         break-inside: avoid;
         page-break-inside: avoid;
         position: relative;
     }
-    
+
     /* Only add page break before second page, not after first */
     .page.page-break {
         page-break-before: always;
     }
-    
+
     .page:last-child {
         page-break-after: avoid;
     }
-    
+
     /* Show page footer in print */
     .page-footer {
         display: flex !important;
@@ -570,7 +593,7 @@ table tfoot td {
         align-items: center;
         padding: 0 0.5in;
     }
-    
+
     .page-number {
         display: flex !important;
         position: absolute;
@@ -585,39 +608,40 @@ table tfoot td {
         align-items: center;
         justify-content: center;
     }
-    
+
     .footer-link {
         display: block !important;
         font-size: 10px;
         color: #1a5276;
         text-align: center;
     }
-    
+
     .footer-link a {
         color: #1a5276 !important;
         text-decoration: none;
     }
-    
+
     /* Remove print header and footer added by browser */
     @page {
         margin: 0;
     }
-    
+
     body {
         margin: 0 !important;
     }
-    
+
     /* Hide browser's default header/footer */
-    html, body {
+    html,
+    body {
         height: 100%;
         overflow: visible;
     }
-    
+
     table {
         page-break-inside: avoid;
         width: 100% !important;
     }
-    
+
     /* Style select dropdowns to look like regular text */
     select {
         -webkit-appearance: none !important;
@@ -630,12 +654,12 @@ table tfoot td {
         color: #000 !important;
         font-size: 10px !important;
     }
-    
+
     /* Hide dropdown arrow */
     select::-ms-expand {
         display: none;
     }
-    
+
     /* Style inputs to look like regular text */
     input[type="text"],
     input[type="number"] {
@@ -647,7 +671,7 @@ table tfoot td {
         color: #000 !important;
         font-weight: 500 !important;
     }
-    
+
     /* Payment amount inputs should be bold in print - must come after general input styles */
     input.payment-amount-input {
         font-weight: bold !important;
@@ -656,7 +680,7 @@ table tfoot td {
         padding: 0 !important;
         color: #000 !important;
     }
-    
+
     /* Contenteditable spans should not show border in print */
     [contenteditable="true"] {
         border: none !important;
@@ -664,31 +688,31 @@ table tfoot td {
         border-bottom: none !important;
         background: transparent !important;
     }
-    
+
     /* Hide placeholder text in print */
     input::placeholder {
         color: transparent !important;
     }
-    
+
     /* Hide empty inputs except unit-display and client info */
     input[value=""]:not(.unit-display):not(.info-value),
     input:not([value]):not(.unit-display):not(.info-value) {
         display: none !important;
     }
-    
+
     /* Make sure unit-display and client info fields are always visible */
     .unit-display,
     .info-value {
         display: inline-block !important;
         visibility: visible !important;
     }
-    
+
     /* Show client info labels */
     .info-label {
         display: inline !important;
         visibility: visible !important;
     }
-    
+
     /* Client info fields - show border as underline when empty */
     .info-value {
         border: none !important;
@@ -697,31 +721,31 @@ table tfoot td {
         border-radius: 0 !important;
         padding: 2px 4px !important;
     }
-    
+
     /* Make sure filled values are visible */
     input[value]:not([value=""]) {
         display: inline-block !important;
         color: #000 !important;
     }
-    
+
     /* Ensure colors print correctly - including yellow highlights */
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
-    
+
     /* Format table cells for print */
     table td {
         padding: 8px !important;
         vertical-align: top !important;
     }
-    
+
     /* Show item names clearly */
     .item-name {
         font-weight: 600 !important;
         color: #1a5276 !important;
     }
-    
+
     /* Format inclusions/descriptions */
     #typeInclusions {
         font-size: 9px !important;
@@ -729,5 +753,32 @@ table tfoot td {
         font-style: italic !important;
         margin-top: 5px !important;
         line-height: 1.4 !important;
+    }
+
+    #delivery-text[contenteditable="true"] {
+        cursor: text;
+        border: 1px dashed #4CAF50;
+        padding: 8px;
+        border-radius: 4px;
+        background-color: rgba(76, 175, 80, 0.05);
+        transition: all 0.2s ease;
+    }
+
+    #delivery-text[contenteditable="true"]:hover {
+        background-color: rgba(76, 175, 80, 0.1);
+    }
+
+    #delivery-text[contenteditable="true"]:focus {
+        background-color: rgba(76, 175, 80, 0.15);
+        border: 1px solid #4CAF50;
+        outline: none;
+    }
+
+    /* Hide edit indicator when printing */
+    @media print {
+        #delivery-text[contenteditable="true"] {
+            border: none !important;
+            background: none !important;
+        }
     }
 }
