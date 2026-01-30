@@ -22,10 +22,10 @@ body {
     height: 11in;
     margin: 20px auto;
     background: white;
-    padding: 0.3in 0.5in;
+    padding: 0.25in 0.4in;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     position: relative;
-    padding-bottom: 0.7in;
+    padding-bottom: 0.6in;
     box-sizing: border-box;
     overflow: hidden;
 }
@@ -39,8 +39,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
 }
 
 .company-info {
@@ -75,7 +75,7 @@ body {
 .info-section {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
     gap: 15px;
 }
 
@@ -124,16 +124,16 @@ body {
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     border: 1px solid #ccc;
 }
 
 table th {
     background: #d6e6f0;
     color: #000;
-    padding: 10px 8px;
+    padding: 6px 5px;
     text-align: left;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     border: 1px solid #ccc;
 }
@@ -164,10 +164,10 @@ table th:nth-child(6) {
 }
 
 table td {
-    padding: 8px;
+    padding: 5px;
     border: 1px solid #ccc;
     vertical-align: top;
-    font-size: 10px;
+    font-size: 9px;
 }
 
 table td:nth-child(2),
@@ -182,6 +182,7 @@ table td:nth-child(6) {
 
 table tfoot td {
     border: 1px solid #ccc;
+    padding: 6px;
 }
 
 .item-name {
@@ -447,7 +448,7 @@ table tfoot td {
 /* Page Footer with Page Number */
 .page-footer {
     position: absolute;
-    bottom: 0.3in;
+    bottom: 0.2in;
     left: 0;
     right: 0;
     display: flex;
@@ -516,10 +517,9 @@ table tfoot td {
 /* Print Styles */
 @media print {
     @page {
-        size: A4;
+        size: letter;
         margin: 0.5in;
     }
-
 
     body,
     html {
@@ -632,13 +632,50 @@ table tfoot td {
         box-shadow: none !important;
         margin: 0 !important;
         width: 100% !important;
-        height: 11in !important;
-        padding: 0.2in 0.5in !important;
-        padding-bottom: 0.7in !important;
+        height: 100% !important;
+        padding: 0.15in 0.4in !important;
+        padding-bottom: 0.5in !important;
         page-break-after: always;
         page-break-inside: avoid;
         position: relative;
         overflow: hidden;
+    }
+
+    /* Compact spacing in print */
+    .header {
+        margin-bottom: 5px !important;
+        padding-bottom: 3px !important;
+    }
+
+    .header img {
+        height: 100px !important;
+        width: 100px !important;
+    }
+
+    .info-section {
+        margin-bottom: 5px !important;
+    }
+
+    table {
+        margin-bottom: 3px !important;
+        page-break-inside: avoid;
+        width: 100% !important;
+    }
+
+    table th {
+        padding: 4px 3px !important;
+        font-size: 9px !important;
+    }
+
+    table td {
+        padding: 4px !important;
+        font-size: 8.5px !important;
+        line-height: 1.2 !important;
+        vertical-align: top !important;
+    }
+
+    table tfoot td {
+        padding: 5px !important;
     }
 
     /* Only add page break before second page, not after first */
@@ -651,10 +688,11 @@ table tfoot td {
     }
 
     /* Show page footer in print */
+    /* Show page footer in print */
     .page-footer {
         display: flex !important;
         position: absolute;
-        bottom: 0.3in;
+        bottom: 0.15in;
         left: 0;
         right: 0;
         justify-content: center;
@@ -689,25 +727,11 @@ table tfoot td {
         text-decoration: none;
     }
 
-    /* Remove print header and footer added by browser */
-    @page {
-        margin: 0;
-    }
-
-    body {
-        margin: 0 !important;
-    }
-
     /* Hide browser's default header/footer */
     html,
     body {
         height: 100%;
         overflow: visible;
-    }
-
-    table {
-        page-break-inside: avoid;
-        width: 100% !important;
     }
 
     /* Style select dropdowns to look like regular text */
@@ -827,12 +851,6 @@ table tfoot td {
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-    }
-
-    /* Format table cells for print */
-    table td {
-        padding: 8px !important;
-        vertical-align: top !important;
     }
 
     /* Show item names clearly */
