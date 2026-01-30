@@ -23,6 +23,10 @@
             .page {
                 width: 100%;
             }
+
+            @page {
+                margin: 0.5in
+            }
         }
 
 
@@ -2503,9 +2507,9 @@
                 setTimeout(() => {
                     window.print();
 
-                    // After printing, show custom success modal with navigation options
+                    // After printing, redirect to quotation list
                     setTimeout(() => {
-                        showSaveSuccessModal(quotation.quotation_no || quotationNo, clientName);
+                        window.location.href = 'quotationlist.html';
                     }, 500);
                 }, 500);
 
