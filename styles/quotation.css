@@ -609,6 +609,23 @@ table tfoot td {
         text-align: center !important;
     }
 
+    /* ✅ Remove borders from searchable dropdown containers */
+    .searchable-dropdown-container,
+    .selected-product-display {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .searchable-dropdown-container input {
+        display: none !important;
+    }
+
+    .selected-product-display {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
     .page {
         box-shadow: none !important;
         margin: 0 !important;

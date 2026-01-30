@@ -1115,16 +1115,17 @@
         display: none;
         position: absolute;
         top: 100%;
-        left: 5px;
-        right: 5px;
-        max-height: 300px;
+        left: 0px;
+        right: 0px;
+        min-width: 450px;
+        max-height: 400px;
         overflow-y: auto;
         background: white;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(102,126,234,0.15);
         z-index: 1000;
-        margin-top: 2px;
+        margin-top: 8px;
     `;
 
             // Fetch products
@@ -1144,7 +1145,7 @@
                     const freqHeader = document.createElement('div');
                     freqHeader.textContent = '⭐ FREQUENTLY USED';
                     freqHeader.dataset.section = 'frequent-header';
-                    freqHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+                    freqHeader.style.cssText = 'padding: 12px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; position: sticky; top: 0; z-index: 10;';
                     dropdownList.appendChild(freqHeader);
 
                     frequentlyUsed.forEach(product => {
@@ -1165,7 +1166,7 @@
                     const allHeader = document.createElement('div');
                     allHeader.textContent = '📦 ALL PRODUCTS';
                     allHeader.dataset.section = 'all-header';
-                    allHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+                    allHeader.style.cssText = 'padding: 12px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; position: sticky; top: 0; z-index: 10;';
                     dropdownList.appendChild(allHeader);
                 }
 
@@ -1186,7 +1187,7 @@
             function createDropdownItem(product, isFrequent) {
                 const item = document.createElement('div');
                 item.textContent = (isFrequent ? '⭐ ' : '') + product.name;
-                item.style.cssText = 'padding: 8px; cursor: pointer; font-size: 11px; border-bottom: 1px solid #f0f0f0;';
+                item.style.cssText = 'padding: 12px 16px; cursor: pointer; font-size: 12px; border-bottom: 1px solid #f5f5f5; transition: all 0.2s ease; background: white;';
                 item.dataset.name = product.name;
                 item.dataset.id = product.id;  // ← ADD THIS LINE - Store product ID!
                 item.dataset.unit = product.unit || '';
@@ -1194,10 +1195,14 @@
                 item.dataset.frequent = isFrequent ? 'true' : 'false';
 
                 item.addEventListener('mouseenter', function () {
-                    this.style.background = '#e3f2fd';
+                    this.style.background = 'linear-gradient(90deg, #e3f2fd 0%, #f3e5f5 100%)';
+                    this.style.transform = 'translateX(4px)';
+                    this.style.paddingLeft = '20px';
                 });
                 item.addEventListener('mouseleave', function () {
                     this.style.background = 'white';
+                    this.style.transform = 'translateX(0)';
+                    this.style.paddingLeft = '16px';
                 });
                 item.addEventListener('click', function () {
                     selectProduct(this.dataset);
@@ -1261,11 +1266,43 @@
                 updateItemNumbers();
             }
             // Show dropdown on focus
+            // ✅ NEW: Helper function to get already-added product IDs
+            function getAddedProductIds() {
+                const addedIds = [];
+
+                // Check package row
+                const packageRow = document.getElementById('package-type-row');
+                if (packageRow && packageRow.dataset.productId) {
+                    addedIds.push(parseInt(packageRow.dataset.productId));
+                }
+
+                // Check all product rows
+                const allRows = document.querySelectorAll('.product-row');
+                allRows.forEach(row => {
+                    if (row.dataset.productId) {
+                        addedIds.push(parseInt(row.dataset.productId));
+                    }
+                });
+
+                return addedIds;
+            }
+
+            // Show dropdown on focus
             searchInput.addEventListener('focus', function () {
                 console.log('Search input focused');
                 dropdownList.style.display = 'block';
-                // Reset all items to visible
-                allProductsList.forEach(item => item.element.style.display = 'block');
+
+                // ✅ UPDATED: Filter out already-added products
+                const addedIds = getAddedProductIds();
+                allProductsList.forEach(item => {
+                    const itemId = parseInt(item.element.dataset.id);
+                    if (addedIds.includes(itemId)) {
+                        item.element.style.display = 'none'; // Hide if already added
+                    } else {
+                        item.element.style.display = 'block'; // Show if not added
+                    }
+                });
+
                 // Show all headers
                 const headers = dropdownList.querySelectorAll('[data-section]');
                 headers.forEach(h => h.style.display = 'block');
@@ -1277,22 +1314,31 @@
                 console.log('Searching for:', searchTerm);
                 dropdownList.style.display = 'block';
 
+                // ✅ UPDATED: Filter by search AND already-added products
+                const addedIds = getAddedProductIds();
+
                 if (searchTerm === '') {
-                    // Show all items in original order
-                    allProductsList.forEach(item => item.element.style.display = 'block');
+                    // Filter out already-added products
+                    allProductsList.forEach(item => {
+                        const itemId = parseInt(item.element.dataset.id);
+                        item.element.style.display = addedIds.includes(itemId) ? 'none' : 'block';
+                    });
 
                     // Show all headers
                     const headers = dropdownList.querySelectorAll('[data-section]');
                     headers.forEach(h => h.style.display = 'block');
                 } else {
-                    // Filter items but maintain separation
+                    // ✅ UPDATED: Filter items by search AND already-added
                     let frequentMatchCount = 0;
                     let allMatchCount = 0;
 
                     allProductsList.forEach(item => {
+                        const itemId = parseInt(item.element.dataset.id);
                         const matches = item.name.includes(searchTerm);
+                        const notAdded = !addedIds.includes(itemId);
 
-                        if (matches) {
+                        // Show only if: matches search AND not already added
+                        if (matches && notAdded) {
                             item.element.style.display = 'block';
 
                             // Count matches in each section
@@ -1534,12 +1580,39 @@
                         searchInput.autocomplete = 'off';
                         searchInput.style.cssText = `
                             width: 100%;
-                            padding: 8px;
-                            border: 1px solid #ccc;
-                            border-radius: 4px;
-                            font-size: 11px;
+                            padding: 12px 16px;
+                            border: 2px solid #667eea;
+                            border-radius: 8px;
+                            font-size: 12px;
                             box-sizing: border-box;
+                            transition: all 0.3s ease;
+                            background: #f8f9ff;
+                            color: #333;
+                            font-weight: 500;
                         `;
+
+                        // Add focus effects
+                        searchInput.addEventListener('focus', function () {
+                            this.style.borderColor = '#5568d3';
+                            this.style.background = '#fff';
+                            this.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                        });
+                        searchInput.addEventListener('blur', function () {
+                            this.style.borderColor = '#667eea';
+                            this.style.background = '#f8f9ff';
+                            this.style.boxShadow = 'none';
+                        });
+                        //Add focus/blur effects after searchInput creation
+                        searchInput.addEventListener('focus', function () {
+                            this.style.borderColor = '#5568d3';
+                            this.style.background = '#fff';
+                            this.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                        });
+                        searchInput.addEventListener('blur', function () {
+                            this.style.borderColor = '#667eea';
+                            this.style.background = '#f8f9ff';
+                            this.style.boxShadow = 'none';
+                        });
 
                         // Create dropdown list
                         const dropdownList = document.createElement('div');
@@ -1547,16 +1620,17 @@
                             display: none;
                             position: absolute;
                             top: 100%;
-                            left: 5px;
-                            right: 5px;
-                            max-height: 300px;
+                            left: 0px;
+                            right: 0px;
+                            min-width: 450px;
+                            max-height: 400px;
                             overflow-y: auto;
                             background: white;
-                            border: 1px solid #ccc;
-                            border-radius: 4px;
-                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                            border: 2px solid #667eea;
+                            border-radius: 8px;
+                            box-shadow: 0 8px 24px rgba(102,126,234, 0.15);
                             z-index: 1000;
-                            margin-top: 2px;
+                            margin-top: 8px;
                         `;
 
                         // Store all products for filtering
@@ -1567,7 +1641,7 @@
                             if (frequentlyUsed && frequentlyUsed.length > 0) {
                                 const freqHeader = document.createElement('div');
                                 freqHeader.textContent = '⭐ FREQUENTLY USED';
-                                freqHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+                                freqHeader.style.cssText = 'padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; position: sticky; top: 0; z-index: 10;';
                                 dropdownList.appendChild(freqHeader);
 
                                 frequentlyUsed.forEach(product => {
@@ -1599,7 +1673,7 @@
 
                                 const allHeader = document.createElement('div');
                                 allHeader.textContent = '📦 ALL PRODUCTS';
-                                allHeader.style.cssText = 'padding: 8px; background: #f0f0f0; font-weight: bold; font-size: 10px; border-bottom: 1px solid #ddd;';
+                                allHeader.style.cssText = 'padding: 12px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; position: sticky; top: 0; z-index: 10;';
                                 dropdownList.appendChild(allHeader);
                             }
 
@@ -1985,12 +2059,10 @@
                         }, 0);
 
                         // On-site delivery: price of delivery row, if any
-                        const deliveryItem = items.find(it => it.row_type === 'delivery');
-                        const onsiteDelivery = deliveryItem
-                            ? (typeof deliveryItem.price === 'number'
-                                ? deliveryItem.price
-                                : parseFloat(deliveryItem.price) || 0)
-                            : 0;
+                        // ✅ UPDATED: Get on-site delivery from quotation record (not delivery row)
+                        const onsiteDelivery = typeof quotation.onsite_delivery === 'number'
+                            ? quotation.onsite_delivery
+                            : parseFloat(quotation.onsite_delivery) || 0;
 
                         // Discount and total come from main quotation record
                         const discount = typeof quotation.discount === 'number'
@@ -2277,6 +2349,7 @@
                     package_type: packageType,
                     total: totalPackagePrice,
                     discount: discount,
+                    onsite_delivery: onsiteDelivery,
                     page2_html: page2Html,
                     employee_name: employeeName,
                     status: 'pending'
