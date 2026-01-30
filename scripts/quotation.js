@@ -628,18 +628,32 @@ function calculateTotalFromInputs() {
     const discountInput = document.getElementById('discount-input');
     const totalPackagePriceInput = document.getElementById('total-package-price-input');
     
-    const subtotal = subtotalInput ? parseFloat(subtotalInput.value) || 0 : 0;
-    const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
-    const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
+    // Parse values (remove peso sign and commas)
+    const subtotal = subtotalInput ? parseFloat(subtotalInput.value.replace(/[₱,]/g, '')) || 0 : 0;
+    const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value.replace(/[₱,]/g, '')) || 0 : 0;
+    const discount = discountInput ? parseFloat(discountInput.value.replace(/[₱,]/g, '')) || 0 : 0;
     
     // Calculate total: subtotal + on-site delivery - discount
     const totalPackagePrice = subtotal + onsiteDelivery - discount;
     
+    // ✅ NEW: Format with peso sign and smart decimals
     if (totalPackagePriceInput) {
-        totalPackagePriceInput.value = totalPackagePrice.toFixed(2);
+        // Check if total has decimals
+        const hasDecimals = totalPackagePrice % 1 !== 0;
+        
+        if (hasDecimals) {
+            totalPackagePriceInput.value = '₱' + totalPackagePrice.toLocaleString('en-PH', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+        } else {
+            totalPackagePriceInput.value = '₱' + totalPackagePrice.toLocaleString('en-PH', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+        }
     }
 }
-
 // Validate that total package price makes sense (optional warning)
 function validateTotalPackagePrice() {
     const subtotalInput = document.getElementById('subtotal-input');

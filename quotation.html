@@ -575,7 +575,7 @@
                         <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">On-site delivery
                             setup & training (optional)</td>
                         <td style="text-align: right; padding: 10px;">
-                            <input type="text" id="onsite-delivery-input" value="₱0.00"
+                            <input type="text" id="onsite-delivery-input" value=""
                                 style="width: 120px; font-size: 12px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
                                 onchange="calculateTotalFromInputs()">
                         </td>
@@ -584,7 +584,7 @@
                     <tr style="background: #d6e6f0;">
                         <td colspan="5" style="text-align: right; font-weight: bold; padding: 10px;">Discount</td>
                         <td style="text-align: right; padding: 10px;">
-                            <input type="text" id="discount-input" value="₱0.00"
+                            <input type="text" id="discount-input" value=""
                                 style="width: 120px; font-size: 12px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-weight: bold;"
                                 onchange="calculateTotalFromInputs()">
                         </td>
@@ -975,7 +975,7 @@
                 });
             }
 
-            // FORMAT FOOTER INPUTS WITH PESO SIGN ON BLUR
+            // FORMAT FOOTER INPUTS WITH PESO SIGN ON BLUR (PRESERVE USER DECIMALS)
             const footerInputs = [
                 { id: 'subtotal-input', readonly: true },
                 { id: 'onsite-delivery-input', readonly: false },
@@ -988,14 +988,46 @@
                 if (input && !config.readonly) {
                     // Remove peso sign and commas on focus (for editing)
                     input.addEventListener('focus', function () {
-                        const value = this.value.replace(/[₱,]/g, '');
+                        const value = this.value.replace(/[₱,]/g, '').trim();
                         this.value = value;
+                        this.select(); // Select all text for easy replacement
                     });
 
-                    // Add peso sign and commas on blur (when done editing)
+                    // Auto-calculate on input (as user types)
+                    input.addEventListener('input', function () {
+                        calculateTotalFromInputs();
+                    });
+
+                    // Format on blur with peso sign, preserving user decimal part
                     input.addEventListener('blur', function () {
-                        const value = parseFloat(this.value) || 0;
-                        this.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        let raw = this.value.replace(/[₱,]/g, '').trim();
+
+                        if (!raw) {
+                            this.value = '';
+                            return;
+                        }
+
+                        // Split into integer and decimal parts based on what user typed
+                        const parts = raw.split('.');
+                        let intPart = parts[0] || '0';
+                        let decPart = parts[1] || '';
+
+                        // Format integer part with commas
+                        const intNum = parseInt(intPart, 10) || 0;
+                        const formattedInt = intNum.toLocaleString('en-PH', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        });
+
+                        // Keep up to 2 decimal digits exactly as typed
+                        decPart = decPart.replace(/[^0-9]/g, '').slice(0, 2);
+
+                        let finalValue = '₱' + formattedInt;
+                        if (decPart.length > 0) {
+                            finalValue += '.' + decPart;
+                        }
+
+                        this.value = finalValue;
                     });
                 }
             });
@@ -1007,26 +1039,12 @@
 
             if (subtotalInput && subtotalInput.value) {
                 const value = parseFloat(subtotalInput.value) || 0;
-                subtotalInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                subtotalInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
             }
 
             if (totalPackagePriceInput && totalPackagePriceInput.value) {
                 const value = parseFloat(totalPackagePriceInput.value) || 0;
-                totalPackagePriceInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
-
-            // Format onsite delivery and discount if they have values
-            const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
-            const discountInput = document.getElementById('discount-input');
-
-            if (onsiteDeliveryInput && onsiteDeliveryInput.value) {
-                const value = parseFloat(onsiteDeliveryInput.value) || 0;
-                onsiteDeliveryInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
-
-            if (discountInput && discountInput.value) {
-                const value = parseFloat(discountInput.value) || 0;
-                discountInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                totalPackagePriceInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
             }
 
             // NOTE: markZeroValuesForPrint is intentionally NOT run on load here.
@@ -1435,7 +1453,7 @@
                 const price = parseFloat(priceInput.value) || 0;
                 const total = qty * price;
 
-                totalCell.textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                totalCell.textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
             }
         }
 
@@ -1740,8 +1758,8 @@
             // Clear on-site delivery and discount
             const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
             const discountInput = document.getElementById('discount-input');
-            if (onsiteDeliveryInput) onsiteDeliveryInput.value = 0;
-            if (discountInput) discountInput.value = 0;
+            if (onsiteDeliveryInput) onsiteDeliveryInput.value = '';
+            if (discountInput) discountInput.value = '';
 
             // Recalculate totals
             if (typeof calculateTotals === 'function') {
@@ -1974,13 +1992,13 @@
 
                         const formatPeso = (value) =>
                             '₱' + (value || 0).toLocaleString('en-PH', {
-                                minimumFractionDigits: 2,
+                                minimumFractionDigits: 0,
                                 maximumFractionDigits: 2
                             });
 
                         if (subtotalInput) subtotalInput.value = formatPeso(subtotal);
-                        if (onsiteDeliveryInput) onsiteDeliveryInput.value = formatPeso(onsiteDelivery);
-                        if (discountInput) discountInput.value = formatPeso(discount);
+                        if (onsiteDeliveryInput) onsiteDeliveryInput.value = onsiteDelivery > 0 ? formatPeso(onsiteDelivery) : '';
+                        if (discountInput) discountInput.value = discount > 0 ? formatPeso(discount) : '';
                         if (totalPackagePriceInput) totalPackagePriceInput.value = formatPeso(totalPackagePrice);
                     } catch (footerError) {
                         console.error('Error restoring footer totals in view mode:', footerError);
@@ -2066,7 +2084,7 @@
                         <td><input type="text" value="${unit}" disabled class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; width: 100%; text-align: center;"></td>
                         <td>${descriptionContent}</td>
                         <td><input type="number" value="${item.price}" disabled class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
-                        <td class="total-cell" style="text-align: right; font-weight: bold;">₱${parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td class="total-cell" style="text-align: right; font-weight: bold;">₱${parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</td>
                         <td class="no-print"></td>
                     `;
 
@@ -2091,7 +2109,7 @@
                             </div>
                         </td>
                         <td><input type="number" value="${item.price}" disabled class="delivery-price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
-                        <td class="delivery-total-cell" style="text-align: right; font-weight: bold; color: ${isFree ? '#28a745' : '#000'};">${isFree ? 'FREE' : '₱' + parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td class="delivery-total-cell" style="text-align: right; font-weight: bold; color: ${isFree ? '#28a745' : '#000'};">${isFree ? 'FREE' : '₱' + parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</td>
                         <td class="no-print"></td>
                     `;
                     tbody.appendChild(deliveryRow);
@@ -2436,7 +2454,7 @@
 
                     const value = parseFloat(rawVal.replace(/[₱,]/g, '')) || 0;
                     const isPrice = input.classList.contains('price-input');
-                    
+
                     // Hide zeros, but NOT price inputs when in CUSTOMIZE mode
                     if (value === 0 && !(isPrice && isCustomize)) {
                         if (input.dataset.zeroReplaced === 'true') return;
@@ -2549,7 +2567,12 @@
                     if (el) {
                         const raw = String(el.value || '').replace(/[₱,]/g, '').trim();
                         const num = parseFloat(raw) || 0;
-                        el.value = '₱' + num.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        // Leave onsite-delivery-input and discount-input blank if 0, format others normally
+                        if ((id === 'onsite-delivery-input' || id === 'discount-input') && num === 0) {
+                            el.value = '';
+                        } else {
+                            el.value = '₱' + num.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+                        }
                     }
                 });
             } catch (err) {
