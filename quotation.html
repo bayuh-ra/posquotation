@@ -364,7 +364,13 @@
         }
 
         .hide-zero-in-print {
-            display: none !important;
+            /* Intentionally empty: class is applied to mark elements for hiding only when printing. */
+        }
+
+        @media print {
+            .hide-zero-in-print {
+                display: none !important;
+            }
         }
 
         /* Editable content styling */
@@ -1020,26 +1026,8 @@
                 discountInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
 
-            // Ensure zeros are marked for print immediately (covers mobile Save as PDF)
-            // and keep the marking updated when relevant inputs change or page visibility changes.
-            try {
-                if (typeof markZeroValuesForPrint === 'function') {
-                    markZeroValuesForPrint();
-                }
-
-                const dynamicInputs = document.querySelectorAll('.price-input, .qty-input, .delivery-price-input, #subtotal-input, #onsite-delivery-input, #discount-input, #total-package-price-input, .payment-amount-input');
-                dynamicInputs.forEach(inp => {
-                    inp.addEventListener('input', markZeroValuesForPrint);
-                    inp.addEventListener('blur', markZeroValuesForPrint);
-                });
-
-                window.addEventListener('pageshow', markZeroValuesForPrint);
-                document.addEventListener('visibilitychange', function () {
-                    if (document.visibilityState === 'visible') markZeroValuesForPrint();
-                });
-            } catch (e) {
-                console.warn('Could not attach zero-marking listeners:', e);
-            }
+            // NOTE: markZeroValuesForPrint is intentionally NOT run on load here.
+            // We only apply zero-hiding right before printing (see Save/Print handlers)
 
         });
 
@@ -2471,6 +2459,44 @@
                 window.location.href = 'index.html';
             };
         }
+
+        // Ensure on-screen rows and footer fields are formatted to match PDF output
+        function formatAllRowsAndFooters() {
+            try {
+                const tbody = document.getElementById('quotation-tbody');
+                if (tbody) {
+                    const rows = tbody.querySelectorAll('tr');
+                    rows.forEach(row => {
+                        try { calculateRowTotal(row); } catch (e) { /* ignore */ }
+                    });
+                }
+
+                const footerIds = ['subtotal-input', 'onsite-delivery-input', 'discount-input', 'total-package-price-input'];
+                footerIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        const raw = String(el.value || '').replace(/[₱,]/g, '').trim();
+                        const num = parseFloat(raw) || 0;
+                        el.value = '₱' + num.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    }
+                });
+            } catch (err) {
+                console.warn('formatAllRowsAndFooters error', err);
+            }
+        }
+
+        // Run formatting on load and when rows change
+        window.addEventListener('DOMContentLoaded', function () {
+            setTimeout(formatAllRowsAndFooters, 250);
+
+            const tbody = document.getElementById('quotation-tbody');
+            if (tbody) {
+                const mo = new MutationObserver(function () {
+                    setTimeout(formatAllRowsAndFooters, 100);
+                });
+                mo.observe(tbody, { childList: true, subtree: true });
+            }
+        });
 
     </script>
 
