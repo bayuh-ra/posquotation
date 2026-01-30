@@ -371,6 +371,16 @@
             .hide-zero-in-print {
                 display: none !important;
             }
+
+            /* Remove input boxes/outlines in PDF while keeping text visible */
+            input,
+            textarea,
+            select {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                outline: none !important;
+            }
         }
 
         /* Editable content styling */
@@ -516,7 +526,7 @@
                         <td><input type="number" class="price-input" value="" step="0.01"
                                 style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
                         </td>
-                        <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
+                        <td class="total-cell" style="text-align: right; font-weight: bold;"></td>
                         <td class="no-print"></td>
                     </tr>
 
@@ -534,7 +544,7 @@
                         <td><input type="number" class="price-input" value="" step="0.01"
                                 style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;">
                         </td>
-                        <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
+                        <td class="total-cell" style="text-align: right; font-weight: bold;"></td>
                         <td class="no-print"><button onclick="deleteRow(this)"
                                 style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button>
                         </td>
@@ -1077,7 +1087,7 @@
             <div class="searchable-dropdown-container" style="position: relative; padding: 5px;"></div>
         </td>
         <td><input type="number" class="price-input" value="" step="0.01" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-        <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
+        <td class="total-cell" style="text-align: right; font-weight: bold;"></td>
         <td class="no-print"><button onclick="deleteRow(this)" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button></td>
     `;
 
@@ -1495,7 +1505,7 @@
                 if (qtyInput) qtyInput.value = 0;
                 if (unitDisplay) unitDisplay.value = '';
                 if (priceInput) priceInput.value = '';
-                if (totalCell) totalCell.textContent = '₱0.00';
+                if (totalCell) totalCell.textContent = '';
                 console.log('Reset inputs');
 
                 // Create searchable dropdown in description cell
@@ -2434,69 +2444,82 @@
         // Function to mark zero values to hide in print
         // Replaces zero-valued inputs/cells with inert spans before printing,
         // and restores the originals after print to preserve layout without showing zeros in PDFs.
+        // Function to mark zero values to hide in print
         function markZeroValuesForPrint() {
-            // container for restorations
             window.__zeroReplacements = window.__zeroReplacements || [];
 
             // Check if CUSTOMIZE mode is active
-            const packageTypeSelect = document.getElementById('packageTypeSelect');
+            const packageTypeSelect = document.getElementById('packageType');
             const isCustomize = packageTypeSelect && packageTypeSelect.value === 'CUSTOMIZE';
 
-            // Inputs to check (price inputs and footer inputs)
-            const inputSelector = '.price-input, .delivery-price-input, #subtotal-input, #onsite-delivery-input, #discount-input, #total-package-price-input';
-
-            document.querySelectorAll(inputSelector).forEach(input => {
-                try {
-                    // For text inputs, remove peso/comma then parse
-                    let rawVal = '';
-                    if (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA') rawVal = String(input.value || '');
-                    else rawVal = String(input.textContent || '');
-
-                    const value = parseFloat(rawVal.replace(/[₱,]/g, '')) || 0;
-                    const isPrice = input.classList.contains('price-input');
-
-                    // Hide zeros, but NOT price inputs when in CUSTOMIZE mode
-                    if (value === 0 && !(isPrice && isCustomize)) {
-                        if (input.dataset.zeroReplaced === 'true') return;
-
-                        const span = document.createElement('span');
-                        span.className = (input.className || '') + ' zero-replacement';
-                        span.style.cssText = (input.style && input.style.cssText) ? input.style.cssText : '';
-                        span.style.display = 'inline-block';
-                        span.textContent = '';
-
-                        window.__zeroReplacements.push({ type: 'input', original: input, replacement: span });
-
-                        if (input.parentNode) input.parentNode.replaceChild(span, input);
-                        input.dataset.zeroReplaced = 'true';
-                    }
-                } catch (e) { console.warn('zero replace input error', e); }
-            });
-
-            // Cells to check (totals)
+            // ✅ FIX: Hide cells with empty or zero text content
             const cellSelector = '.total-cell, .delivery-total-cell';
             document.querySelectorAll(cellSelector).forEach(cell => {
                 try {
                     const txt = String(cell.textContent || '').trim();
-                    if (txt === '₱0.00' || txt === '0' || txt === '₱0') {
+
+                    // Hide if: empty, "₱0", "₱0.00", or "0"
+                    if (txt === '' || txt === '₱0' || txt === '₱0.00' || txt === '0') {
                         if (cell.dataset.zeroReplaced === 'true') return;
 
                         const originalHTML = cell.innerHTML;
+                        cell.style.visibility = 'hidden'; // Hide but preserve layout
+                        cell.dataset.originalHTML = originalHTML;
+                        cell.dataset.zeroReplaced = 'true';
+
+                        window.__zeroReplacements.push({
+                            type: 'cell',
+                            cell: cell,
+                            originalHTML: originalHTML
+                        });
+                    }
+                } catch (e) {
+                    console.warn('zero replace cell error', e);
+                }
+            });
+
+            // ✅ FIX: For footer inputs - hide if zero OR convert to plain text
+            const footerInputs = ['onsite-delivery-input', 'discount-input'];
+            footerInputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (!input) return;
+
+                try {
+                    const rawVal = String(input.value || '').replace(/[₱,]/g, '').trim();
+                    const value = parseFloat(rawVal) || 0;
+
+                    if (value === 0) {
+                        // Hide completely if zero
+                        if (input.dataset.zeroReplaced === 'true') return;
+
                         const span = document.createElement('span');
                         span.className = 'zero-replacement';
-                        span.style.cssText = 'display:inline-block;width:100%;';
+                        span.style.display = 'none'; // Completely hidden
                         span.textContent = '';
 
-                        window.__zeroReplacements.push({ type: 'cell', cell: cell, originalHTML: originalHTML });
+                        window.__zeroReplacements.push({
+                            type: 'input',
+                            original: input,
+                            replacement: span
+                        });
 
-                        cell.innerHTML = '';
-                        cell.appendChild(span);
-                        cell.dataset.zeroReplaced = 'true';
+                        if (input.parentNode) {
+                            input.parentNode.replaceChild(span, input);
+                        }
+                        input.dataset.zeroReplaced = 'true';
+                    } else {
+                        // Show as plain text (no box) if has value
+                        input.style.border = 'none';
+                        input.style.background = 'none';
+                        input.style.outline = 'none';
+                        input.style.boxShadow = 'none';
+                        input.style.padding = '0';
                     }
-                } catch (e) { console.warn('zero replace cell error', e); }
+                } catch (e) {
+                    console.warn('footer input error', e);
+                }
             });
         }
-
         // Clean up zero value replacements after print: restore originals
         window.addEventListener('afterprint', function () {
             try {

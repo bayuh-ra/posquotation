@@ -535,10 +535,59 @@ table tfoot td {
         display: none !important;
     }
 
+    /* ✅ CRITICAL: Remove ALL input borders and backgrounds in print */
+    input,
+    textarea,
+    select {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        outline: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+    }
+
+    /* ✅ Make ALL text inputs invisible borders */
+    input[type="text"],
+    input[type="number"] {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+    }
+
+    /* ✅ Specific rule for footer input fields */
+    #subtotal-input,
+    #onsite-delivery-input,
+    #discount-input,
+    #total-package-price-input {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        outline: none !important;
+        padding: 0 !important;
+    }
+
+    /* ✅ Hide empty or zero-value total cells */
+    .total-cell:empty::after {
+        content: '' !important;
+    }
+
     /* Hide price inputs by default in print (only those without show-in-print class) */
     .price-input:not(.show-in-print),
     .delivery-price-input {
         display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* ✅ CRITICAL: Make ANY price input with 0 completely invisible */
+    .price-input {
+        color: transparent !important;
+    }
+
+    /* ✅ Only show price inputs that have the show-in-print class */
+    .price-input.show-in-print {
+        color: #000 !important;
     }
 
     /* Show price inputs when they have show-in-print class */
@@ -672,6 +721,23 @@ table tfoot td {
         font-weight: 500 !important;
     }
 
+    /* ✅ CRITICAL: Remove box outlines for footer inputs in print */
+    #onsite-delivery-input,
+    #discount-input,
+    #subtotal-input,
+    #total-package-price-input {
+        border: none !important;
+        background: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        padding: 0 !important;
+        width: auto !important;
+        display: inline-block !important;
+    }
+
     /* Payment amount inputs should be bold in print - must come after general input styles */
     input.payment-amount-input {
         font-weight: bold !important;
@@ -698,6 +764,16 @@ table tfoot td {
     input[value=""]:not(.unit-display):not(.info-value),
     input:not([value]):not(.unit-display):not(.info-value) {
         display: none !important;
+    }
+
+    /* Hide empty total cells in print */
+    .total-cell:empty::after {
+        content: '' !important;
+    }
+
+    /* Don't show zero values in total cells */
+    .total-cell {
+        white-space: nowrap;
     }
 
     /* Make sure unit-display and client info fields are always visible */
@@ -753,203 +829,5 @@ table tfoot td {
         font-style: italic !important;
         margin-top: 5px !important;
         line-height: 1.4 !important;
-    }
-
-    #delivery-text[contenteditable="true"] {
-        cursor: text;
-        border: 1px dashed #4CAF50;
-        padding: 8px;
-        border-radius: 4px;
-        background-color: rgba(76, 175, 80, 0.05);
-        transition: all 0.2s ease;
-    }
-
-    #delivery-text[contenteditable="true"]:hover {
-        background-color: rgba(76, 175, 80, 0.1);
-    }
-
-    #delivery-text[contenteditable="true"]:focus {
-        background-color: rgba(76, 175, 80, 0.15);
-        border: 1px solid #4CAF50;
-        outline: none;
-    }
-
-    /* Hide edit indicator when printing */
-    @media print {
-        #delivery-text[contenteditable="true"] {
-            border: none !important;
-            background: none !important;
-        }
-    }
-}
-
-/* ================================================
-   Save Success Modal
-   ================================================ */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-.modal-dialog {
-    background: #111827;
-    color: #f9fafb;
-    padding: 24px 28px;
-    border-radius: 12px;
-    max-width: 420px;
-    width: 90%;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-.modal-dialog h2 {
-    margin: 0 0 8px;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.modal-dialog p {
-    margin: 4px 0;
-    font-size: 14px;
-}
-
-.modal-actions {
-    margin-top: 18px;
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-}
-
-.modal-btn {
-    border: none;
-    border-radius: 999px;
-    padding: 8px 18px;
-    font-size: 13px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.modal-btn.primary {
-    background: #2563eb;
-    color: #ffffff;
-}
-
-.modal-btn.primary:hover {
-    background: #1d4ed8;
-}
-
-.modal-btn.secondary {
-    background: #374151;
-    color: #e5e7eb;
-}
-
-.modal-btn.secondary:hover {
-    background: #4b5563;
-}
-
-@media print {
-    .modal-overlay {
-        display: none !important;
-    }
-}
-
-/* Price visibility toggle button */
-.price-toggle-container {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 15px;
-    background: #f8f9fa;
-    border: 2px solid #28a745;
-    border-radius: 6px;
-    margin-left: 15px;
-    transition: border-color 0.3s;
-}
-
-.price-toggle-container label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #495057;
-    margin: 0;
-    cursor: pointer;
-    user-select: none;
-}
-
-.price-toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-}
-
-.price-toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.price-toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #28a745;
-    transition: 0.3s;
-    border-radius: 24px;
-}
-
-.price-toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.3s;
-    border-radius: 50%;
-}
-
-.price-toggle-switch input:checked+.price-toggle-slider {
-    background-color: #dc3545;
-}
-
-.price-toggle-switch input:checked+.price-toggle-slider:before {
-    transform: translateX(26px);
-}
-
-/* Hide price column when toggle is OFF */
-.hide-price-column th.price-header,
-.hide-price-column td.price-column {
-    display: none !important;
-}
-
-/* Ensure it works in print/PDF */
-@media print {
-
-    .hide-price-column th.price-header,
-    .hide-price-column td.price-column {
-        display: none !important;
-    }
-
-    .price-toggle-container {
-        display: none !important;
-    }
-}
-
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-    .price-toggle-container {
-        margin-left: 0;
-        margin-top: 10px;
-        width: 100%;
-        justify-content: center;
     }
 }
