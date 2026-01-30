@@ -909,6 +909,9 @@
                     line.style.display = 'none';
                 }
             });
+
+            // Also replace zero-valued inputs/totals for the print snapshot
+            try { if (typeof markZeroValuesForPrint === 'function') markZeroValuesForPrint(); } catch (e) { }
         });
 
         // Restore all payment terms after printing
@@ -2407,28 +2410,84 @@
             }
         }
         // Function to mark zero values to hide in print
+        // This replaces zero-valued inputs/cells with inert spans before printing,
+        // and restores the originals after print to preserve layout without showing zeros in PDFs.
         function markZeroValuesForPrint() {
-            // Hide zero price inputs
+            // container for restorations
+            window.__zeroReplacements = window.__zeroReplacements || [];
+
+            // Replace zero price inputs with empty spans that copy inline styles/classes
             document.querySelectorAll('.price-input').forEach(input => {
-                const value = parseFloat(input.value) || 0;
-                if (value === 0) {
-                    input.classList.add('hide-zero-in-print');
-                }
+                try {
+                    const value = parseFloat(String(input.value).replace(/[₱,]/g, '')) || 0;
+                    if (value === 0) {
+                        // don't replace twice
+                        if (input.dataset.zeroReplaced === 'true') return;
+
+                        const span = document.createElement('span');
+                        span.className = input.className + ' zero-replacement';
+                        // copy inline styles to preserve width/appearance
+                        span.style.cssText = input.style.cssText || '';
+                        // keep alignment
+                        span.style.display = 'inline-block';
+                        span.textContent = '';
+
+                        // store original for restore
+                        window.__zeroReplacements.push({ type: 'input', original: input, replacement: span });
+
+                        input.parentNode.replaceChild(span, input);
+                        input.dataset.zeroReplaced = 'true';
+                    }
+                } catch (e) { console.warn('zero replace price-input error', e); }
             });
 
-            // Hide zero total cells that show ₱0.00
+            // Replace zero total cells that show ₱0.00 with empty spans (preserve cell)
             document.querySelectorAll('.total-cell').forEach(cell => {
-                if (cell.textContent.trim() === '₱0.00') {
-                    cell.classList.add('hide-zero-in-print');
-                }
+                try {
+                    if (cell.textContent.trim() === '₱0.00') {
+                        // avoid double replace
+                        if (cell.dataset.zeroReplaced === 'true') return;
+
+                        const originalHTML = cell.innerHTML;
+                        const span = document.createElement('span');
+                        span.className = 'zero-replacement';
+                        span.style.cssText = 'display:inline-block;width:100%;';
+                        span.textContent = '';
+
+                        window.__zeroReplacements.push({ type: 'cell', cell: cell, originalHTML: originalHTML, replacement: span });
+
+                        // clear cell and append span
+                        cell.innerHTML = '';
+                        cell.appendChild(span);
+                        cell.dataset.zeroReplaced = 'true';
+                    }
+                } catch (e) { console.warn('zero replace total-cell error', e); }
             });
         }
 
-        // Clean up zero value classes after print
+        // Clean up zero value replacements after print: restore originals
         window.addEventListener('afterprint', function () {
-            document.querySelectorAll('.hide-zero-in-print').forEach(element => {
-                element.classList.remove('hide-zero-in-print');
-            });
+            try {
+                const repls = window.__zeroReplacements || [];
+                repls.forEach(r => {
+                    if (r.type === 'input' && r.replacement && r.original) {
+                        try {
+                            // If replacement still exists in DOM, swap back
+                            if (r.replacement.parentNode) r.replacement.parentNode.replaceChild(r.original, r.replacement);
+                            r.original.dataset.zeroReplaced = '';
+                        } catch (e) { /* ignore */ }
+                    } else if (r.type === 'cell' && r.cell) {
+                        try {
+                            r.cell.innerHTML = r.originalHTML;
+                            r.cell.dataset.zeroReplaced = '';
+                        } catch (e) { /* ignore */ }
+                    }
+                });
+            } catch (e) {
+                console.warn('Error restoring zero replacements after print', e);
+            } finally {
+                window.__zeroReplacements = [];
+            }
         });
 
         // Show custom "Quotation saved" modal instead of browser alerts
