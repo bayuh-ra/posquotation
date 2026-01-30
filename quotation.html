@@ -364,7 +364,7 @@
         }
 
         .hide-zero-in-print {
-            visibility: hidden !important;
+            display: none !important;
         }
 
         /* Editable content styling */
@@ -1018,6 +1018,27 @@
             if (discountInput && discountInput.value) {
                 const value = parseFloat(discountInput.value) || 0;
                 discountInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            // Ensure zeros are marked for print immediately (covers mobile Save as PDF)
+            // and keep the marking updated when relevant inputs change or page visibility changes.
+            try {
+                if (typeof markZeroValuesForPrint === 'function') {
+                    markZeroValuesForPrint();
+                }
+
+                const dynamicInputs = document.querySelectorAll('.price-input, .qty-input, .delivery-price-input, #subtotal-input, #onsite-delivery-input, #discount-input, #total-package-price-input, .payment-amount-input');
+                dynamicInputs.forEach(inp => {
+                    inp.addEventListener('input', markZeroValuesForPrint);
+                    inp.addEventListener('blur', markZeroValuesForPrint);
+                });
+
+                window.addEventListener('pageshow', markZeroValuesForPrint);
+                document.addEventListener('visibilitychange', function () {
+                    if (document.visibilityState === 'visible') markZeroValuesForPrint();
+                });
+            } catch (e) {
+                console.warn('Could not attach zero-marking listeners:', e);
             }
 
         });
