@@ -440,6 +440,7 @@ async function loadProductsForPackageType(packageTypeName) {
         // Recalculate all totals
         calculateTotals();
         updateTotalItemsCount();
+        updateItemNumbers();
 
         console.log('Finished loading', sortedItems.length, 'products');
 
@@ -1117,7 +1118,6 @@ async function saveAndPrintPDF() {
 }
 
 // For print: ensure the wrapped text shows instead of dropdown
-// For print: ensure the wrapped text shows instead of dropdown
 document.addEventListener('DOMContentLoaded', function () {
     console.log('Page loaded, initializing...');
 
@@ -1134,55 +1134,78 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeQuotation();
 
     // Add event listeners to all existing rows
-    document.querySelectorAll('.product-row, #package-type-row').forEach(row => {
-        const qtyInput = row.querySelector('.qty-input');
-        const priceInput = row.querySelector('.price-input');
-        const productDropdown = row.querySelector('.product-dropdown');
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Page loaded, initializing...');
 
-        if (productDropdown) {
-            productDropdown.addEventListener('change', function () {
-                const selectedOption = this.options[this.selectedIndex];
-                const currentRow = this.closest('tr');
+        const employeeName = localStorage.getItem('selectedEmployeeName');
+        const quotationNo = localStorage.getItem('currentQuotationNumber');
 
-                console.log('Product selected:', selectedOption.value, 'Unit:', selectedOption.dataset.unit);
-                console.log('Product description:', selectedOption.dataset.description);
+        console.log('Session data:', {
+            employeeName,
+            quotationNo
+        });
 
-                // Auto-set quantity to 1 when product is selected
-                const qtyInput = currentRow.querySelector('.qty-input');
-                if (qtyInput && parseFloat(qtyInput.value) === 0) {
-                    qtyInput.value = 1;
-                }
+        loadData();
+        initializeQuotation();
 
-                // Set unit
-                const unitDisplay = currentRow.querySelector('.unit-display');
-                if (unitDisplay && selectedOption.dataset.unit) {
-                    unitDisplay.value = selectedOption.dataset.unit;
-                }
+        // Add event listeners to all existing rows
+        document.querySelectorAll('.product-row, #package-type-row').forEach(row => {
+            const qtyInput = row.querySelector('.qty-input');
+            const priceInput = row.querySelector('.price-input');
+            const productDropdown = row.querySelector('.product-dropdown');
 
-                // Set price
-                const priceInput = currentRow.querySelector('.price-input');
-                if (priceInput && selectedOption.dataset.price) {
-                    priceInput.value = selectedOption.dataset.price;
-                }
+            if (productDropdown) {
+                productDropdown.addEventListener('change', function () {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const currentRow = this.closest('tr');
 
-                calculateRowTotal(currentRow);
-                calculateTotals();
-            });
-        }
+                    console.log('Product selected:', selectedOption.value, 'Unit:', selectedOption.dataset.unit);
+                    console.log('Product description:', selectedOption.dataset.description);
 
-        if (qtyInput) {
-            qtyInput.addEventListener('input', function () {
-                calculateRowTotal(row);
-                calculateTotals();
-            });
-        }
+                    // Auto-set quantity to 1 when product is selected
+                    const qtyInput = currentRow.querySelector('.qty-input');
+                    if (qtyInput && parseFloat(qtyInput.value) === 0) {
+                        qtyInput.value = 1;
+                    }
 
-        if (priceInput) {
-            priceInput.addEventListener('input', function () {
-                calculateRowTotal(row);
-                calculateTotals();
-            });
-        }
+                    // Set unit
+                    const unitDisplay = currentRow.querySelector('.unit-display');
+                    if (unitDisplay && selectedOption.dataset.unit) {
+                        unitDisplay.value = selectedOption.dataset.unit;
+                    }
+
+                    // Set price
+                    const priceInput = currentRow.querySelector('.price-input');
+                    if (priceInput && selectedOption.dataset.price) {
+                        priceInput.value = selectedOption.dataset.price;
+                    }
+
+                    calculateRowTotal(currentRow);
+                    calculateTotals();
+                    updateItemNumbers(); // ← ADD THIS LINE
+                });
+            }
+
+            if (qtyInput) {
+                qtyInput.addEventListener('input', function () {
+                    calculateRowTotal(row);
+                    calculateTotals();
+                    updateItemNumbers(); // ← ADD THIS LINE
+                });
+            }
+
+            if (priceInput) {
+                priceInput.addEventListener('input', function () {
+                    calculateRowTotal(row);
+                    calculateTotals();
+                });
+            }
+        });
+
+        // ... rest of the code ...
+
+        calculateTotals();
+        updateItemNumbers(); // ← ADD THIS LINE to initialize numbers on load
     });
 
     // Add listener to description dropdown
@@ -1297,4 +1320,46 @@ function calculateRowTotal(row) {
             totalCell.innerHTML = ''; // ← Completely empty HTML
         }
     }
+}
+// Update item numbers sequentially (skip rows with qty = 0)
+function updateItemNumbers() {
+    const tbody = document.getElementById('quotation-tbody');
+    if (!tbody) return;
+
+    let itemNumber = 1;
+
+    // Get all rows
+    const allRows = tbody.querySelectorAll('tr');
+
+    allRows.forEach(row => {
+        // Skip delivery row
+        if (row.id === 'delivery-row') {
+            const itemCell = row.querySelector('td:first-child');
+            if (itemCell) itemCell.textContent = '';
+            return;
+        }
+
+        // Get quantity
+        const qtyInput = row.querySelector('.qty-input');
+        const qty = qtyInput ? parseFloat(qtyInput.value) || 0 : 0;
+
+        // Get the first cell (item number cell)
+        const itemCell = row.querySelector('td:first-child');
+
+        if (itemCell) {
+            if (qty > 0) {
+                // Has quantity - assign number
+                itemCell.textContent = itemNumber;
+                itemCell.style.textAlign = 'center';
+                itemCell.style.fontWeight = 'bold';
+                itemCell.style.fontSize = '12px';
+                itemNumber++;
+            } else {
+                // No quantity - clear number
+                itemCell.textContent = '';
+            }
+        }
+    });
+
+    console.log('Item numbers updated. Total items:', itemNumber - 1);
 }
