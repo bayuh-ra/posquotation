@@ -2410,42 +2410,53 @@
             }
         }
         // Function to mark zero values to hide in print
-        // This replaces zero-valued inputs/cells with inert spans before printing,
+        // Replaces zero-valued inputs/cells with inert spans before printing,
         // and restores the originals after print to preserve layout without showing zeros in PDFs.
         function markZeroValuesForPrint() {
             // container for restorations
             window.__zeroReplacements = window.__zeroReplacements || [];
 
-            // Replace zero price inputs with empty spans that copy inline styles/classes
-            document.querySelectorAll('.price-input').forEach(input => {
+            // Check if CUSTOMIZE mode is active
+            const packageTypeSelect = document.getElementById('packageTypeSelect');
+            const isCustomize = packageTypeSelect && packageTypeSelect.value === 'CUSTOMIZE';
+
+            // Inputs to check (price inputs and footer inputs)
+            const inputSelector = '.price-input, .delivery-price-input, #subtotal-input, #onsite-delivery-input, #discount-input, #total-package-price-input';
+
+            document.querySelectorAll(inputSelector).forEach(input => {
                 try {
-                    const value = parseFloat(String(input.value).replace(/[₱,]/g, '')) || 0;
-                    if (value === 0) {
-                        // don't replace twice
+                    // For text inputs, remove peso/comma then parse
+                    let rawVal = '';
+                    if (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA') rawVal = String(input.value || '');
+                    else rawVal = String(input.textContent || '');
+
+                    const value = parseFloat(rawVal.replace(/[₱,]/g, '')) || 0;
+                    const isPrice = input.classList.contains('price-input');
+                    
+                    // Hide zeros, but NOT price inputs when in CUSTOMIZE mode
+                    if (value === 0 && !(isPrice && isCustomize)) {
                         if (input.dataset.zeroReplaced === 'true') return;
 
                         const span = document.createElement('span');
-                        span.className = input.className + ' zero-replacement';
-                        // copy inline styles to preserve width/appearance
-                        span.style.cssText = input.style.cssText || '';
-                        // keep alignment
+                        span.className = (input.className || '') + ' zero-replacement';
+                        span.style.cssText = (input.style && input.style.cssText) ? input.style.cssText : '';
                         span.style.display = 'inline-block';
                         span.textContent = '';
 
-                        // store original for restore
                         window.__zeroReplacements.push({ type: 'input', original: input, replacement: span });
 
-                        input.parentNode.replaceChild(span, input);
+                        if (input.parentNode) input.parentNode.replaceChild(span, input);
                         input.dataset.zeroReplaced = 'true';
                     }
-                } catch (e) { console.warn('zero replace price-input error', e); }
+                } catch (e) { console.warn('zero replace input error', e); }
             });
 
-            // Replace zero total cells that show ₱0.00 with empty spans (preserve cell)
-            document.querySelectorAll('.total-cell').forEach(cell => {
+            // Cells to check (totals)
+            const cellSelector = '.total-cell, .delivery-total-cell';
+            document.querySelectorAll(cellSelector).forEach(cell => {
                 try {
-                    if (cell.textContent.trim() === '₱0.00') {
-                        // avoid double replace
+                    const txt = String(cell.textContent || '').trim();
+                    if (txt === '₱0.00' || txt === '0' || txt === '₱0') {
                         if (cell.dataset.zeroReplaced === 'true') return;
 
                         const originalHTML = cell.innerHTML;
@@ -2454,14 +2465,13 @@
                         span.style.cssText = 'display:inline-block;width:100%;';
                         span.textContent = '';
 
-                        window.__zeroReplacements.push({ type: 'cell', cell: cell, originalHTML: originalHTML, replacement: span });
+                        window.__zeroReplacements.push({ type: 'cell', cell: cell, originalHTML: originalHTML });
 
-                        // clear cell and append span
                         cell.innerHTML = '';
                         cell.appendChild(span);
                         cell.dataset.zeroReplaced = 'true';
                     }
-                } catch (e) { console.warn('zero replace total-cell error', e); }
+                } catch (e) { console.warn('zero replace cell error', e); }
             });
         }
 
@@ -2472,7 +2482,6 @@
                 repls.forEach(r => {
                     if (r.type === 'input' && r.replacement && r.original) {
                         try {
-                            // If replacement still exists in DOM, swap back
                             if (r.replacement.parentNode) r.replacement.parentNode.replaceChild(r.original, r.replacement);
                             r.original.dataset.zeroReplaced = '';
                         } catch (e) { /* ignore */ }

@@ -418,8 +418,9 @@ async function loadProductsForPackageType(packageTypeName) {
             // Update price
             const priceInput = packageRow.querySelector('.price-input');
             if (priceInput && firstItem.product) {
-                priceInput.value = firstItem.product.base_price || 0;
-                console.log('Set price to:', firstItem.product.base_price);
+                // For non-CUSTOMIZE package types we show package contents but hide per-item prices (set to zero)
+                priceInput.value = 0;
+                console.log('Non-custom package: set displayed price to 0 for package item');
             }
 
             // Calculate total for first row
@@ -459,7 +460,7 @@ async function loadProductsForPackageType(packageTypeName) {
                 <td><input type="number" value="1" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                 <td><input type="text" value="${item.product && item.product.unit ? item.product.unit : ''}" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
                 <td>${descriptionHTML}</td>
-                <td><input type="number" value="${item.product && item.product.base_price ? item.product.base_price : 0}" step="0.01" class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+                <td><input type="number" value="0" step="0.01" class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                 <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
                 <td class="no-print"><button onclick="deleteRow(this)" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button></td>
             `;
