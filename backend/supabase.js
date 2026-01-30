@@ -103,7 +103,7 @@ async function getNextQuotationNo(employeeName) {
 async function getPackageTypes() {
   const { data, error } = await supabaseClient
     .from('package_type')
-    .select('*')
+    .select('name, description, package_price')  // ✅ Added package_price
     .order('name');
   
   if (error) {
@@ -113,12 +113,15 @@ async function getPackageTypes() {
   return data || [];
 }
 
-async function updatePackageTypeByName(oldName, newName, description) {
-  // 1️⃣ If name did not change → update description only
+async function updatePackageTypeByName(oldName, newName, description, packagePrice) {
+  // 1️⃣ If name did not change → update description and price only
   if (oldName === newName) {
     const { data, error } = await supabaseClient
       .from('package_type')
-      .update({ description })
+      .update({ 
+        description,
+        package_price: packagePrice  // ✅ Added package_price
+      })
       .eq('name', oldName)
       .select()
       .single();
@@ -142,10 +145,14 @@ async function updatePackageTypeByName(oldName, newName, description) {
     throw new Error('Package type name already exists');
   }
 
-  // 3️⃣ Rename safely
+  // 3️⃣ Rename safely and update price
   const { data, error } = await supabaseClient
     .from('package_type')
-    .update({ name: newName, description })
+    .update({ 
+      name: newName, 
+      description,
+      package_price: packagePrice  // ✅ Added package_price
+    })
     .eq('name', oldName)
     .select()
     .single();

@@ -1303,6 +1303,9 @@
 
             // Add event listeners
             setupRowEventListeners(newRow);
+
+            // Update item numbers to maintain sequential numbering
+            updateItemNumbers();
         }
 
         // Delete row function
@@ -1322,6 +1325,7 @@
             if (rowToDelete) {
                 rowToDelete.remove();
                 calculateTotals();
+                updateItemNumbers();
                 closeDeleteModal();
             }
         }

@@ -23,6 +23,10 @@
             <input type="text" id="add-package-name" placeholder="e.g., Standard POS Retail Package">
         </div>
         <div class="form-group">
+            <label>Package Price (₱) *</label>
+            <input type="number" id="add-package-price" placeholder="e.g., 97000.00" step="0.01" min="0">
+        </div>
+        <div class="form-group">
             <label>Description/Inclusions</label>
             <textarea id="add-package-description" placeholder="Package inclusions and details"></textarea>
         </div>
@@ -45,6 +49,10 @@
         <div class="form-group">
             <label>Package Name *</label>
             <input type="text" id="edit-package-name">
+        </div>
+        <div class="form-group">
+            <label>Package Price (₱) *</label>
+            <input type="number" id="edit-package-price" placeholder="e.g., 97000.00" step="0.01" min="0">
         </div>
         <div class="form-group">
             <label>Description/Inclusions</label>
@@ -70,6 +78,10 @@
                 <div id="detail-package-name" style="font-size: 18px; font-weight: bold; color: #2d3748; margin-top: 5px;"></div>
             </div>
             <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">PACKAGE PRICE</label>
+                <div id="detail-package-price" style="font-size: 18px; font-weight: bold; color: #16a34a; margin-top: 5px;"></div>
+            </div>
+            <div style="margin-bottom: 20px;">
                 <label style="font-weight: 600; color: #4a5568; font-size: 12px;">DESCRIPTION</label>
                 <div id="detail-package-description" style="font-size: 14px; color: #2d3748; margin-top: 5px; line-height: 1.6;"></div>
             </div>
@@ -88,20 +100,29 @@
 
     window.loadPackageTypes = async function() {
         const container = document.getElementById('package-types-list');
-        const { data, error } = await supabase.from('package_type').select('*').order('name');
+        const { data, error } = await supabase
+            .from('package_type')
+            .select('*')
+            .order('name');
         
         if (error) {
             container.innerHTML = '<p class="error">Error loading package types: ' + error.message + '</p>';
             return;
         }
         
-        let html = '<table><tr><th>Name</th><th>Description</th></tr>';
+        let html = '<table><tr><th>Name</th><th>Package Price</th><th>Description</th></tr>';
         data.forEach((pkg, index) => {
             const rowId = `package-row-${index}`;
+            const formattedPrice = pkg.package_price 
+                ? '₱' + parseFloat(pkg.package_price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                : '₱0.00';
+            
             html += `<tr id="${rowId}" style="cursor: pointer;" 
                 data-name="${encodeURIComponent(pkg.name)}" 
+                data-price="${pkg.package_price || 0}"
                 data-description="${encodeURIComponent(pkg.description || '')}">
                 <td>${pkg.name}</td>
+                <td style="font-weight: bold; color: #16a34a;">${formattedPrice}</td>
                 <td>${pkg.description || ''}</td>
             </tr>`;
         });
@@ -115,6 +136,7 @@
                 row.addEventListener('click', function() {
                     showPackageDetail(
                         decodeURIComponent(this.dataset.name),
+                        parseFloat(this.dataset.price) || 0,
                         decodeURIComponent(this.dataset.description)
                     );
                 });
@@ -122,12 +144,18 @@
         });
     };
 
-    window.showPackageDetail = function(name, description) {
+    window.showPackageDetail = function(name, price, description) {
+        const formattedPrice = '₱' + parseFloat(price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
         document.getElementById('detail-package-name').textContent = name;
+        document.getElementById('detail-package-price').textContent = formattedPrice;
         document.getElementById('detail-package-description').textContent = description || 'No description';
-        document.getElementById('detailPackageModal').dataset.name = name;
-        document.getElementById('detailPackageModal').dataset.description = description;
-        document.getElementById('detailPackageModal').classList.add('active');
+        
+        const modal = document.getElementById('detailPackageModal');
+        modal.dataset.name = name;
+        modal.dataset.price = price;
+        modal.dataset.description = description;
+        modal.classList.add('active');
     };
 
     window.closeDetailPackageModal = function() {
@@ -136,7 +164,7 @@
 
     window.editPackageFromDetail = function() {
         const modal = document.getElementById('detailPackageModal');
-        editPackageType(modal.dataset.name, modal.dataset.description);
+        editPackageType(modal.dataset.name, modal.dataset.price, modal.dataset.description);
         closeDetailPackageModal();
     };
 
@@ -148,6 +176,7 @@
 
     window.addPackageType = async function() {
         const name = document.getElementById('add-package-name').value.trim();
+        const priceInput = document.getElementById('add-package-price').value.trim();
         const description = document.getElementById('add-package-description').value.trim();
         
         if (!name) {
@@ -155,7 +184,21 @@
             return;
         }
         
-        const { error } = await supabase.from('package_type').insert([{ name, description }]);
+        if (!priceInput || parseFloat(priceInput) < 0) {
+            showMessage('add-package-type-message', 'Please enter a valid package price', true);
+            return;
+        }
+        
+        const packagePrice = parseFloat(priceInput);
+        
+        const { error } = await supabase
+            .from('package_type')
+            .insert([{ 
+                name, 
+                package_price: packagePrice,
+                description 
+            }]);
+        
         if (error) {
             showMessage('add-package-type-message', 'Error: ' + error.message, true);
             return;
@@ -163,6 +206,7 @@
         
         showMessage('package-types-message', 'Package type added successfully!');
         document.getElementById('add-package-name').value = '';
+        document.getElementById('add-package-price').value = '';
         document.getElementById('add-package-description').value = '';
         closeAddPackageTypeModal();
         loadPackageTypes();
@@ -177,9 +221,10 @@
         document.getElementById('add-package-type-message').innerHTML = '';
     };
 
-    window.editPackageType = function(name, description) {
+    window.editPackageType = function(name, price, description) {
         document.getElementById('edit-package-old-name').value = name;
         document.getElementById('edit-package-name').value = name;
+        document.getElementById('edit-package-price').value = parseFloat(price) || 0;
         document.getElementById('edit-package-description').value = description;
         document.getElementById('editPackageModal').classList.add('active');
     };
@@ -191,6 +236,7 @@
     window.updatePackageType = async function() {
         const oldName = document.getElementById('edit-package-old-name').value;
         const newName = document.getElementById('edit-package-name').value.trim();
+        const priceInput = document.getElementById('edit-package-price').value.trim();
         const description = document.getElementById('edit-package-description').value.trim();
         
         if (!newName) {
@@ -198,10 +244,18 @@
             return;
         }
         
+        if (!priceInput || parseFloat(priceInput) < 0) {
+            showMessage('edit-package-message', 'Please enter a valid package price', true);
+            return;
+        }
+        
+        const packagePrice = parseFloat(priceInput);
+        
         const { error } = await supabase
             .from('package_type')
             .update({
                 name: newName,
+                package_price: packagePrice,
                 description
             })
             .eq('name', oldName);
@@ -219,7 +273,11 @@
     window.deletePackageType = async function(name) {
         if (!confirm(`Delete package type "${name}"?`)) return;
         
-        const { error } = await supabase.from('package_type').delete().eq('name', name);
+        const { error } = await supabase
+            .from('package_type')
+            .delete()
+            .eq('name', name);
+        
         if (error) {
             alert('Error: ' + error.message);
             return;
