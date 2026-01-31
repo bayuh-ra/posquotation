@@ -1143,6 +1143,13 @@
             @page {
                 size: legal;
                 margin: 0.2in;
+                /* Use the variable for consistent spacing */
+            }
+
+            :root {
+                /* Auto-calculate footer position based on page height */
+                --page-height: 13.6in;    /* Legal: 14in - 0.2in top - 0.2in bottom */
+                --footer-bottom: 0.3in;   /* Adjust as needed for legal paper */
             }
 
             body {
@@ -1151,16 +1158,16 @@
 
             .page {
                 width: 100%;
-                height: 13.6in;
+                height: var(--page-height);
                 page-break-after: always;
                 box-shadow: none !important;
                 margin: 0 !important;
                 padding: 0.1in 0.3in !important;
-                padding-bottom: 1.2in !important;
+                padding-bottom: 0.5in !important;
                 /* ← INCREASED to 1 inch */
                 position: relative;
                 overflow: hidden;
-                min-height: 13.6in !important;
+                min-height: var(--page-height)!important;
             }
 
             body,
@@ -1339,7 +1346,7 @@
             .page-footer {
                 display: flex !important;
                 position: absolute;
-                bottom: 0.5in;
+                bottom: var(--page-height);
                 left: 0;
                 right: 0;
                 justify-content: center;
@@ -3750,6 +3757,24 @@
                 console.warn('formatAllRowsAndFooters error', err);
             }
         }
+
+        function setPaperSize(paperSize) {
+            const root = document.documentElement;
+            
+            if (paperSize === 'letter') {
+                root.style.setProperty('--page-height', '11in');
+                root.style.setProperty('--footer-bottom', '0.2in');
+            } else if (paperSize === 'legal') {
+                root.style.setProperty('--page-height', '13.6in');
+                root.style.setProperty('--footer-bottom', '0.3in');
+            } else if (paperSize === 'a4') {
+                root.style.setProperty('--page-height', '11.7in');
+                root.style.setProperty('--footer-bottom', '0.25in');
+            }
+        }
+
+        // Set default on page load
+        setPaperSize('legal');
 
         // Run formatting on load and when rows change
         window.addEventListener('DOMContentLoaded', function () {
