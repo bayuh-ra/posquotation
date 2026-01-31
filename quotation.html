@@ -629,6 +629,19 @@
             padding-left: 0;
         }
 
+        .total-cell {
+                font-size: 13px !important;  /* Consistent size for all totals */
+                font-weight: bold !important;
+                text-align: right !important;
+                white-space: nowrap;
+            }
+
+        .delivery-total-cell {
+            font-size: 11px !important;  /* Consistent size for all totals */
+            font-weight: bold !important;
+             text-align: right !important;
+        }
+
         .feature-list li {
             margin-bottom: 2px;
         }
@@ -1405,7 +1418,16 @@
             }
 
             .total-cell {
+                font-size: 13px !important;  /* Consistent size for all totals */
+                font-weight: bold !important;
+                text-align: right !important;
                 white-space: nowrap;
+            }
+
+            .delivery-total-cell {
+                font-size: 11px !important;  /* Consistent size for all totals */
+                font-weight: bold !important;
+                text-align: right !important;
             }
 
             .unit-display,
@@ -3216,7 +3238,7 @@
                         <td><input type="text" value="${unit}" disabled class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; width: 100%; text-align: center;"></td>
                         <td>${descriptionContent}</td>
                         <td><input type="number" value="${item.price}" disabled class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; text-align: right;"></td>
-                        <td class="total-cell" style="text-align: right; font-weight: bold;">₱${parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</td>
+                        <td class="total-cell">₱${parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</td>
                         <td class="no-print"></td>
                     `;
 
