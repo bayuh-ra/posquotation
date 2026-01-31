@@ -3311,6 +3311,7 @@
 
                     // Trigger print dialog
                     setTimeout(() => {
+                        showMobilePaperSizeAlert();
                         window.print();
                     }, 200);
 
@@ -3581,6 +3582,7 @@
                 // STEP 5: Trigger print dialog
                 console.log('Quotation saved successfully. Opening print dialog...');
                 setTimeout(() => {
+                    showMobilePaperSizeAlert()
                     window.print();
 
                     // After printing, redirect to quotation list
@@ -3755,6 +3757,27 @@
                 });
             } catch (err) {
                 console.warn('formatAllRowsAndFooters error', err);
+            }
+        }
+
+        // Detect if user is on a mobile device
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Show paper size instructions for mobile users
+        function showMobilePaperSizeAlert() {
+            if (isMobileDevice()) {
+                alert(
+                    '📱 MOBILE DEVICE DETECTED\n\n' +
+                    'Your phone\'s print settings will override our default.\n\n' +
+                    '✅ IMPORTANT: When the print dialog opens:\n' +
+                    '1. Look for "Paper Size" or "Page Setup"\n' +
+                    '2. Change from Letter/A4 to "LEGAL" (8.5" × 14")\n' +
+                    '3. Then save or print\n\n' +
+                    'iOS: Check "Print Details" → Paper Size\n' +
+                    'Android: Tap the 3-dot menu → Paper Size'
+                );
             }
         }
 
