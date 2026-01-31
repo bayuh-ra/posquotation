@@ -327,15 +327,14 @@
 
         /* Page number and footer styles */
         .page-footer {
-            position: absolute;
-            bottom: 0.2in;
-            left: 0;
-            right: 0;
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 0 0.5in;
+            padding: 0.2in 0.5in;
             z-index: 10;
+            margin-top: auto;
+            border-top: 1px solid #ddd;
         }
 
         .page-number {
@@ -887,20 +886,19 @@
 
         /* ==================== PAGE FOOTER ==================== */
         .page-footer {
-            position: absolute;
-            bottom: 0.2in;
-            left: 0;
-            right: 0;
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 0 0.5in;
+            padding: 0.2in 0.5in;
             z-index: 10;
+            margin-top: auto;
+            border-top: 1px solid #ddd;
         }
 
         .page-number {
-            position: absolute;
-            left: 0.5in;
+            position: static;
+            /* left: 0.5in; */
             width: 30px;
             height: 30px;
             background-color: #1a5276;
