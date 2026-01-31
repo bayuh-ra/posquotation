@@ -1122,8 +1122,8 @@
         /* ==================== PRINT STYLES ==================== */
         @media print {
             @page {
-                size: letter;
-                margin: 0.5in;
+                size: A4;
+                margin: 0.2in;
             }
 
             body {
@@ -1136,7 +1136,7 @@
                 page-break-after: always;
                 box-shadow: none !important;
                 margin: 0 !important;
-                padding: 0.15in 0.4in !important;
+                padding: 0.1in 0.3in !important;
                 padding-bottom: 1.2in !important;
                 /* ← INCREASED to 1 inch */
                 position: relative;
@@ -1262,9 +1262,30 @@
                 text-align: center !important;
             }
 
-            table th:nth-child(6) {
-                text-align: right !important;
-            }
+        table th:nth-child(1) {
+            width: 40px;
+            text-align: center;
+        }
+
+        table th:nth-child(2) {
+            width: 35px;
+            text-align: center;
+        }
+
+        table th:nth-child(3) {
+            width: 45px;
+            text-align: center;
+        }
+
+        table th:nth-child(5) {
+            width: auto;
+            text-align: center;
+        }
+
+        table th:nth-child(6) {
+            width: 60px;
+            text-align: right;
+        }
 
             table td {
                 padding: 4px !important;
