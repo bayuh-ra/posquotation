@@ -546,6 +546,7 @@
             border-collapse: collapse;
             margin-bottom: 3px;
             border: 1px solid #ccc;
+            table-layout: fixed;
         }
 
         table th {
@@ -559,7 +560,7 @@
         }
 
         table th:nth-child(1) {
-            width: 80px;
+            width: 70px;
             text-align: center;
         }
 
@@ -569,7 +570,7 @@
         }
 
         table th:nth-child(3) {
-            width: 60px;
+            width: 50px;
             text-align: center;
         }
 
@@ -579,12 +580,12 @@
         }
 
         table th:nth-child(5) {
-            width: 70px;
+            width: 60px;
             text-align: center;
         }
 
         table th:nth-child(6) {
-            width: 65px;
+            width: 50px;
             text-align: right;
         }
 
@@ -1122,11 +1123,19 @@
         }
 
         /* ==================== MOBILE RESPONSIVE ==================== */
-        @media (max-width: 768px) {
+        @media (max-width: 480px) {
             .button-container {
                 flex-wrap: nowrap;
                 overflow-x: auto;
             }
+            /* Small-screen adjustments (phones) */
+            table { table-layout: auto; } /* allow wrapping on very small screens */
+            table th:nth-child(1) { width: 50px; }
+            table th:nth-child(3) { width: 40px; }
+            table th:nth-child(5) { width: 55px; }
+            table th:nth-child(6) { width: 45px; }
+            table th:nth-child(4) { width: auto; } /* maximize description width */
+            .total-cell { white-space: nowrap; } /* keep totals on one line */
 
             .button-container button {
                 flex: 1;
@@ -1281,6 +1290,7 @@
                 border-collapse: collapse;
                 margin-bottom: 3px;
                 border: 1px solid #ccc;
+                table-layout: fixed;
             }
 
             table th {
