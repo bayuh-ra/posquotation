@@ -437,7 +437,7 @@
             height: 15in;
             margin: 20px auto;
             background: white;
-            padding: 0.25in 0.4in;
+            padding: 0.2in 0.35in;
             /* ← Keep compact padding */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             position: relative;
@@ -545,6 +545,7 @@
             border-collapse: collapse;
             margin-bottom: 3px;
             border: 1px solid #ccc;
+            table-layout: fixed;
         }
 
         table th {
@@ -558,27 +559,27 @@
         }
 
         table th:nth-child(1) {
-            width: 95px;
-            text-align: center;
-        }
-
-        table th:nth-child(2) {
             width: 40px;
             text-align: center;
         }
 
+        table th:nth-child(2) {
+            width: 35px;
+            text-align: center;
+        }
+
         table th:nth-child(3) {
-            width: 50px;
+            width: 45px;
             text-align: center;
         }
 
         table th:nth-child(5) {
-            width: 80px;
+            width: auto;
             text-align: center;
         }
 
         table th:nth-child(6) {
-            width: 80px;
+            width: 60px;
             text-align: right;
         }
 
@@ -588,11 +589,22 @@
             vertical-align: top;
             font-size: 8.5px;
             line-height: 1.2;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        table td:nth-child(4) {
+            max-width: 280px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            font-size: 8px;
         }
 
         table td:nth-child(2),
         table td:nth-child(3) {
-            text-align: left;
+            text-align: center;
         }
 
         table td:nth-child(5),
@@ -1136,7 +1148,7 @@
                 page-break-after: always;
                 box-shadow: none !important;
                 margin: 0 !important;
-                padding: 0.15in 0.4in !important;
+                padding: 0.1in 0.3in !important;
                 padding-bottom: 1.2in !important;
                 /* ← INCREASED to 1 inch */
                 position: relative;
@@ -1254,27 +1266,68 @@
                 margin-bottom: 10px !important;
                 page-break-inside: avoid;
                 width: 100% !important;
+                table-layout: fixed !important;
             }
 
             table th {
                 padding: 4px 3px !important;
-                font-size: 9px !important;
+                font-size: px !important;
                 text-align: center !important;
             }
 
+            table th:nth-child(1) {
+                width: 45px !important;
+            }
+
+            table th:nth-child(2) {
+                width: 30px !important;
+            }
+
+            table th:nth-child(3) {
+                width: 40px !important;
+            }
+
+            table th:nth-child(4) {
+                width: auto !important;
+                max-width: 260px !important;
+            }
+
+            table th:nth-child(5) {
+                width: 60px !important;
+            }
+
             table th:nth-child(6) {
+                width: 65px !important;
                 text-align: right !important;
             }
 
+            table th:nth-child(7) {
+                display: none !important;
+            }
+
             table td {
-                padding: 4px !important;
-                font-size: 8.5px !important;
-                line-height: 1.2 !important;
+                padding: 3px !important;
+                /* ← Reduced from 4px */
+                font-size: 7.5px !important;
+                /* ← Reduced from 8.5px */
+                line-height: 1.1 !important;
                 vertical-align: top !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                white-space: normal !important;
+            }
+
+            /* ✅ FORCE DESCRIPTION TEXT TO BE SMALLER AND WRAP */
+            table td:nth-child(4) {
+                font-size: 7px !important;
+                max-width: 260px !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
             }
 
             table tfoot td {
-                padding: 5px !important;
+                padding: 4px !important;
+                font-size: 8px !important;
             }
 
             .page.page-break {
