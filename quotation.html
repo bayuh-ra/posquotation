@@ -3608,14 +3608,15 @@
                         if (cell.dataset.zeroReplaced === 'true') return;
 
                         const originalHTML = cell.innerHTML;
-                        cell.style.visibility = 'hidden'; // Hide but preserve layout
+                        cell.style.visibility = 'none'; // Hide but preserve layout
                         cell.dataset.originalHTML = originalHTML;
                         cell.dataset.zeroReplaced = 'true';
 
                         window.__zeroReplacements.push({
                             type: 'cell',
                             cell: cell,
-                            originalHTML: originalHTML
+                            originalHTML: originalHTML,
+                            originalDisplay: cell.style.display || ''
                         });
                     }
                 } catch (e) {
@@ -3678,6 +3679,7 @@
                     } else if (r.type === 'cell' && r.cell) {
                         try {
                             r.cell.innerHTML = r.originalHTML;
+                            r.cell.style.display = r.originalDisplay || '';
                             r.cell.dataset.zeroReplaced = '';
                         } catch (e) { /* ignore */ }
                     }
