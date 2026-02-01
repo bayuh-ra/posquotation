@@ -1268,6 +1268,76 @@
         }
 
         /* ==================== END VIEW MODE ==================== */
+        /* ==================== PRINT FIXES (DO NOT AFFECT VIEW MODE) ==================== */
+        @media print {
+
+            /* 1️⃣ Hide VIEW MODE UI */
+            .view-mode-banner,
+            .view-mode-buttons,
+            .btn-back-view,
+            .btn-delete-view,
+            .btn-pdf-view,
+            .no-print,
+            .button-container,
+            .add-product-btn {
+                display: none !important;
+            }
+
+            /* 2️⃣ Normalize body for print */
+            body {
+                background: white !important;
+                margin: 0 !important;
+            }
+
+            /* 3️⃣ Page reset for printing */
+            .page {
+                box-shadow: none !important;
+                border: none !important;
+                background: white !important;
+
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0.25in 0.4in !important;
+            }
+
+            /* 4️⃣ FORCE table styling (prevents white/blue issue) */
+            table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+                border: 1px solid #000 !important;
+            }
+
+            table th,
+            table td {
+                border: 1px solid #000 !important;
+                color: #000 !important;
+                background: white !important;
+            }
+
+            table th {
+                background: #d6e6f0 !important; /* keep header color */
+                font-weight: bold !important;
+            }
+
+            /* 5️⃣ Remove blue outlines & input chrome */
+            input,
+            textarea,
+            select {
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+                appearance: none !important;
+            }
+
+            /* 6️⃣ Ensure colors actually print (Chrome fix) */
+            * {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+        /* ==================== END PRINT FIXES ==================== */
+
     </style>
 </head>
 
