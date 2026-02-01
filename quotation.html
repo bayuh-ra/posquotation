@@ -1138,73 +1138,74 @@
             overflow-x: hidden;
         }
 
-        /* View mode banner styling */
+        /* ==================== VIEW MODE BANNER ==================== */
         .view-mode-banner {
-            background: #e3f2fd;
-            border: 2px solid #2196F3;
-            padding: 8px;
-            margin: 8px;
-            text-align: center;
-            font-weight: bold;
-            color: #1565C0;
-            border-radius: 8px;
-            font-size: 14px;
+            background: #e3f2fd !important;
+            border: 2px solid #2196F3 !important;
+            padding: 15px !important;
+            margin: 10px !important;
+            text-align: center !important;
+            font-weight: bold !important;
+            color: #1565C0 !important;
+            border-radius: 8px !important;
+            font-size: 16px !important;
+            width: calc(100% - 20px) !important;
+            box-sizing: border-box !important;
         }
 
-        /* Button container for view mode */
+        /* ==================== VIEW MODE BUTTONS ==================== */
         .view-mode-buttons {
-            display: flex;
-            gap: 15px;  /* ✅ Increased from 8px */
-            padding: 15px 20px;  /* ✅ Increased from 8px */
-            justify-content: space-between;
-            align-items: stretch;  /* ✅ Changed from center */
-            width: 100%;  /* ✅ Added */
-            box-sizing: border-box;  /* ✅ Added */
+            display: flex !important;
+            gap: 10px !important;
+            padding: 10px !important;
+            justify-content: space-between !important;
+            align-items: stretch !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
         }
 
         .view-mode-buttons button {
-            flex: 1;
-            padding: 18px 20px;  /* ✅ Increased from 12px 8px */
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;  /* ✅ Increased from 12px */
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
-            min-height: 50px;  /* ✅ Added minimum height */
+            flex: 1 !important;
+            padding: 15px 10px !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            white-space: nowrap !important;
+            min-height: 55px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
 
         .btn-back-view {
-            background: #f5f5f5;
-            color: #333;
-            border: 2px solid #ddd;
-            flex: 0.6;  /* ✅ Increased from 0.5 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;  /* ✅ Increased from 5px */
-            font-size: 20px;  /* ✅ Increased from 16px */
+            background: #f5f5f5 !important;
+            color: #333 !important;
+            border: 2px solid #ddd !important;
+            flex: 0.6 !important;
+            font-size: 24px !important;
         }
 
         .btn-delete-view {
-            background: #dc3545;
-            color: white;
-            flex: 1.2;  /* ✅ Added to make it slightly bigger */
+            background: #dc3545 !important;
+            color: white !important;
+            flex: 1 !important;
         }
 
         .btn-pdf-view {
-            background: #28a745;
-            color: white;
-            flex: 1.2;  /* ✅ Added to make it slightly bigger */
+            background: #28a745 !important;
+            color: white !important;
+            flex: 1 !important;
         }
 
         .btn-back-view:active,
         .btn-delete-view:active,
         .btn-pdf-view:active {
-            transform: scale(0.98);
+            transform: scale(0.98) !important;
+            opacity: 0.9 !important;
         }
-
         /* ✅ MOBILE VIEW - FIT ENTIRE PAGE (WIDTH + HEIGHT) */
         @media (max-width: 768px) {
             /* Prevent scrolling */
