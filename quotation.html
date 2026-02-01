@@ -1130,9 +1130,9 @@
             }
         }
 
-/* ==================== VIEW MODE (PDF-LIKE, ZOOM SAFE) ==================== */
+/* ==================== VIEW MODE (SCREEN ONLY) ==================== */
 
-        /* Body */
+        /* View mode body */
         body.view-mode {
             background: #f5f5f5;
             margin: 0;
@@ -1173,9 +1173,9 @@
         }
 
         .btn-back-view {
-            background: #5f5f5f;
+            background: #f5f5f5;
             color: #333;
-            border: 2px solid #5f5f5f;
+            border: 2px solid #ddd;
             flex: 0.6;
         }
 
@@ -1189,22 +1189,37 @@
             color: white;
         }
 
-        /* ==================== PAGE ==================== */
+        /* ==================== VIEW MODE CONTENT ==================== */
+        body.view-mode #pdf-content {
+            display: block;            /* 🔥 NOT flex */
+            width: 100%;
+            padding: 20px;
+            overflow-x: auto;          /* 🔥 allow horizontal pan + zoom */
+        }
+
+        /* ==================== VIEW MODE PAGE ==================== */
         body.view-mode .page {
-            width: 8.5in;             /* Real page size */
-            max-width: none;          /* 🔥 DO NOT constrain */
-            min-width: unset;         /* 🔥 PREVENT SIDE-BY-SIDE */
+            display: block;            /* 🔥 force vertical stacking */
+            width: 8.5in;              /* real document width */
+            margin: 0 auto 24px auto;  /* stack pages vertically */
+
+            background: white;
+            padding: 12px;
+            box-sizing: border-box;
+
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         /* ==================== MOBILE & TABLET ==================== */
-        @media (max-width: 1080px) {
+        @media (max-width: 1024px) {
 
             body.view-mode #pdf-content {
                 padding: 12px;
             }
 
             body.view-mode .page {
-                margin: 0 auto;
+                margin-bottom: 20px;
             }
 
             .view-mode-banner {
@@ -1229,15 +1244,15 @@
             }
         }
 
-        /* ==================== TABLE SAFETY ==================== */
-        .quotation-table {
+        /* ==================== TABLE SAFETY (VIEW MODE ONLY) ==================== */
+        body.view-mode .quotation-table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
         }
 
-        .quotation-table th,
-        .quotation-table td {
+        body.view-mode .quotation-table th,
+        body.view-mode .quotation-table td {
             padding: 6px;
             font-size: 11px;
             vertical-align: top;
@@ -1245,8 +1260,8 @@
             word-wrap: break-word;
         }
 
-        .quotation-table input,
-        .quotation-table select {
+        body.view-mode .quotation-table input,
+        body.view-mode .quotation-table select {
             width: 100%;
             box-sizing: border-box;
             font-size: 11px;
