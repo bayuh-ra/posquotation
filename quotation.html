@@ -1322,6 +1322,73 @@
                 page-break-inside: avoid;
             }
         }  
+
+        /* ==================== VIEW MODE MOBILE RESPONSIVE ==================== */
+
+        /* Detect view mode with a data attribute */
+        body.view-mode {
+            background: #f5f5f5;
+        }
+
+        /* Mobile adjustments for view mode */
+        @media (max-width: 768px) {
+            /* Scale down the entire page to fit mobile screen */
+            body.view-mode .page {
+                transform: scale(0.4);
+                transform-origin: top center;
+                margin: 10px auto;
+                width: 8.5in;
+            }
+
+            /* Adjust container spacing */
+            body.view-mode #pdf-content {
+                width: 100%;
+                overflow-x: hidden;
+            }
+
+            /* Make buttons full-width and properly sized on mobile */
+            .no-print {
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            .button-container {
+                flex-direction: column;
+                gap: 10px;
+                padding: 0 10px;
+            }
+
+            .button-container button {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 100% !important;
+                padding: 15px 20px !important;
+                font-size: 16px !important;
+                flex: none;
+                margin: 0;
+            }
+
+            /* View mode banner responsive */
+            body.view-mode .no-print > div[style*="background: #e3f2fd"] {
+                font-size: 14px !important;
+                padding: 12px !important;
+                margin: 10px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* Extra small phones - scale even more */
+            body.view-mode .page {
+                transform: scale(0.35);
+            }
+
+            .button-container button {
+                padding: 12px 15px !important;
+                font-size: 14px !important;
+            }
+        }
+
+/* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */
        
     </style>
 </head>
@@ -3130,6 +3197,8 @@
         }
         // Function to make entire page read-only
         function makePageReadOnly() {
+            // ✅ ADD VIEW MODE CLASS TO BODY FOR MOBILE STYLING
+            document.body.classList.add('view-mode');
             // Add visual indicator banner
             const buttonContainer = document.querySelector('.button-container');
             if (buttonContainer) {
