@@ -128,15 +128,18 @@
                 showError('An error occurred while loading quotations');
             }
         }
-
-        // Display quotations in table
+        // Display quotations in table AND cards (for mobile)
         function displayQuotations() {
             const tbody = document.getElementById('quotationsTableBody');
+            const tableContainer = document.querySelector('.table-container');
             const emptyState = document.getElementById('emptyState');
             
             if (quotations.length === 0) {
                 tbody.innerHTML = '';
                 emptyState.style.display = 'flex';
+                // Remove any existing cards
+                const existingCards = tableContainer.querySelectorAll('.quotation-card');
+                existingCards.forEach(card => card.remove());
                 return;
             }
 
@@ -155,10 +158,14 @@
             }
 
             if (filteredQuotations.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #666;">No quotations found matching your criteria</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #666;">No quotations found matching your criteria</td></tr>';
+                // Remove any existing cards
+                const existingCards = tableContainer.querySelectorAll('.quotation-card');
+                existingCards.forEach(card => card.remove());
                 return;
             }
 
+            // ✅ DESKTOP TABLE VIEW
             tbody.innerHTML = filteredQuotations.map(q => `
                 <tr onclick="viewQuotation('${q.id}')" style="cursor: pointer;" title="Click to view quotation">
                     <td><strong>${q.quotation_no || 'N/A'}</strong></td>
@@ -169,8 +176,49 @@
                     <td class="amount">₱${formatAmount(q.total || 0)}</td>
                 </tr>
             `).join('');
-        }
 
+            // ✅ MOBILE CARD VIEW
+            // Remove existing cards first
+            const existingCards = tableContainer.querySelectorAll('.quotation-card');
+            existingCards.forEach(card => card.remove());
+            
+            // Create new cards
+            filteredQuotations.forEach(q => {
+                const card = document.createElement('div');
+                card.className = 'quotation-card';
+                card.onclick = () => viewQuotation(q.id);
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-quotation-no">${q.quotation_no || 'N/A'}</div>
+                        <div class="card-date">${formatDate(q.quotation_date || q.created_at)}</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-row">
+                            <span class="card-label">Client:</span>
+                            <span class="card-value">${q.client_name || '-'}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Employee:</span>
+                            <span class="card-value">${q.employee_name || '-'}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Package:</span>
+                            <span class="card-value">${q.package_type || '-'}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Total:</span>
+                            <span class="card-value card-amount">₱${formatAmount(q.total || 0)}</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Append card to table container
+                tableContainer.appendChild(card);
+            });
+
+            console.log('✓ Displayed', filteredQuotations.length, 'quotations (table + cards)');
+        }
 
         // Filter quotations by search
         function filterQuotations() {
