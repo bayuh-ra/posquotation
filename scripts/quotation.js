@@ -6,6 +6,15 @@ let categories = [];
 let units = [];
 let packageTypes = [];
 
+// ✅ CHECK VIEW MODE IMMEDIATELY - Before any other code runs
+const viewMode = localStorage.getItem('viewMode');
+const viewQuotationData = localStorage.getItem('viewQuotationData');
+const isViewMode = (viewMode === 'true' && viewQuotationData);
+
+if (isViewMode) {
+    console.log('🔵 VIEW MODE DETECTED - Quotation initialization will be skipped');
+}
+
 // Function to replace dropdown with wrapped text after selection
 function handleDropdownSelection(selectElement) {
     console.log('handleDropdownSelection called for:', selectElement.id || selectElement.className);
@@ -1121,6 +1130,12 @@ async function saveAndPrintPDF() {
 document.addEventListener('DOMContentLoaded', function () {
     console.log('Page loaded, initializing...');
 
+    // ✅ CHECK: Don't initialize if in view mode
+    if (isViewMode) {
+        console.log('🔵 View mode active - skipping new quotation initialization');
+        return;
+    }
+
     // Keep both for logging, but only employeeName is needed now
     const employeeName = localStorage.getItem('selectedEmployeeName');
     const quotationNo = localStorage.getItem('currentQuotationNumber');
@@ -1134,78 +1149,57 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeQuotation();
 
     // Add event listeners to all existing rows
-    document.addEventListener('DOMContentLoaded', function () {
-        console.log('Page loaded, initializing...');
+    document.querySelectorAll('.product-row, #package-type-row').forEach(row => {
+        const qtyInput = row.querySelector('.qty-input');
+        const priceInput = row.querySelector('.price-input');
+        const productDropdown = row.querySelector('.product-dropdown');
 
-        const employeeName = localStorage.getItem('selectedEmployeeName');
-        const quotationNo = localStorage.getItem('currentQuotationNumber');
+        if (productDropdown) {
+            productDropdown.addEventListener('change', function () {
+                const selectedOption = this.options[this.selectedIndex];
+                const currentRow = this.closest('tr');
 
-        console.log('Session data:', {
-            employeeName,
-            quotationNo
-        });
+                console.log('Product selected:', selectedOption.value, 'Unit:', selectedOption.dataset.unit);
+                console.log('Product description:', selectedOption.dataset.description);
 
-        loadData();
-        initializeQuotation();
+                // Auto-set quantity to 1 when product is selected
+                const qtyInput = currentRow.querySelector('.qty-input');
+                if (qtyInput && parseFloat(qtyInput.value) === 0) {
+                    qtyInput.value = 1;
+                }
 
-        // Add event listeners to all existing rows
-        document.querySelectorAll('.product-row, #package-type-row').forEach(row => {
-            const qtyInput = row.querySelector('.qty-input');
-            const priceInput = row.querySelector('.price-input');
-            const productDropdown = row.querySelector('.product-dropdown');
+                // Set unit
+                const unitDisplay = currentRow.querySelector('.unit-display');
+                if (unitDisplay && selectedOption.dataset.unit) {
+                    unitDisplay.value = selectedOption.dataset.unit;
+                }
 
-            if (productDropdown) {
-                productDropdown.addEventListener('change', function () {
-                    const selectedOption = this.options[this.selectedIndex];
-                    const currentRow = this.closest('tr');
+                // Set price
+                const priceInput = currentRow.querySelector('.price-input');
+                if (priceInput && selectedOption.dataset.price) {
+                    priceInput.value = selectedOption.dataset.price;
+                }
 
-                    console.log('Product selected:', selectedOption.value, 'Unit:', selectedOption.dataset.unit);
-                    console.log('Product description:', selectedOption.dataset.description);
+                calculateRowTotal(currentRow);
+                calculateTotals();
+                updateItemNumbers();
+            });
+        }
 
-                    // Auto-set quantity to 1 when product is selected
-                    const qtyInput = currentRow.querySelector('.qty-input');
-                    if (qtyInput && parseFloat(qtyInput.value) === 0) {
-                        qtyInput.value = 1;
-                    }
+        if (qtyInput) {
+            qtyInput.addEventListener('input', function () {
+                calculateRowTotal(row);
+                calculateTotals();
+                updateItemNumbers();
+            });
+        }
 
-                    // Set unit
-                    const unitDisplay = currentRow.querySelector('.unit-display');
-                    if (unitDisplay && selectedOption.dataset.unit) {
-                        unitDisplay.value = selectedOption.dataset.unit;
-                    }
-
-                    // Set price
-                    const priceInput = currentRow.querySelector('.price-input');
-                    if (priceInput && selectedOption.dataset.price) {
-                        priceInput.value = selectedOption.dataset.price;
-                    }
-
-                    calculateRowTotal(currentRow);
-                    calculateTotals();
-                    updateItemNumbers(); // ← ADD THIS LINE
-                });
-            }
-
-            if (qtyInput) {
-                qtyInput.addEventListener('input', function () {
-                    calculateRowTotal(row);
-                    calculateTotals();
-                    updateItemNumbers(); // ← ADD THIS LINE
-                });
-            }
-
-            if (priceInput) {
-                priceInput.addEventListener('input', function () {
-                    calculateRowTotal(row);
-                    calculateTotals();
-                });
-            }
-        });
-
-        // ... rest of the code ...
-
-        calculateTotals();
-        updateItemNumbers(); // ← ADD THIS LINE to initialize numbers on load
+        if (priceInput) {
+            priceInput.addEventListener('input', function () {
+                calculateRowTotal(row);
+                calculateTotals();
+            });
+        }
     });
 
     // Add listener to description dropdown
@@ -1229,6 +1223,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     calculateTotals();
+    updateItemNumbers();
 });
 
 // Calculate delivery row total
@@ -1362,51 +1357,4 @@ function updateItemNumbers() {
     });
 
     console.log('Item numbers updated. Total items:', itemNumber - 1);
-}
-
-// ✅ ADD THIS FUNCTION to the END of scripts/quotation.js
-
-// Delete quotation in view mode
-async function deleteQuotationInViewMode(quotationId) {
-    if (!quotationId) {
-        alert('Error: No quotation ID found');
-        return;
-    }
-
-    // Confirm deletion
-    const confirmed = confirm('Are you sure you want to delete this quotation?\n\nThis action cannot be undone.');
-    
-    if (!confirmed) {
-        return;
-    }
-
-    try {
-        console.log('Deleting quotation:', quotationId);
-
-        // Delete quotation from database (items will cascade delete automatically)
-        const { error } = await supabaseClient
-            .from('quotations')
-            .delete()
-            .eq('id', quotationId);
-
-        if (error) {
-            console.error('Error deleting quotation:', error);
-            alert('Failed to delete quotation: ' + error.message);
-            return;
-        }
-
-        console.log('✓ Quotation deleted successfully');
-        
-        // Clear localStorage
-        localStorage.removeItem('viewQuotationData');
-        localStorage.removeItem('viewMode');
-
-        // Show success message and redirect
-        alert('Quotation deleted successfully!');
-        window.location.href = 'quotationlist.html';
-
-    } catch (error) {
-        console.error('Error in deleteQuotationInViewMode:', error);
-        alert('Error deleting quotation: ' + (error.message || 'Unknown error'));
-    }
 }
