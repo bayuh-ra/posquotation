@@ -69,16 +69,18 @@
 
         @media (max-width: 768px) {
             .button-container {
-                flex-wrap: nowrap;
-                overflow-x: auto;
+                flex-direction: row;  /* Stack buttons vertically */
+                gap: 12px;
+                padding: 10px 15px;
             }
 
             .button-container button {
-                flex: 1;
-                min-width: 100px;
+                flex: none;  /* Don't use flex sizing */
+                width: 100%;  /* Full width */
+                min-width: auto;
                 max-width: none;
-                font-size: 12px;
-                padding: 10px 15px;
+                font-size: 15px;  /* Bigger text for mobile */
+                padding: 16px 20px;  /* Bigger padding for mobile */
                 white-space: nowrap;
             }
         }
@@ -3284,7 +3286,7 @@
 
             console.log('Finished populating', items.length, 'items');
         }
-        
+
         // Function to make entire page read-only
         function makePageReadOnly() {
             // Get quotation ID from localStorage
