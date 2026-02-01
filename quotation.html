@@ -3360,7 +3360,7 @@
 
                 // Back button
                 const backBtn = document.createElement('button');
-                backBtn.innerHTML = '← Back';  // Shorter text
+                backBtn.textContent = '← Back to List';
                 backBtn.style.background = '#6c757d';
                 backBtn.style.color = 'white';
                 backBtn.onclick = function() {
@@ -3369,7 +3369,7 @@
 
                 // Delete button
                 const deleteBtn = document.createElement('button');
-                deleteBtn.innerHTML = '🗑️ Delete';  // Shorter text
+                deleteBtn.textContent = '🗑️ Delete Quotation';
                 deleteBtn.style.background = '#dc3545';
                 deleteBtn.style.color = 'white';
                 deleteBtn.onclick = function(e) {
@@ -3380,7 +3380,7 @@
 
                 // Save as PDF button
                 const pdfBtn = document.createElement('button');
-                pdfBtn.innerHTML = '📄 PDF';  // Shorter text
+                pdfBtn.textContent = '📄 Save as PDF';
                 pdfBtn.style.background = '#28a745';
                 pdfBtn.style.color = 'white';
                 pdfBtn.onclick = function(e) {
@@ -3392,6 +3392,7 @@
                     }, 200);
                     return false;
                 };
+
                 // Append all buttons
                 buttonContainer.appendChild(backBtn);
                 buttonContainer.appendChild(deleteBtn);
