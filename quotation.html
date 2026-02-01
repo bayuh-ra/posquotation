@@ -3285,8 +3285,19 @@
             console.log('Finished populating', items.length, 'items');
         }
         // Function to make entire page read-only
-        // Function to make entire page read-only
         function makePageReadOnly() {
+            // Get quotation ID from localStorage
+            const quotationData = localStorage.getItem('viewQuotationData');
+            let quotationId = null;
+            if (quotationData) {
+                try {
+                    const quotation = JSON.parse(quotationData);
+                    quotationId = quotation.id;
+                } catch (e) {
+                    console.error('Error parsing quotation data:', e);
+                }
+            }
+
             // Add visual indicator banner
             const buttonContainer = document.querySelector('.button-container');
             if (buttonContainer) {
@@ -3297,77 +3308,92 @@
                 buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);
                 
                 // ✅ ADD FLEXBOX STYLING TO BUTTON CONTAINER
-                buttonContainer.style.cssText = 'display: flex; gap: 10px; justify-content: center; align-items: center; margin: 20px 0;';
-            }
+                buttonContainer.style.cssText = 'display: flex; gap: 15px; justify-content: center; align-items: center; margin: 20px 0; padding: 0 20px;';
+                
+                // Clear existing buttons and create new ones
+                buttonContainer.innerHTML = '';
 
-            // ✅ UPDATE BUTTONS: Back to List, Delete Quotation, Save as PDF
-            const buttons = document.querySelectorAll('.button-container button');
-            
-            // Change "Back" button text to "Back to List"
-            if (buttons[0]) {
-                buttons[0].textContent = '← Back to List';
-                buttons[0].onclick = function() {
+                // Back button
+                const backBtn = document.createElement('button');
+                backBtn.textContent = '← Back to List';
+                backBtn.style.cssText = `
+                    background: #6c757d;
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    font-weight: bold;
+                    flex: 1;
+                    min-width: 140px;
+                    max-width: 200px;
+                    transition: all 0.3s;
+                `;
+                backBtn.onclick = function() {
                     window.location.href = 'quotationlist.html';
                 };
-                // ✅ ADD FLEX STYLING TO BACK BUTTON
-                buttons[0].style.flex = '1';
-                buttons[0].style.minWidth = '120px';
-                buttons[0].style.maxWidth = '200px';
-            }
+                backBtn.onmouseenter = function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                };
+                backBtn.onmouseleave = function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                };
 
-            // ✅ REPLACE "Save & Print" with "Delete Quotation" and "Save as PDF"
-            if (buttons[1]) {
-                // Get current quotation ID from localStorage
-                const quotationData = localStorage.getItem('viewQuotationData');
-                let quotationId = null;
-                if (quotationData) {
-                    try {
-                        const quotation = JSON.parse(quotationData);
-                        quotationId = quotation.id;
-                    } catch (e) {
-                        console.error('Error parsing quotation data:', e);
-                    }
-                }
-
-                // Replace the second button with Delete button
-                buttons[1].textContent = '🗑️ Delete Quotation';
-                buttons[1].style.background = '#dc3545';  // Red color
-                buttons[1].style.color = 'white';
-                buttons[1].style.cursor = 'pointer';
-                // ✅ ADD FLEX STYLING TO DELETE BUTTON
-                buttons[1].style.flex = '1';
-                buttons[1].style.minWidth = '120px';
-                buttons[1].style.maxWidth = '200px';
-                buttons[1].style.padding = '10px 20px';
-                buttons[1].style.border = 'none';
-                buttons[1].style.borderRadius = '4px';
-                buttons[1].style.fontSize = '14px';
-                buttons[1].style.fontWeight = 'bold';
-                buttons[1].onclick = function (e) {
+                // Delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '🗑️ Delete Quotation';
+                deleteBtn.style.cssText = `
+                    background: #dc3545;
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    font-weight: bold;
+                    flex: 1;
+                    min-width: 160px;
+                    max-width: 220px;
+                    transition: all 0.3s;
+                `;
+                deleteBtn.onclick = function(e) {
                     e.preventDefault();
                     deleteQuotationInViewMode(quotationId);
                     return false;
                 };
+                deleteBtn.onmouseenter = function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                    this.style.background = '#c82333';
+                };
+                deleteBtn.onmouseleave = function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                    this.style.background = '#dc3545';
+                };
 
-                // Add a new "Save as PDF" button after the Delete button
-                const savePdfBtn = document.createElement('button');
-                savePdfBtn.textContent = '📄 Save as PDF';
-                savePdfBtn.style.background = '#2196F3';  // Blue color
-                savePdfBtn.style.color = 'white';
-                savePdfBtn.style.padding = '10px 20px';
-                savePdfBtn.style.border = 'none';
-                savePdfBtn.style.borderRadius = '4px';
-                savePdfBtn.style.fontSize = '14px';
-                savePdfBtn.style.cursor = 'pointer';
-                savePdfBtn.style.fontWeight = 'bold';
-                savePdfBtn.style.flex = '1';
-                savePdfBtn.style.minWidth = '120px';
-                savePdfBtn.style.maxWidth = '200px';
-                savePdfBtn.style.transition = 'all 0.3s';
-                
-                savePdfBtn.onclick = function (e) {
+                // Save as PDF button
+                const pdfBtn = document.createElement('button');
+                pdfBtn.textContent = '📄 Save as PDF';
+                pdfBtn.style.cssText = `
+                    background: #28a745;
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    font-weight: bold;
+                    flex: 1;
+                    min-width: 160px;
+                    max-width: 220px;
+                    transition: all 0.3s;
+                `;
+                pdfBtn.onclick = function(e) {
                     e.preventDefault();
-                    console.log('Save as PDF clicked');
                     markZeroValuesForPrint();
                     setTimeout(() => {
                         showMobilePaperSizeAlert();
@@ -3375,11 +3401,23 @@
                     }, 200);
                     return false;
                 };
+                pdfBtn.onmouseenter = function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                    this.style.background = '#218838';
+                };
+                pdfBtn.onmouseleave = function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                    this.style.background = '#28a745';
+                };
 
-                // Insert after the Delete button
-                buttonContainer.insertBefore(savePdfBtn, buttons[1].nextSibling);
+                // Append all buttons
+                buttonContainer.appendChild(backBtn);
+                buttonContainer.appendChild(deleteBtn);
+                buttonContainer.appendChild(pdfBtn);
 
-                console.log('✓ Delete and Save as PDF buttons configured');
+                console.log('✓ View mode buttons configured');
             }
 
             // Disable all inputs and selects
@@ -3421,7 +3459,7 @@
             });
 
             console.log('✓ Page set to read-only mode');
-        } 
+        }
     // Combined Save & Print function
         async function saveAndPrintQuotation() {
             try {
