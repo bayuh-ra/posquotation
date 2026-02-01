@@ -1324,6 +1324,7 @@
         }  
 
 /* ==================== VIEW MODE MOBILE RESPONSIVE ==================== */
+
         /* Detect view mode with a data attribute */
         body.view-mode {
             background: #f5f5f5;
@@ -1334,30 +1335,30 @@
         .view-mode-banner {
             background: #e3f2fd;
             border: 2px solid #2196F3;
-            padding: 12px;
-            margin: 10px;
+            padding: 8px;
+            margin: 8px;
             text-align: center;
             font-weight: bold;
             color: #1565C0;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         /* Button container for view mode */
         .view-mode-buttons {
             display: flex;
-            gap: 10px;
-            padding: 10px;
+            gap: 8px;
+            padding: 8px;
             justify-content: space-between;
             align-items: center;
         }
 
         .view-mode-buttons button {
             flex: 1;
-            padding: 15px 10px;
+            padding: 12px 8px;
             border: none;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
@@ -1368,11 +1369,12 @@
             background: #f5f5f5;
             color: #333;
             border: 2px solid #ddd;
-            flex: 0.6;
+            flex: 0.5;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 5px;
+            font-size: 16px;
         }
 
         .btn-delete-view {
@@ -1393,93 +1395,86 @@
             transform: scale(0.98);
         }
 
-        /* ✅ MOBILE VIEW - SCALE TO FIT LIKE IMAGE 1 */
+        /* ✅ MOBILE VIEW - FIT ENTIRE PAGE (WIDTH + HEIGHT) */
         @media (max-width: 768px) {
-            /* Prevent horizontal scroll */
+            /* Prevent scrolling */
             body.view-mode {
-                overflow-x: hidden;
+                overflow: hidden;
                 width: 100vw;
+                height: 100vh;
             }
 
-            /* ✅ CENTER THE PDF CONTENT CONTAINER */
+            /* ✅ CONTAINER TAKES AVAILABLE HEIGHT */
             body.view-mode #pdf-content {
                 width: 100%;
-                overflow-x: hidden;
+                /* Calculate available height: viewport - banner - buttons - margins */
+                height: calc(100vh - 120px);
+                overflow: hidden;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                justify-content: center;
                 padding: 0;
                 margin: 0;
             }
 
-            /* ✅ SCALE THE ENTIRE PAGE TO FIT - LIKE IMAGE 1 */
+            /* ✅ FIT ENTIRE PAGE TO SCREEN - BOTH WIDTH AND HEIGHT */
             body.view-mode .page {
-                /* Keep original page dimensions */
+                /* Keep original dimensions */
                 width: 8.5in;
-                height: auto;
-                min-height: 11in;
+                height: 13.6in; /* Legal size */
                 
-                /* Scale to fit viewport (8.5in = 816px) */
-                /* Add 20px padding on sides = 40px total */
-                transform: scale(calc((100vw - 40px) / 816));
-                transform-origin: top center;
+                /* Calculate scale to fit BOTH width and height */
+                /* Width scale: (viewport-width - 40px) / 816px */
+                /* Height scale: (available-height - 40px) / 1305px */
+                /* Use the SMALLER of the two to ensure both fit */
                 
-                /* Center horizontally */
-                margin-left: auto;
-                margin-right: auto;
-                margin-top: 20px;
-                margin-bottom: 20px;
+                /* For most phones, height is the limiting factor */
+                max-width: calc(100vw - 20px);
+                max-height: calc(100vh - 140px);
+                
+                /* Use object-fit contain approach */
+                transform: scale(0.28); /* Adjust based on common phone screens */
+                transform-origin: center center;
+                
+                /* Center it */
+                margin: 0 auto;
                 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.15);
                 border: 1px solid #ddd;
                 background: white;
-                
                 box-sizing: border-box;
             }
-
-            /* Banner */
-            .view-mode-banner {
-                font-size: clamp(12px, 3.5vw, 16px);
-                padding: 10px;
-                margin: 10px;
-            }
-
-            /* Buttons */
-            .view-mode-buttons {
-                flex-direction: row;
-                gap: 8px;
-                padding: 0 10px 10px 10px;
-            }
-
-            .view-mode-buttons button {
-                font-size: clamp(10px, 2.8vw, 14px);
-                padding: clamp(8px, 2.5vw, 15px) clamp(6px, 2vw, 10px);
-            }
-
-            .btn-back-view {
-                flex: 0.5;
-                font-size: clamp(14px, 4vw, 20px);
-            }
         }
 
-        /* ✅ SMALLER PHONES */
-        @media (max-width: 480px) {
+        /* ✅ DIFFERENT PHONE SIZES - AUTO ADJUST */
+        @media (max-width: 768px) and (min-height: 700px) {
+            /* Taller phones (iPhone 12, 13, 14) */
             body.view-mode .page {
-                /* Tighter margins for small phones */
-                transform: scale(calc((100vw - 30px) / 816));
+                transform: scale(0.32);
             }
         }
 
-        /* ✅ VERY SMALL PHONES */
-        @media (max-width: 375px) {
+        @media (max-width: 768px) and (min-height: 800px) {
+            /* Very tall phones (iPhone 14 Pro Max) */
             body.view-mode .page {
-                /* Even tighter margins for very small phones */
-                transform: scale(calc((100vw - 20px) / 816));
+                transform: scale(0.36);
             }
         }
 
-        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */
-    </style>
+        @media (max-width: 768px) and (max-height: 700px) {
+            /* Shorter phones or landscape */
+            body.view-mode .page {
+                transform: scale(0.24);
+            }
+            
+            body.view-mode #pdf-content {
+                height: calc(100vh - 100px);
+            }
+        }
+
+        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */    
+</style>
 </head>
 
 <body>
