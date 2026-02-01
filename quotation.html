@@ -9,6 +9,7 @@
     <script src="backend/supabase.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
     <title>Quotation - LAP I.T. Solutions</title>
 
     <!-- External CSS -->
@@ -1323,143 +1324,166 @@
             }
         }  
 
-    /* ==================== VIEW MODE MOBILE RESPONSIVE ==================== */
+/* ==================== VIEW MODE MOBILE RESPONSIVE (ZOOM SAFE) ==================== */
 
-    /* Detect view mode with a data attribute */
-    body.view-mode {
-        background: #f5f5f5;
-    }
-
-    /* View mode banner styling */
-    .view-mode-banner {
-        background: #e3f2fd;
-        border: 2px solid #2196F3;
-        padding: 12px;
-        margin: 10px;
-        text-align: center;
-        font-weight: bold;
-        color: #1565C0;
-        border-radius: 8px;
-        font-size: 16px;
-    }
-
-    /* Button container for view mode */
-    .view-mode-buttons {
-        display: flex;
-        gap: 10px;
-        padding: 10px;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .view-mode-buttons button {
-        flex: 1;
-        padding: 15px 10px;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s;
-        white-space: nowrap;
-    }
-
-    .btn-back-view {
-        background: #f5f5f5;
-        color: #333;
-        border: 2px solid #ddd;
-        flex: 0.6;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-    }
-
-    .btn-delete-view {
-        background: #dc3545;
-        color: white;
-        flex: 1;
-    }
-
-    .btn-pdf-view {
-        background: #28a745;
-        color: white;
-        flex: 1;
-    }
-
-    .btn-back-view:active,
-    .btn-delete-view:active,
-    .btn-pdf-view:active {
-        transform: scale(0.98);
-    }
-
-    /* ✅ AUTOMATIC RESPONSIVE SCALING FOR ALL MOBILE DEVICES */
-    @media (max-width: 768px) {
-        /* ✅ CENTER THE PDF CONTENT CONTAINER */
-        body.view-mode #pdf-content {
-            width: 100%;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
+        /* Detect view mode */
+        body.view-mode {
+            background: #f5f5f5;
         }
 
-        /* ✅ AUTOMATIC SCALE BASED ON VIEWPORT WIDTH */
-        body.view-mode .page {
-            /* Calculate scale: viewport width / page width (8.5in = 816px) */
-            /* Subtract some pixels for margins (40px total) */
-            transform: scale(calc((100vw - 40px) / 816));
-            transform-origin: top center;
-            
-            /* Dynamic margin calculation to compensate for scaling */
-            margin-top: calc(-1 * (13.6in * (1 - (100vw - 40px) / 816) / 2));
-            margin-bottom: 20px;
-            margin-left: auto;
-            margin-right: auto;
-            
-            width: 8.5in;
-            height: 13.6in;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            border: 1px solid #ddd;
-            position: relative;
-        }
-
-        /* Banner */
+        /* ==================== VIEW MODE BANNER ==================== */
         .view-mode-banner {
-            font-size: clamp(12px, 3.5vw, 16px);
-            padding: 10px;
+            background: #e3f2fd;
+            border: 2px solid #2196F3;
+            padding: 12px;
             margin: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #1565C0;
+            border-radius: 8px;
+            font-size: 16px;
         }
 
-        /* Buttons */
+        /* ==================== VIEW MODE BUTTONS ==================== */
         .view-mode-buttons {
-            flex-direction: row;
-            gap: 8px;
-            padding: 0 10px 10px 10px;
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .view-mode-buttons button {
-            font-size: clamp(10px, 2.8vw, 14px);
-            padding: clamp(8px, 2.5vw, 15px) clamp(6px, 2vw, 10px);
+            flex: 1;
+            padding: 15px 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            white-space: nowrap;
         }
 
         .btn-back-view {
-            flex: 0.5;
-            font-size: clamp(14px, 4vw, 20px);
+            background: #f5f5f5;
+            color: #333;
+            border: 2px solid #ddd;
+            flex: 0.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
-    }
 
-    /* ✅ TABLET AND LARGER PHONES (LANDSCAPE) */
-    @media (min-width: 769px) and (max-width: 1024px) {
+        .btn-delete-view {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-pdf-view {
+            background: #28a745;
+            color: white;
+        }
+
+        .view-mode-buttons button:active {
+            transform: scale(0.98);
+        }
+
+        /* ==================== DOCUMENT CONTAINER ==================== */
+        body.view-mode #pdf-content {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 20px 10px;
+            overflow-x: auto; /* allow pan + zoom */
+        }
+
+        /* ==================== PAGE STYLING (DESKTOP DEFAULT) ==================== */
         body.view-mode .page {
-            transform: scale(0.6);
-            transform-origin: top center;
-            margin: -200px auto 20px auto;
-        }
-    }
+            width: 8.5in;              /* Real document width */
+            min-width: 8.5in;
+            background: white;
+            padding: 12px;
+            box-sizing: border-box;
 
-    /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */        
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* ==================== MOBILE & TABLET ==================== */
+        @media (max-width: 1024px) {
+
+            body.view-mode {
+                overflow-x: auto;
+            }
+
+            body.view-mode #pdf-content {
+                padding: 12px;
+            }
+
+            body.view-mode .page {
+                margin: 0 auto 20px auto;
+            }
+
+            /* Banner */
+            .view-mode-banner {
+                font-size: clamp(12px, 3.5vw, 16px);
+                padding: 10px;
+            }
+
+            /* Buttons */
+            .view-mode-buttons {
+                gap: 8px;
+                padding: 0 10px 10px 10px;
+            }
+
+            .view-mode-buttons button {
+                font-size: clamp(11px, 2.8vw, 14px);
+                padding: clamp(10px, 2.5vw, 14px);
+            }
+
+            .btn-back-view {
+                font-size: clamp(14px, 4vw, 20px);
+            }
+        }
+
+        /* ==================== SMALL PHONES ==================== */
+        @media (max-width: 480px) {
+
+            body.view-mode #pdf-content {
+                padding: 8px;
+            }
+
+            body.view-mode .page {
+                padding: 8px;
+            }
+        }
+
+        /* ==================== TABLE SAFETY (NO SQUISHING) ==================== */
+        .quotation-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .quotation-table th,
+        .quotation-table td {
+            padding: 6px;
+            font-size: 11px;
+            vertical-align: top;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        .quotation-table input,
+        .quotation-table select {
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 11px;
+        }
+
+        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */
     </style>
 </head>
 
