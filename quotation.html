@@ -3304,7 +3304,6 @@
         // Function to make entire page read-only
         // Function to make entire page read-only
         function makePageReadOnly() {
-            // Add view mode class to body
             document.body.classList.add('view-mode');
             
             // Get quotation ID from localStorage
@@ -3319,24 +3318,19 @@
                 }
             }
 
-            // Find and replace the no-print section
-            const noprint = document.querySelector('.no-print');
-            if (noprint) {
-                // Clear existing content
-                noprint.innerHTML = '';
-                noprint.style.cssText = 'text-align: center; margin: 0; padding: 0; background: transparent; border: none;';
+            // Add visual indicator banner and buttons
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer) {
+                const viewBanner = document.createElement('div');
+                viewBanner.className = 'no-print';
+                viewBanner.style.cssText = 'background: #e3f2fd; border: 2px solid #2196F3; padding: 15px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #1565C0; border-radius: 8px; font-size: 16px;';
+                viewBanner.innerHTML = '👁️ VIEW MODE - This is a saved quotation. You can save it as PDF, delete it, or go back to the list.';
+                buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);
 
-                // Create VIEW MODE banner
-                const banner = document.createElement('div');
-                banner.className = 'view-mode-banner';
-                banner.textContent = '👁️ VIEW MODE - This is a saved quotation. You can save it as PDF, delete it, or go back to the list.';
-                noprint.appendChild(banner);
+                // Clear existing buttons and create new ones
+                buttonContainer.innerHTML = '';
 
-                // Create button container
-                const buttonContainer = document.createElement('div');
-                buttonContainer.className = 'view-mode-buttons';
-
-                // Back button
+                // Back button (← icon only)
                 const backBtn = document.createElement('button');
                 backBtn.className = 'btn-back-view';
                 backBtn.innerHTML = '←';
@@ -3375,7 +3369,8 @@
                 buttonContainer.appendChild(backBtn);
                 buttonContainer.appendChild(deleteBtn);
                 buttonContainer.appendChild(pdfBtn);
-                noprint.appendChild(buttonContainer);
+
+                console.log('✓ Delete and Save as PDF buttons configured');
             }
 
             // Disable all inputs and selects
@@ -3417,8 +3412,8 @@
             });
 
             console.log('✓ Page set to read-only mode');
-        }    
- // Combined Save & Print function
+        }
+     // Combined Save & Print function
         async function saveAndPrintQuotation() {
             try {
                 // Get employee name
