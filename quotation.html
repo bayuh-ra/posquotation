@@ -1323,155 +1323,74 @@
             }
         }  
 
-/* ==================== VIEW MODE MOBILE RESPONSIVE ==================== */
+        /* ==================== VIEW MODE MOBILE RESPONSIVE ==================== */
+
         /* Detect view mode with a data attribute */
         body.view-mode {
             background: #f5f5f5;
-            overflow-x: hidden;
         }
 
-        /* View mode banner styling */
-        .view-mode-banner {
-            background: #e3f2fd;
-            border: 2px solid #2196F3;
-            padding: 12px;
-            margin: 10px;
-            text-align: center;
-            font-weight: bold;
-            color: #1565C0;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        /* Button container for view mode */
-        .view-mode-buttons {
-            display: flex;
-            gap: 10px;
-            padding: 10px;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .view-mode-buttons button {
-            flex: 1;
-            padding: 15px 10px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .btn-back-view {
-            background: #f5f5f5;
-            color: #333;
-            border: 2px solid #ddd;
-            flex: 0.6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .btn-delete-view {
-            background: #dc3545;
-            color: white;
-            flex: 1;
-        }
-
-        .btn-pdf-view {
-            background: #28a745;
-            color: white;
-            flex: 1;
-        }
-
-        .btn-back-view:active,
-        .btn-delete-view:active,
-        .btn-pdf-view:active {
-            transform: scale(0.98);
-        }
-
-        /* ✅ MOBILE VIEW - FIT ENTIRE PAGE WIDTH */
+        /* Mobile adjustments for view mode */
         @media (max-width: 768px) {
-            /* Prevent horizontal scroll on body */
-            body.view-mode {
-                overflow-x: hidden;
-                width: 100vw;
+            /* Scale down the entire page to fit mobile screen */
+            body.view-mode .page {
+                transform: scale(0.4);
+                transform-origin: top center;
+                margin: 10px auto;
+                width: 8.5in;
             }
 
-            /* ✅ CENTER THE PDF CONTENT CONTAINER */
+            /* Adjust container spacing */
             body.view-mode #pdf-content {
                 width: 100%;
                 overflow-x: hidden;
-                display: flex;
+            }
+
+            /* Make buttons full-width and properly sized on mobile */
+            .no-print {
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            .button-container {
                 flex-direction: column;
-                align-items: center;
-                padding: 0;
+                gap: 10px;
+                padding: 0 10px;
+            }
+
+            .button-container button {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 100% !important;
+                padding: 15px 20px !important;
+                font-size: 16px !important;
+                flex: none;
                 margin: 0;
             }
 
-            /* ✅ FIT PAGE TO SCREEN WIDTH - SHOW FULL WIDTH */
-            body.view-mode .page {
-                width: 100%;
-                max-width: 100%;
-                margin: 12px auto;
-                padding: 12px;
-
-                box-sizing: border-box;
-                background: white;
-                border: 1px solid #ddd;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-
-                overflow-x: auto; /* allow table breathing room */
+            /* View mode banner responsive */
+            body.view-mode .no-print > div[style*="background: #e3f2fd"] {
+                font-size: 14px !important;
+                padding: 12px !important;
+                margin: 10px !important;
             }
-
-            /* Scale down all content inside the page proportionally */
-            /* body.view-mode .page > * {
-                transform: scale(0.85);
-                transform-origin: top left;
-                width: 117.65%; /* 100% / 0.85 to compensate for scale */
-            } */
-
-            /* Banner */
-            .view-mode-banner {
-                font-size: clamp(12px, 3.5vw, 16px);
-                padding: 10px;
-                margin: 10px;
-            }
-
-            /* Buttons */
-            .view-mode-buttons {
-                flex-direction: row;
-                gap: 8px;
-                padding: 0 10px 10px 10px;
-            }
-
-            .view-mode-buttons button {
-                font-size: clamp(10px, 2.8vw, 14px);
-                padding: clamp(8px, 2.5vw, 15px) clamp(6px, 2vw, 10px);
-            }
-
-            .btn-back-view {
-                flex: 0.5;
-                font-size: clamp(14px, 4vw, 20px);
-            }
-
-        /* ✅ SMALLER PHONES - MORE AGGRESSIVE SCALING */
-        @media (max-width: 480px) {
-            body.view-mode .page {
-                padding: 8px;
-            }
-
-            /* body.view-mode .page > * {
-                transform: scale(0.75);
-                width: 133.33%;
-            } */
         }
 
-        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */
-</style>
+        @media (max-width: 480px) {
+            /* Extra small phones - scale even more */
+            body.view-mode .page {
+                transform: scale(0.35);
+            }
+
+            .button-container button {
+                padding: 12px 15px !important;
+                font-size: 14px !important;
+            }
+        }
+
+/* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */
+       
+    </style>
 </head>
 
 <body>
@@ -2137,10 +2056,6 @@
         });
 
         function goBack() {
-            // ✅ Clear view mode data when leaving page
-            localStorage.removeItem('viewMode');
-            localStorage.removeItem('viewQuotationData');
-            
             // Check if we came from the quotations list
             const referrer = document.referrer;
             if (referrer.includes('quotationlist.html')) {
@@ -3281,15 +3196,33 @@
             console.log('Finished populating', items.length, 'items');
         }
         // Function to make entire page read-only
-        // Function to make entire page read-only
         function makePageReadOnly() {
             // ✅ ADD VIEW MODE CLASS TO BODY FOR MOBILE STYLING
             document.body.classList.add('view-mode');
+            // Add visual indicator banner
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer) {
+                const viewBanner = document.createElement('div');
+                viewBanner.className = 'no-print';
+                viewBanner.style.cssText = 'background: #e3f2fd; border: 2px solid #2196F3; padding: 15px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #1565C0; border-radius: 8px; font-size: 16px;';
+                viewBanner.innerHTML = '👁️ VIEW MODE - This is a saved quotation. You can save it as PDF, delete it, or go back to the list.';
+                buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);
+            }
+
+            // ✅ UPDATE BUTTONS: Back to List, Delete Quotation, Save as PDF
+            const buttons = document.querySelectorAll('.button-container button');
             
-            // ✅ NEW: Create custom view mode UI
-            const noprint = document.querySelector('.no-print');
-            if (noprint) {
-                // Get quotation ID
+            // Change "Back" button text to "Back to List"
+            if (buttons[0]) {
+                buttons[0].textContent = '← Back to List';
+                buttons[0].onclick = function() {
+                    window.location.href = 'quotationlist.html';
+                };
+            }
+
+            // ✅ REPLACE "Save & Print" with "Delete Quotation" and "Save as PDF"
+            if (buttons[1]) {
+                // Get current quotation ID from localStorage
                 const quotationData = localStorage.getItem('viewQuotationData');
                 let quotationId = null;
                 if (quotationData) {
@@ -3301,46 +3234,36 @@
                     }
                 }
 
-                // Clear existing content
-                noprint.innerHTML = '';
-
-                // Create VIEW MODE banner
-                const banner = document.createElement('div');
-                banner.className = 'view-mode-banner no-print';
-                banner.textContent = '👁️ VIEW MODE';
-                noprint.appendChild(banner);
-
-                // Create button container
-                const buttonContainer = document.createElement('div');
-                buttonContainer.className = 'view-mode-buttons no-print';
-
-                // Back button (← icon only)
-                const backBtn = document.createElement('button');
-                backBtn.className = 'btn-back-view';
-                backBtn.innerHTML = '←';
-                backBtn.title = 'Back to List';
-                backBtn.onclick = function() {
-                    localStorage.removeItem('viewMode');
-                    localStorage.removeItem('viewQuotationData');
-                    window.location.href = 'quotationlist.html';
-                };
-
-                // Delete button
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'btn-delete-view';
-                deleteBtn.textContent = 'DELETE QUOTATION';
-                deleteBtn.onclick = function(e) {
+                // Replace the second button with Delete button
+                buttons[1].textContent = '🗑️ Delete Quotation';
+                buttons[1].style.background = '#dc3545';  // Red color
+                buttons[1].style.color = 'white';
+                buttons[1].style.cursor = 'pointer';
+                buttons[1].onclick = function (e) {
                     e.preventDefault();
                     deleteQuotationInViewMode(quotationId);
                     return false;
                 };
 
-                // Save as PDF button
-                const pdfBtn = document.createElement('button');
-                pdfBtn.className = 'btn-pdf-view';
-                pdfBtn.textContent = 'SAVE AS PDF';
-                pdfBtn.onclick = function(e) {
+                // Add a new "Save as PDF" button after the Delete button
+                const savePdfBtn = document.createElement('button');
+                savePdfBtn.textContent = '📄 Save as PDF';
+                savePdfBtn.style.background = '#2196F3';  // Blue color
+                savePdfBtn.style.color = 'white';
+                savePdfBtn.style.padding = '10px 20px';
+                savePdfBtn.style.border = 'none';
+                savePdfBtn.style.borderRadius = '4px';
+                savePdfBtn.style.fontSize = '14px';
+                savePdfBtn.style.cursor = 'pointer';
+                savePdfBtn.style.fontWeight = 'bold';
+                savePdfBtn.style.flex = '1';
+                savePdfBtn.style.minWidth = '120px';
+                savePdfBtn.style.maxWidth = '200px';
+                savePdfBtn.style.transition = 'all 0.3s';
+                
+                savePdfBtn.onclick = function (e) {
                     e.preventDefault();
+                    console.log('Save as PDF clicked');
                     markZeroValuesForPrint();
                     setTimeout(() => {
                         showMobilePaperSizeAlert();
@@ -3349,11 +3272,10 @@
                     return false;
                 };
 
-                // Append buttons
-                buttonContainer.appendChild(backBtn);
-                buttonContainer.appendChild(deleteBtn);
-                buttonContainer.appendChild(pdfBtn);
-                noprint.appendChild(buttonContainer);
+                // Insert after the Delete button
+                buttonContainer.insertBefore(savePdfBtn, buttons[1].nextSibling);
+
+                console.log('✓ Delete and Save as PDF buttons configured');
             }
 
             // Disable all inputs and selects
@@ -3395,8 +3317,8 @@
             });
 
             console.log('✓ Page set to read-only mode');
-        }        // Combined Save & Print function
-
+        }
+        // Combined Save & Print function
         async function saveAndPrintQuotation() {
             try {
                 // Get employee name
@@ -3825,24 +3747,16 @@
         // Set default on page load
         setPaperSize('legal');
 
-        // Check if we're in view mode when page loads
+        // Run formatting on load and when rows change
         window.addEventListener('DOMContentLoaded', function () {
-            const viewMode = localStorage.getItem('viewMode');
-            const quotationData = localStorage.getItem('viewQuotationData');
+            setTimeout(formatAllRowsAndFooters, 250);
 
-            if (viewMode === 'true' && quotationData) {
-                try {
-                    const quotation = JSON.parse(quotationData);
-                    loadQuotationInViewMode(quotation);
-
-                    // ✅ DON'T clear the flags here - keep them for refresh
-                    // They will be cleared when user leaves view mode
-                } catch (error) {
-                    console.error('Error loading view mode:', error);
-                    // Clear on error
-                    localStorage.removeItem('viewMode');
-                    localStorage.removeItem('viewQuotationData');
-                }
+            const tbody = document.getElementById('quotation-tbody');
+            if (tbody) {
+                const mo = new MutationObserver(function () {
+                    setTimeout(formatAllRowsAndFooters, 100);
+                });
+                mo.observe(tbody, { childList: true, subtree: true });
             }
         });
 
