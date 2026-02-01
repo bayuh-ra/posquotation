@@ -1323,143 +1323,165 @@
             }
         }  
 
-    /* ==================== VIEW MODE MOBILE RESPONSIVE ==================== */
-
-    /* Detect view mode with a data attribute */
-    body.view-mode {
-        background: #f5f5f5;
-    }
-
-    /* View mode banner styling */
-    .view-mode-banner {
-        background: #e3f2fd;
-        border: 2px solid #2196F3;
-        padding: 12px;
-        margin: 10px;
-        text-align: center;
-        font-weight: bold;
-        color: #1565C0;
-        border-radius: 8px;
-        font-size: 16px;
-    }
-
-    /* Button container for view mode */
-    .view-mode-buttons {
-        display: flex;
-        gap: 10px;
-        padding: 10px;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .view-mode-buttons button {
-        flex: 1;
-        padding: 15px 10px;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s;
-        white-space: nowrap;
-    }
-
-    .btn-back-view {
-        background: #f5f5f5;
-        color: #333;
-        border: 2px solid #ddd;
-        flex: 0.6;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-    }
-
-    .btn-delete-view {
-        background: #dc3545;
-        color: white;
-        flex: 1;
-    }
-
-    .btn-pdf-view {
-        background: #28a745;
-        color: white;
-        flex: 1;
-    }
-
-    .btn-back-view:active,
-    .btn-delete-view:active,
-    .btn-pdf-view:active {
-        transform: scale(0.98);
-    }
-
-    /* ✅ AUTOMATIC RESPONSIVE SCALING FOR ALL MOBILE DEVICES */
-    @media (max-width: 768px) {
-        /* ✅ CENTER THE PDF CONTENT CONTAINER */
-        body.view-mode #pdf-content {
-            width: 100%;
+/* ==================== VIEW MODE MOBILE RESPONSIVE ==================== */
+        /* Detect view mode with a data attribute */
+        body.view-mode {
+            background: #f5f5f5;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
         }
 
-        /* ✅ AUTOMATIC SCALE BASED ON VIEWPORT WIDTH */
-        body.view-mode .page {
-            /* Calculate scale: viewport width / page width (8.5in = 816px) */
-            /* Subtract some pixels for margins (40px total) */
-            transform: scale(calc((100vw - 40px) / 816));
-            transform-origin: top center;
-            
-            /* Dynamic margin calculation to compensate for scaling */
-            margin-top: calc(-1 * (13.6in * (1 - (100vw - 40px) / 816) / 2));
-            margin-bottom: 20px;
-            margin-left: auto;
-            margin-right: auto;
-            
-            width: 8.5in;
-            height: 13.6in;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            border: 1px solid #ddd;
-            position: relative;
-        }
-
-        /* Banner */
+        /* View mode banner styling */
         .view-mode-banner {
-            font-size: clamp(12px, 3.5vw, 16px);
-            padding: 10px;
+            background: #e3f2fd;
+            border: 2px solid #2196F3;
+            padding: 12px;
             margin: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #1565C0;
+            border-radius: 8px;
+            font-size: 16px;
         }
 
-        /* Buttons */
+        /* Button container for view mode */
         .view-mode-buttons {
-            flex-direction: row;
-            gap: 8px;
-            padding: 0 10px 10px 10px;
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .view-mode-buttons button {
-            font-size: clamp(10px, 2.8vw, 14px);
-            padding: clamp(8px, 2.5vw, 15px) clamp(6px, 2vw, 10px);
+            flex: 1;
+            padding: 15px 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
         }
 
         .btn-back-view {
-            flex: 0.5;
-            font-size: clamp(14px, 4vw, 20px);
+            background: #f5f5f5;
+            color: #333;
+            border: 2px solid #ddd;
+            flex: 0.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
-    }
 
-    /* ✅ TABLET AND LARGER PHONES (LANDSCAPE) */
-    @media (min-width: 769px) and (max-width: 1024px) {
-        body.view-mode .page {
-            transform: scale(0.6);
-            transform-origin: top center;
-            margin: -200px auto 20px auto;
+        .btn-delete-view {
+            background: #dc3545;
+            color: white;
+            flex: 1;
         }
-    }
 
-    /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */        
+        .btn-pdf-view {
+            background: #28a745;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-back-view:active,
+        .btn-delete-view:active,
+        .btn-pdf-view:active {
+            transform: scale(0.98);
+        }
+
+        /* ✅ MOBILE VIEW - FIT ENTIRE PAGE WIDTH */
+        @media (max-width: 768px) {
+            /* Prevent horizontal scroll on body */
+            body.view-mode {
+                overflow-x: hidden;
+                width: 100vw;
+            }
+
+            /* ✅ CENTER THE PDF CONTENT CONTAINER */
+            body.view-mode #pdf-content {
+                width: 100%;
+                overflow-x: hidden;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 0;
+                margin: 0;
+            }
+
+            /* ✅ FIT PAGE TO SCREEN WIDTH - SHOW FULL WIDTH */
+            body.view-mode .page {
+                /* Scale to fit viewport width with 20px margin on each side */
+                width: calc(100vw - 20px);
+                height: auto;
+                max-width: calc(100vw - 20px);
+                
+                /* Remove transform, use natural scaling */
+                transform: none;
+                
+                /* Center the page */
+                margin: 20px auto;
+                padding: 10px;
+                
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                border: 1px solid #ddd;
+                background: white;
+                
+                /* Ensure content fits */
+                box-sizing: border-box;
+                overflow: hidden;
+            }
+
+            /* Scale down all content inside the page proportionally */
+            body.view-mode .page > * {
+                transform: scale(0.85);
+                transform-origin: top left;
+                width: 117.65%; /* 100% / 0.85 to compensate for scale */
+            }
+
+            /* Banner */
+            .view-mode-banner {
+                font-size: clamp(12px, 3.5vw, 16px);
+                padding: 10px;
+                margin: 10px;
+            }
+
+            /* Buttons */
+            .view-mode-buttons {
+                flex-direction: row;
+                gap: 8px;
+                padding: 0 10px 10px 10px;
+            }
+
+            .view-mode-buttons button {
+                font-size: clamp(10px, 2.8vw, 14px);
+                padding: clamp(8px, 2.5vw, 15px) clamp(6px, 2vw, 10px);
+            }
+
+            .btn-back-view {
+                flex: 0.5;
+                font-size: clamp(14px, 4vw, 20px);
+            }
+        }
+
+        /* ✅ SMALLER PHONES - MORE AGGRESSIVE SCALING */
+        @media (max-width: 480px) {
+            body.view-mode .page {
+                width: calc(100vw - 16px);
+                max-width: calc(100vw - 16px);
+                padding: 8px;
+            }
+
+            body.view-mode .page > * {
+                transform: scale(0.75);
+                width: 133.33%; /* 100% / 0.75 */
+            }
+        }
+
+        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */    
     </style>
 </head>
 
