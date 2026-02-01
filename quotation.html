@@ -3312,6 +3312,7 @@
                 try {
                     const quotation = JSON.parse(quotationData);
                     quotationId = quotation.id;
+                    console.log('✓ Captured quotation ID for delete button:', quotationId);
                 } catch (e) {
                     console.error('Error parsing quotation data:', e);
                 }
@@ -3320,19 +3321,8 @@
             // Add visual indicator banner
             const buttonContainer = document.querySelector('.button-container');
             if (buttonContainer) {
-                // Make the parent .no-print sticky on mobile
-                const noPrintParent = buttonContainer.closest('.no-print');
-                if (noPrintParent) {
-                    noPrintParent.style.position = 'sticky';
-                    noPrintParent.style.top = '0';
-                    noPrintParent.style.zIndex = '1000';
-                }
+                // ... banner creation code ...
                 
-                const viewBanner = document.createElement('div');
-                viewBanner.className = 'view-mode-banner';  // Don't use 'no-print' class
-                viewBanner.style.cssText = 'background: #e3f2fd; border: 2px solid #2196F3; padding: 10px; margin-bottom: 10px; text-align: center; font-weight: bold; color: #1565C0; border-radius: 8px; font-size: 14px;';
-                viewBanner.innerHTML = '👁️ VIEW MODE';
-                buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);                
                 // Clear existing buttons
                 buttonContainer.innerHTML = '';
 
@@ -3345,6 +3335,9 @@
                     window.location.href = 'quotationlist.html';
                 };
 
+                // ✅ CAPTURE quotation ID in a closure variable BEFORE creating delete button
+                const capturedQuotationId = quotationId;
+
                 // Delete button
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = '🗑️ Delete Quotation';
@@ -3352,7 +3345,12 @@
                 deleteBtn.style.color = 'white';
                 deleteBtn.onclick = function(e) {
                     e.preventDefault();
-                    deleteQuotationInViewMode(quotationId);
+                    console.log('Delete button clicked, quotation ID:', capturedQuotationId);
+                    if (!capturedQuotationId) {
+                        alert('Error: No quotation ID found');
+                        return;
+                    }
+                    deleteQuotationInViewMode(capturedQuotationId); // ✅ Use captured ID
                     return false;
                 };
 
@@ -3375,8 +3373,9 @@
                 buttonContainer.appendChild(deleteBtn);
                 buttonContainer.appendChild(pdfBtn);
 
-                console.log('✓ View mode buttons configured');
+                console.log('✓ View mode buttons configured with quotation ID:', capturedQuotationId);
             }
+            
 
             // Disable all inputs and selects
             const allInputs = document.querySelectorAll('input, select, textarea');
@@ -3635,6 +3634,19 @@
                 console.error('Error in saveAndPrintQuotation:', error);
                 alert('Error saving quotation: ' + (error.message || 'Unknown error'));
             }
+            // After clearing quotation number and marking zero values...
+            localStorage.removeItem('currentQuotationNumber');
+
+            // STEP 4: Mark zero values to hide in print
+            markZeroValuesForPrint();
+
+            // ✅ STEP 5: Show success message
+            alert(`Quotation saved successfully!\n\nQuotation No: ${quotationNo}\nClient: ${clientName}`);
+
+            // ✅ STEP 6: Trigger print dialog
+            setTimeout(() => {
+                window.print();
+            }, 300);
         }
         // Function to mark zero values to hide in print
         // Replaces zero-valued inputs/cells with inert spans before printing,
