@@ -67,23 +67,45 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
-        @media (max-width: 768px) {
-            .button-container {
-                flex-direction: column;  /* Stack buttons vertically */
-                gap: 12px;
-                padding: 10px 15px;
-            }
-
-            .button-container button {
-                flex: none;  /* Don't use flex sizing */
-                width: 100%;  /* Full width */
-                min-width: auto;
-                max-width: none;
-                font-size: 15px;  /* Bigger text for mobile */
-                padding: 16px 20px;  /* Bigger padding for mobile */
-                white-space: nowrap;
-            }
+    @media (max-width: 768px) {
+        .no-print {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #f8f9fa;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 0;
+            padding: 12px;
         }
+
+        .button-container {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            justify-content: space-between;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        .button-container button {
+            flex: 1;
+            min-width: 0;  /* Critical: allows buttons to shrink below content size */
+            max-width: none;
+            font-size: clamp(10px, 3vw, 14px);  /* Responsive font size */
+            padding: 12px 6px;
+            white-space: normal;  /* Allow text to wrap */
+            word-break: break-word;
+            line-height: 1.2;
+            overflow: visible;  /* Don't hide text */
+            height: auto;
+            min-height: 44px;  /* Minimum tap target size */
+        }
+        
+        /* Smaller text for emojis and icons */
+        .button-container button::before {
+            font-size: 1.2em;
+        }
+    }
 
         .add-product-btn {
             margin-top: 20px;
@@ -3338,7 +3360,7 @@
 
                 // Back button
                 const backBtn = document.createElement('button');
-                backBtn.textContent = '← Back to List';
+                backBtn.innerHTML = '← Back';  // Shorter text
                 backBtn.style.background = '#6c757d';
                 backBtn.style.color = 'white';
                 backBtn.onclick = function() {
@@ -3347,7 +3369,7 @@
 
                 // Delete button
                 const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = '🗑️ Delete Quotation';
+                deleteBtn.innerHTML = '🗑️ Delete';  // Shorter text
                 deleteBtn.style.background = '#dc3545';
                 deleteBtn.style.color = 'white';
                 deleteBtn.onclick = function(e) {
@@ -3358,7 +3380,7 @@
 
                 // Save as PDF button
                 const pdfBtn = document.createElement('button');
-                pdfBtn.textContent = '📄 Save as PDF';
+                pdfBtn.innerHTML = '📄 PDF';  // Shorter text
                 pdfBtn.style.background = '#28a745';
                 pdfBtn.style.color = 'white';
                 pdfBtn.onclick = function(e) {
@@ -3370,7 +3392,6 @@
                     }, 200);
                     return false;
                 };
-
                 // Append all buttons
                 buttonContainer.appendChild(backBtn);
                 buttonContainer.appendChild(deleteBtn);
