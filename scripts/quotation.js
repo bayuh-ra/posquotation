@@ -1363,3 +1363,50 @@ function updateItemNumbers() {
 
     console.log('Item numbers updated. Total items:', itemNumber - 1);
 }
+
+// ✅ ADD THIS FUNCTION to the END of scripts/quotation.js
+
+// Delete quotation in view mode
+async function deleteQuotationInViewMode(quotationId) {
+    if (!quotationId) {
+        alert('Error: No quotation ID found');
+        return;
+    }
+
+    // Confirm deletion
+    const confirmed = confirm('Are you sure you want to delete this quotation?\n\nThis action cannot be undone.');
+    
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        console.log('Deleting quotation:', quotationId);
+
+        // Delete quotation from database (items will cascade delete automatically)
+        const { error } = await supabaseClient
+            .from('quotations')
+            .delete()
+            .eq('id', quotationId);
+
+        if (error) {
+            console.error('Error deleting quotation:', error);
+            alert('Failed to delete quotation: ' + error.message);
+            return;
+        }
+
+        console.log('✓ Quotation deleted successfully');
+        
+        // Clear localStorage
+        localStorage.removeItem('viewQuotationData');
+        localStorage.removeItem('viewMode');
+
+        // Show success message and redirect
+        alert('Quotation deleted successfully!');
+        window.location.href = 'quotationlist.html';
+
+    } catch (error) {
+        console.error('Error in deleteQuotationInViewMode:', error);
+        alert('Error deleting quotation: ' + (error.message || 'Unknown error'));
+    }
+}
