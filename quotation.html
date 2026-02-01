@@ -1155,18 +1155,31 @@
             }
 
             .page {
-                width: 100%;
+                /* width: 100%;
                 height: var(--page-height);
                 page-break-after: always;
                 box-shadow: none !important;
                 margin: 0 !important;
                 padding: 0.1in 0.3in !important;
-                padding-bottom: 0.5in !important;
-                /* ← INCREASED to 1 inch */
+                padding-bottom: 0.9in !important;
                 position: relative;
-                overflow: hidden;
-                min-height: var(--page-height)!important;
+                overflow: visible;
+                min-height: var(--page-height)!important; */
+
+                width: 100%;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0.1in 0.3in !important;
+                padding-bottom: 0.9in !important;
+                position: relative;
+                overflow: visible;
+                box-sizing: border-box;
+                break-inside: avoid;
+                -webkit-column-break-inside: avoid;
+                -webkit-page-break-inside: avoid;
+                page-break-inside: avoid;
             }
+        
 
             body,
             html {
