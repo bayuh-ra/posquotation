@@ -1189,26 +1189,12 @@
             color: white;
         }
 
-        /* ==================== VIEW MODE CONTENT ==================== */
-        body.view-mode #pdf-content {
-            display: block;            /* 🔥 NOT flex */
-            width: 100%;
-            padding: 20px;
-            overflow-x: auto;          /* 🔥 allow horizontal pan + zoom */
-        }
 
         /* ==================== VIEW MODE PAGE ==================== */
         body.view-mode .page {
             display: block;            /* 🔥 force vertical stacking */
             width: 8.5in;              /* real document width */
             margin: 0 auto 24px auto;  /* stack pages vertically */
-
-            background: white;
-            padding: 12px;
-            box-sizing: border-box;
-
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         /* ==================== MOBILE & TABLET ==================== */
@@ -1244,47 +1230,9 @@
             }
         }
 
-        /* ==================== TABLE SAFETY (VIEW MODE ONLY) ==================== */
-        body.view-mode .quotation-table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
 
-        body.view-mode .quotation-table th,
-        body.view-mode .quotation-table td {
-            padding: 6px;
-            font-size: 11px;
-            vertical-align: top;
-            white-space: normal;
-            word-wrap: break-word;
-        }
-
-        body.view-mode .quotation-table input,
-        body.view-mode .quotation-table select {
-            width: 100%;
-            box-sizing: border-box;
-            font-size: 11px;
-        }
 
         /* ==================== END VIEW MODE ==================== */
-        /* ==================== PRINT FIXES (DO NOT AFFECT VIEW MODE) ==================== */
-        @media print {
-
-            /* 1️⃣ Hide VIEW MODE UI */
-            .view-mode-banner,
-            .view-mode-buttons,
-            .btn-back-view,
-            .btn-delete-view,
-            .btn-pdf-view,
-            .no-print,
-            .button-container,
-            .add-product-btn {
-                display: none !important;
-            }
-        }
-        /* ==================== END PRINT FIXES ==================== */
-
     </style>
 </head>
 
