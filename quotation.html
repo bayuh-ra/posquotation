@@ -1117,18 +1117,34 @@
 
         /* ==================== MOBILE RESPONSIVE ==================== */
         @media (max-width: 768px) {
+            .no-print {
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                background: #f8f9fa;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                margin: 0;
+                padding: 15px;
+            }
+
             .button-container {
-                flex-wrap: nowrap;
-                overflow-x: auto;
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+                justify-content: space-between;
+                align-items: stretch;
+                width: 100%;
             }
 
             .button-container button {
                 flex: 1;
-                min-width: 100px;
+                min-width: 0;  /* Allow buttons to shrink */
                 max-width: none;
-                font-size: 12px;
-                padding: 10px 15px;
+                font-size: 13px;
+                padding: 14px 10px;
                 white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
             }
         }
 
@@ -3304,12 +3320,19 @@
             // Add visual indicator banner
             const buttonContainer = document.querySelector('.button-container');
             if (buttonContainer) {
-                const viewBanner = document.createElement('div');
-                viewBanner.className = 'no-print';
-                viewBanner.style.cssText = 'background: #e3f2fd; border: 2px solid #2196F3; padding: 15px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #1565C0; border-radius: 8px; font-size: 16px;';
-                viewBanner.innerHTML = '👁️ VIEW MODE - This is a saved quotation. You can save it as PDF, delete it, or go back to the list.';
-                buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);
+                // Make the parent .no-print sticky on mobile
+                const noPrintParent = buttonContainer.closest('.no-print');
+                if (noPrintParent) {
+                    noPrintParent.style.position = 'sticky';
+                    noPrintParent.style.top = '0';
+                    noPrintParent.style.zIndex = '1000';
+                }
                 
+                const viewBanner = document.createElement('div');
+                viewBanner.className = 'view-mode-banner';  // Don't use 'no-print' class
+                viewBanner.style.cssText = 'background: #e3f2fd; border: 2px solid #2196F3; padding: 10px; margin-bottom: 10px; text-align: center; font-weight: bold; color: #1565C0; border-radius: 8px; font-size: 14px;';
+                viewBanner.innerHTML = '👁️ VIEW MODE';
+                buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);                
                 // Clear existing buttons
                 buttonContainer.innerHTML = '';
 
