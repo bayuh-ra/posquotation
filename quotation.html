@@ -1154,46 +1154,49 @@
         /* Button container for view mode */
         .view-mode-buttons {
             display: flex;
-            gap: 8px;
-            padding: 8px;
+            gap: 15px;  /* ✅ Increased from 8px */
+            padding: 15px 20px;  /* ✅ Increased from 8px */
             justify-content: space-between;
-            align-items: center;
+            align-items: stretch;  /* ✅ Changed from center */
+            width: 100%;  /* ✅ Added */
+            box-sizing: border-box;  /* ✅ Added */
         }
 
         .view-mode-buttons button {
             flex: 1;
-            padding: 12px 8px;
+            padding: 18px 20px;  /* ✅ Increased from 12px 8px */
             border: none;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 15px;  /* ✅ Increased from 12px */
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
             white-space: nowrap;
+            min-height: 50px;  /* ✅ Added minimum height */
         }
 
         .btn-back-view {
             background: #f5f5f5;
             color: #333;
             border: 2px solid #ddd;
-            flex: 0.5;
+            flex: 0.6;  /* ✅ Increased from 0.5 */
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
-            font-size: 16px;
+            gap: 8px;  /* ✅ Increased from 5px */
+            font-size: 20px;  /* ✅ Increased from 16px */
         }
 
         .btn-delete-view {
             background: #dc3545;
             color: white;
-            flex: 1;
+            flex: 1.2;  /* ✅ Added to make it slightly bigger */
         }
 
         .btn-pdf-view {
             background: #28a745;
             color: white;
-            flex: 1;
+            flex: 1.2;  /* ✅ Added to make it slightly bigger */
         }
 
         .btn-back-view:active,
