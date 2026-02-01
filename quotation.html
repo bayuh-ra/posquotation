@@ -837,176 +837,171 @@ body.view-mode .page {
 /* ==================== END VIEW MODE ==================== */
 
 /* ==================== PRINT STYLES ==================== */
-@media print {
-    /* ✅ PRESERVE NORMAL PAGE LAYOUT FOR PRINTING */
-    @page {
-        size: 8.5in 14in;
-        /* Legal size */
-        margin: 0.5in;
+    @media print {
+        /* ✅ FULL SIZE PRINT - NO SCALING */
+        @page {
+            size: 8.5in 14in;  /* Legal size */
+            margin: 0.5in;
+        }
+
+        body {
+            margin: 0;
+            background: #ffffff !important;  /* ✅ WHITE background */
+            padding: 0;
+        }
+
+        /* ✅ REMOVE VIEW MODE STYLES IN PRINT */
+        body.view-mode {
+            background: #ffffff !important;
+        }
+
+        body.view-mode #pdf-content {
+            background: #ffffff !important;
+            padding: 0 !important;
+        }
+
+        /* ✅ FULL SIZE PAGE - NO TRANSFORM */
+        .page,
+        body.view-mode .page {
+            width: 100% !important;
+            height: auto !important;
+            max-width: 100% !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0.25in 0.4in !important;
+            padding-bottom: 0.5in !important;
+            page-break-after: always;
+            position: relative;
+            transform: none !important;  /* ✅ Remove any scaling */
+            background: #ffffff !important;
+        }
+
+        /* Hide UI elements */
+        .no-print,
+        .view-mode-banner,
+        .view-mode-buttons {
+            display: none !important;
+        }
+
+        /* ✅ KEEP NORMAL TABLE STYLES */
+        table {
+            margin-bottom: 5px;
+            width: 100%;
+        }
+
+        table th {
+            padding: 4px 3px;
+            font-size: 9px;
+        }
+
+        table td {
+            padding: 4px;
+            font-size: 8.5px;
+            line-height: 1.2;
+        }
+
+        table tfoot td {
+            padding: 5px;
+        }
+
+        /* ✅ KEEP NORMAL COLUMN WIDTHS */
+        table th:nth-child(1) { width: 80px; }
+        table th:nth-child(2) { width: 35px; }
+        table th:nth-child(3) { width: 60px; }
+        table th:nth-child(4) { width: auto; }
+        table th:nth-child(5) { width: 70px; }
+        table th:nth-child(6) { width: 65px; }
+        table th:nth-child(7) { display: none; }
+
+        /* ✅ KEEP NORMAL TOTAL SIZES */
+        .total-cell {
+            font-size: 13px !important;
+            font-weight: bold !important;
+            white-space: nowrap !important;
+        }
+
+        .delivery-total-cell {
+            font-size: 11px !important;
+            font-weight: bold !important;
+        }
+
+        /* Remove input styling but keep content visible */
+        input,
+        textarea,
+        select {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+            -webkit-appearance: none !important;
+        }
+
+        /* Hide zero values */
+        .hide-zero-in-print {
+            display: none !important;
+        }
+
+        /* Remove contenteditable styling */
+        [contenteditable="true"] {
+            border: none !important;
+            background: none !important;
+        }
+
+        /* Preserve colors */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Page breaks */
+        .page.page-break {
+            page-break-before: always;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        /* Prevent page breaks inside sections */
+        table,
+        .terms-section,
+        .signature-section {
+            page-break-inside: avoid;
+        }
+
+        /* ✅ FOOTER POSITIONING */
+        .page-footer {
+            position: absolute;
+            bottom: 0.2in;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 0.5in;
+        }
+
+        .page-number {
+            position: absolute;
+            left: 0.5in;
+            width: 30px;
+            height: 30px;
+            background-color: #1a5276;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-link {
+            font-size: 10px;
+        }
     }
 
-    body {
-        margin: 0;
-        background: #fff;
-    }
-
-    /* ✅ KEEP NORMAL PAGE STYLES - DON'T COMPRESS */
-    .page {
-        width: 100%;
-        height: auto;
-        box-shadow: none;
-        margin: 0;
-        padding: 0.25in 0.4in;
-        padding-bottom: 0.5in;
-        page-break-after: always;
-        position: relative;
-    }
-
-    /* Hide UI elements */
-    .no-print,
-    .view-mode-banner,
-    .view-mode-buttons {
-        display: none !important;
-    }
-
-    /* ✅ KEEP NORMAL TABLE STYLES - DON'T COMPRESS */
-    table {
-        margin-bottom: 5px;
-    }
-
-    table th {
-        padding: 4px 3px;
-        font-size: 9px;
-    }
-
-    table td {
-        padding: 4px;
-        font-size: 8.5px;
-        line-height: 1.2;
-    }
-
-    table tfoot td {
-        padding: 5px;
-    }
-
-    /* ✅ KEEP NORMAL COLUMN WIDTHS */
-    table th:nth-child(1) {
-        width: 80px;
-    }
-
-    table th:nth-child(2) {
-        width: 35px;
-    }
-
-    table th:nth-child(3) {
-        width: 60px;
-    }
-
-    table th:nth-child(4) {
-        width: auto;
-    }
-
-    table th:nth-child(5) {
-        width: 70px;
-    }
-
-    table th:nth-child(6) {
-        width: 65px;
-    }
-
-    table th:nth-child(7) {
-        display: none;
-    }
-
-    /* ✅ KEEP NORMAL TOTAL SIZES */
-    .total-cell {
-        font-size: 13px !important;
-        font-weight: bold !important;
-        white-space: nowrap !important;
-    }
-
-    .delivery-total-cell {
-        font-size: 11px !important;
-        font-weight: bold !important;
-    }
-
-    /* Remove input styling but keep content visible */
-    input,
-    textarea,
-    select {
-        border: none !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        outline: none !important;
-        -webkit-appearance: none !important;
-    }
-
-    /* Hide zero values */
-    .hide-zero-in-print {
-        display: none !important;
-    }
-
-    /* Remove contenteditable styling */
-    [contenteditable="true"] {
-        border: none !important;
-        background: none !important;
-    }
-
-    /* Preserve colors */
-    * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-
-    /* Page breaks */
-    .page.page-break {
-        page-break-before: always;
-    }
-
-    .page:last-child {
-        page-break-after: avoid;
-    }
-
-    /* Prevent page breaks inside sections */
-    table,
-    .terms-section,
-    .signature-section {
-        page-break-inside: avoid;
-    }
-
-    /* ✅ NORMAL FOOTER POSITIONING */
-    .page-footer {
-        position: absolute;
-        bottom: 0.2in;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0 0.5in;
-    }
-
-    .page-number {
-        position: absolute;
-        left: 0.5in;
-        width: 30px;
-        height: 30px;
-        background-color: #1a5276;
-        color: white;
-        font-weight: bold;
-        font-size: 12px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .footer-link {
-        font-size: 10px;
-    }
-}
-
-/* ==================== END PRINT STYLES ==================== */
+    /* ==================== END PRINT STYLES ==================== */
     </style>
 </head>
 
