@@ -3305,7 +3305,7 @@
 
         // Function to make entire page read-only
         function makePageReadOnly() {
-            // Get quotation ID from localStorage
+            // ✅ STEP 1: Get quotation ID from localStorage FIRST
             const quotationData = localStorage.getItem('viewQuotationData');
             let quotationId = null;
             if (quotationData) {
@@ -3318,10 +3318,23 @@
                 }
             }
 
-            // Add visual indicator banner
+            // ✅ STEP 2: Add visual indicator banner and buttons
             const buttonContainer = document.querySelector('.button-container');
             if (buttonContainer) {
-                // ... banner creation code ...
+                // Make the parent .no-print sticky on mobile
+                const noPrintParent = buttonContainer.closest('.no-print');
+                if (noPrintParent) {
+                    noPrintParent.style.position = 'sticky';
+                    noPrintParent.style.top = '0';
+                    noPrintParent.style.zIndex = '1000';
+                }
+                
+                // ✅ ADD VIEW MODE BANNER
+                const viewBanner = document.createElement('div');
+                viewBanner.className = 'view-mode-banner';
+                viewBanner.style.cssText = 'background: #e3f2fd; border: 2px solid #2196F3; padding: 10px; margin-bottom: 10px; text-align: center; font-weight: bold; color: #1565C0; border-radius: 8px; font-size: 14px;';
+                viewBanner.innerHTML = '👁️ VIEW MODE';
+                buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);
                 
                 // Clear existing buttons
                 buttonContainer.innerHTML = '';
@@ -3335,7 +3348,7 @@
                     window.location.href = 'quotationlist.html';
                 };
 
-                // ✅ CAPTURE quotation ID in a closure variable BEFORE creating delete button
+                // ✅ STEP 3: Capture quotation ID in a closure variable BEFORE creating delete button
                 const capturedQuotationId = quotationId;
 
                 // Delete button
@@ -3350,7 +3363,7 @@
                         alert('Error: No quotation ID found');
                         return;
                     }
-                    deleteQuotationInViewMode(capturedQuotationId); // ✅ Use captured ID
+                    deleteQuotationInViewMode(capturedQuotationId);
                     return false;
                 };
 
@@ -3375,7 +3388,6 @@
 
                 console.log('✓ View mode buttons configured with quotation ID:', capturedQuotationId);
             }
-            
 
             // Disable all inputs and selects
             const allInputs = document.querySelectorAll('input, select, textarea');
