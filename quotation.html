@@ -1382,32 +1382,11 @@
             color: white;
         }
 
-        /* ==================== PDF CONTENT CONTAINER ==================== */
-        body.view-mode #pdf-content {
-            display: flex;
-            flex-direction: column;   /* 🔥 STACK PAGES VERTICALLY */
-            align-items: center;
-            gap: 20px;
-
-            width: 100%;
-            padding: 20px;
-
-            overflow-x: auto;         /* 🔥 ALLOW PAN */
-            overflow-y: visible;
-        }
-
         /* ==================== PAGE ==================== */
         body.view-mode .page {
             width: 8.5in;             /* Real page size */
             max-width: none;          /* 🔥 DO NOT constrain */
             min-width: unset;         /* 🔥 PREVENT SIDE-BY-SIDE */
-
-            background: white;
-            padding: 12px;
-            box-sizing: border-box;
-
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         /* ==================== MOBILE & TABLET ==================== */
