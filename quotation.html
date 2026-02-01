@@ -3136,42 +3136,77 @@
                 const viewBanner = document.createElement('div');
                 viewBanner.className = 'no-print';
                 viewBanner.style.cssText = 'background: #e3f2fd; border: 2px solid #2196F3; padding: 15px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #1565C0; border-radius: 8px; font-size: 16px;';
-                viewBanner.innerHTML = '👁️ VIEW MODE - This is a saved quotation. You can save it as PDF or go back to the list.';
+                viewBanner.innerHTML = '👁️ VIEW MODE - This is a saved quotation. You can save it as PDF, delete it, or go back to the list.';
                 buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);
             }
 
-            // ✅ REPLACE "Save & Print" button with "Save as PDF" button
+            // ✅ UPDATE BUTTONS: Back to List, Delete Quotation, Save as PDF
             const buttons = document.querySelectorAll('.button-container button');
-            if (buttons[1]) { // Second button
-                buttons[1].textContent = '📄 Save as PDF';
-                buttons[1].style.background = '#2196F3';  // Blue color
+            
+            // Change "Back" button text to "Back to List"
+            if (buttons[0]) {
+                buttons[0].textContent = '← Back to List';
+                buttons[0].onclick = function() {
+                    window.location.href = 'quotationlist.html';
+                };
+            }
+
+            // ✅ REPLACE "Save & Print" with "Delete Quotation" and "Save as PDF"
+            if (buttons[1]) {
+                // Get current quotation ID from localStorage
+                const quotationData = localStorage.getItem('viewQuotationData');
+                let quotationId = null;
+                if (quotationData) {
+                    try {
+                        const quotation = JSON.parse(quotationData);
+                        quotationId = quotation.id;
+                    } catch (e) {
+                        console.error('Error parsing quotation data:', e);
+                    }
+                }
+
+                // Replace the second button with Delete button
+                buttons[1].textContent = '🗑️ Delete Quotation';
+                buttons[1].style.background = '#dc3545';  // Red color
                 buttons[1].style.color = 'white';
                 buttons[1].style.cursor = 'pointer';
-
-                // Make it trigger the print dialog (which allows saving as PDF)
                 buttons[1].onclick = function (e) {
                     e.preventDefault();
+                    deleteQuotationInViewMode(quotationId);
+                    return false;
+                };
 
+                // Add a new "Save as PDF" button after the Delete button
+                const savePdfBtn = document.createElement('button');
+                savePdfBtn.textContent = '📄 Save as PDF';
+                savePdfBtn.style.background = '#2196F3';  // Blue color
+                savePdfBtn.style.color = 'white';
+                savePdfBtn.style.padding = '10px 20px';
+                savePdfBtn.style.border = 'none';
+                savePdfBtn.style.borderRadius = '4px';
+                savePdfBtn.style.fontSize = '14px';
+                savePdfBtn.style.cursor = 'pointer';
+                savePdfBtn.style.fontWeight = 'bold';
+                savePdfBtn.style.flex = '1';
+                savePdfBtn.style.minWidth = '120px';
+                savePdfBtn.style.maxWidth = '200px';
+                savePdfBtn.style.transition = 'all 0.3s';
+                
+                savePdfBtn.onclick = function (e) {
+                    e.preventDefault();
                     console.log('Save as PDF clicked');
-
-                    // Mark zero values to hide in print
                     markZeroValuesForPrint();
-
-                    // Trigger print dialog
                     setTimeout(() => {
                         showMobilePaperSizeAlert();
                         window.print();
                     }, 200);
-
                     return false;
                 };
 
-                console.log('✓ Save as PDF button configured');
-            }
+                // Insert after the Delete button
+                buttonContainer.insertBefore(savePdfBtn, buttons[1].nextSibling);
 
-            // Change "Back" button text to "Back to List"
-            if (buttons[0]) {
-                buttons[0].textContent = '← Back to List';
+                console.log('✓ Delete and Save as PDF buttons configured');
             }
 
             // Disable all inputs and selects
@@ -3190,7 +3225,7 @@
                 element.style.opacity = '0.7';
             });
 
-            // Hide all delete buttons
+            // Hide all delete buttons in table
             const deleteButtons = document.querySelectorAll('button[onclick*="deleteRow"]');
             deleteButtons.forEach(btn => {
                 btn.style.display = 'none';
@@ -3655,6 +3690,51 @@
                 mo.observe(tbody, { childList: true, subtree: true });
             }
         });
+
+        // Delete quotation in view mode
+        async function deleteQuotationInViewMode(quotationId) {
+            if (!quotationId) {
+                alert('Error: No quotation ID found');
+                return;
+            }
+
+            // Confirm deletion
+            const confirmed = confirm('Are you sure you want to delete this quotation?\n\nThis action cannot be undone.');
+            
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                console.log('Deleting quotation:', quotationId);
+
+                // Delete quotation from database
+                const { error } = await supabaseClient
+                    .from('quotations')
+                    .delete()
+                    .eq('id', quotationId);
+
+                if (error) {
+                    console.error('Error deleting quotation:', error);
+                    alert('Failed to delete quotation: ' + error.message);
+                    return;
+                }
+
+                console.log('✓ Quotation deleted successfully');
+                
+                // Clear localStorage
+                localStorage.removeItem('viewQuotationData');
+                localStorage.removeItem('viewMode');
+
+                // Show success message and redirect
+                alert('Quotation deleted successfully!');
+                window.location.href = 'quotationlist.html';
+
+            } catch (error) {
+                console.error('Error in deleteQuotationInViewMode:', error);
+                alert('Error deleting quotation: ' + (error.message || 'Unknown error'));
+            }
+        }
 
     </script>
 

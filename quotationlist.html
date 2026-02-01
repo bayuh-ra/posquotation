@@ -49,7 +49,6 @@
                         <th>Employee</th>
                         <th>Package Type</th>
                         <th>Total Amount</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="quotationsTableBody">
@@ -144,7 +143,6 @@
             emptyState.style.display = 'none';
             
             let filteredQuotations = quotations;
-        
 
             // Apply search filter
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -157,22 +155,18 @@
             }
 
             if (filteredQuotations.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #666;">No quotations found matching your criteria</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #666;">No quotations found matching your criteria</td></tr>';
                 return;
             }
 
             tbody.innerHTML = filteredQuotations.map(q => `
-                <tr>
+                <tr onclick="viewQuotation('${q.id}')" style="cursor: pointer;" title="Click to view quotation">
                     <td><strong>${q.quotation_no || 'N/A'}</strong></td>
                     <td>${formatDate(q.quotation_date || q.created_at)}</td>
                     <td>${q.client_name || '-'}</td>
                     <td>${q.employee_name || '-'}</td>
                     <td>${q.package_type || '-'}</td>
                     <td class="amount">₱${formatAmount(q.total || 0)}</td>
-                    <td class="actions">
-                        <button onclick="viewQuotation('${q.id}')" class="btn-action btn-view" title="View">👁️</button>
-                        <button onclick="deleteQuotation('${q.id}')" class="btn-action btn-delete-icon" title="Delete">🗑️</button>
-                    </td>
                 </tr>
             `).join('');
         }
