@@ -3284,6 +3284,7 @@
 
             console.log('Finished populating', items.length, 'items');
         }
+        
         // Function to make entire page read-only
         function makePageReadOnly() {
             // Get quotation ID from localStorage
@@ -3307,91 +3308,34 @@
                 viewBanner.innerHTML = '👁️ VIEW MODE - This is a saved quotation. You can save it as PDF, delete it, or go back to the list.';
                 buttonContainer.parentNode.insertBefore(viewBanner, buttonContainer);
                 
-                // ✅ ADD FLEXBOX STYLING TO BUTTON CONTAINER
-                buttonContainer.style.cssText = 'display: flex; gap: 15px; justify-content: center; align-items: center; margin: 20px 0; padding: 0 20px;';
-                
-                // Clear existing buttons and create new ones
+                // Clear existing buttons
                 buttonContainer.innerHTML = '';
 
                 // Back button
                 const backBtn = document.createElement('button');
                 backBtn.textContent = '← Back to List';
-                backBtn.style.cssText = `
-                    background: #6c757d;
-                    color: white;
-                    padding: 12px 24px;
-                    border: none;
-                    border-radius: 4px;
-                    font-size: 14px;
-                    cursor: pointer;
-                    font-weight: bold;
-                    flex: 1;
-                    min-width: 140px;
-                    max-width: 200px;
-                    transition: all 0.3s;
-                `;
+                backBtn.style.background = '#6c757d';
+                backBtn.style.color = 'white';
                 backBtn.onclick = function() {
                     window.location.href = 'quotationlist.html';
-                };
-                backBtn.onmouseenter = function() {
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-                };
-                backBtn.onmouseleave = function() {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = 'none';
                 };
 
                 // Delete button
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = '🗑️ Delete Quotation';
-                deleteBtn.style.cssText = `
-                    background: #dc3545;
-                    color: white;
-                    padding: 12px 24px;
-                    border: none;
-                    border-radius: 4px;
-                    font-size: 14px;
-                    cursor: pointer;
-                    font-weight: bold;
-                    flex: 1;
-                    min-width: 160px;
-                    max-width: 220px;
-                    transition: all 0.3s;
-                `;
+                deleteBtn.style.background = '#dc3545';
+                deleteBtn.style.color = 'white';
                 deleteBtn.onclick = function(e) {
                     e.preventDefault();
                     deleteQuotationInViewMode(quotationId);
                     return false;
                 };
-                deleteBtn.onmouseenter = function() {
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-                    this.style.background = '#c82333';
-                };
-                deleteBtn.onmouseleave = function() {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = 'none';
-                    this.style.background = '#dc3545';
-                };
 
                 // Save as PDF button
                 const pdfBtn = document.createElement('button');
                 pdfBtn.textContent = '📄 Save as PDF';
-                pdfBtn.style.cssText = `
-                    background: #28a745;
-                    color: white;
-                    padding: 12px 24px;
-                    border: none;
-                    border-radius: 4px;
-                    font-size: 14px;
-                    cursor: pointer;
-                    font-weight: bold;
-                    flex: 1;
-                    min-width: 160px;
-                    max-width: 220px;
-                    transition: all 0.3s;
-                `;
+                pdfBtn.style.background = '#28a745';
+                pdfBtn.style.color = 'white';
                 pdfBtn.onclick = function(e) {
                     e.preventDefault();
                     markZeroValuesForPrint();
@@ -3400,16 +3344,6 @@
                         window.print();
                     }, 200);
                     return false;
-                };
-                pdfBtn.onmouseenter = function() {
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-                    this.style.background = '#218838';
-                };
-                pdfBtn.onmouseleave = function() {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = 'none';
-                    this.style.background = '#28a745';
                 };
 
                 // Append all buttons
