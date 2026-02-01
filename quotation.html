@@ -1414,33 +1414,25 @@
 
             /* ✅ FIT PAGE TO SCREEN WIDTH - SHOW FULL WIDTH */
             body.view-mode .page {
-                /* Scale to fit viewport width with 20px margin on each side */
-                width: calc(100vw - 20px);
-                height: auto;
-                max-width: calc(100vw - 20px);
-                
-                /* Remove transform, use natural scaling */
-                transform: none;
-                
-                /* Center the page */
-                margin: 20px auto;
-                padding: 10px;
-                
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                border: 1px solid #ddd;
-                background: white;
-                
-                /* Ensure content fits */
+                width: 100%;
+                max-width: 100%;
+                margin: 12px auto;
+                padding: 12px;
+
                 box-sizing: border-box;
-                overflow: hidden;
+                background: white;
+                border: 1px solid #ddd;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+
+                overflow-x: auto; /* allow table breathing room */
             }
 
             /* Scale down all content inside the page proportionally */
-            body.view-mode .page > * {
+            /* body.view-mode .page > * {
                 transform: scale(0.85);
                 transform-origin: top left;
                 width: 117.65%; /* 100% / 0.85 to compensate for scale */
-            }
+            } */
 
             /* Banner */
             .view-mode-banner {
@@ -1465,20 +1457,17 @@
                 flex: 0.5;
                 font-size: clamp(14px, 4vw, 20px);
             }
-        }
 
         /* ✅ SMALLER PHONES - MORE AGGRESSIVE SCALING */
         @media (max-width: 480px) {
             body.view-mode .page {
-                width: calc(100vw - 16px);
-                max-width: calc(100vw - 16px);
                 padding: 8px;
             }
 
-            body.view-mode .page > * {
+            /* body.view-mode .page > * {
                 transform: scale(0.75);
-                width: 133.33%; /* 100% / 0.75 */
-            }
+                width: 133.33%;
+            } */
         }
 
         /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */
