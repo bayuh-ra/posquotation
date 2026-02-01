@@ -846,7 +846,7 @@ body.view-mode .page {
 
         body {
             margin: 0;
-            background: #ffffff !important;  /* ✅ WHITE background */
+            background: #ffffff !important;
             padding: 0;
         }
 
@@ -860,20 +860,35 @@ body.view-mode .page {
             padding: 0 !important;
         }
 
-        /* ✅ FULL SIZE PAGE - NO TRANSFORM */
+        /* ✅ FULL SIZE PAGE - ALLOW PROPER HEIGHT */
         .page,
         body.view-mode .page {
             width: 100% !important;
-            height: auto !important;
+            min-height: 13in !important;  /* ✅ Minimum height for legal page */
             max-width: 100% !important;
             box-shadow: none !important;
             margin: 0 !important;
             padding: 0.25in 0.4in !important;
             padding-bottom: 0.5in !important;
-            page-break-after: always;
+            page-break-after: always !important;  /* ✅ Force page break after each page */
+            page-break-inside: avoid !important;  /* ✅ Don't break inside a page */
             position: relative;
-            transform: none !important;  /* ✅ Remove any scaling */
+            transform: none !important;
             background: #ffffff !important;
+            display: block !important;
+        }
+
+        /* ✅ ENSURE PAGE 2 PRINTS */
+        .page.page-break {
+            page-break-before: always !important;
+        }
+
+        /* ✅ DON'T BREAK THESE ELEMENTS */
+        .header,
+        .info-section,
+        .terms-section,
+        .signature-section {
+            page-break-inside: avoid !important;
         }
 
         /* Hide UI elements */
@@ -883,10 +898,16 @@ body.view-mode .page {
             display: none !important;
         }
 
-        /* ✅ KEEP NORMAL TABLE STYLES */
+        /* ✅ TABLE SHOULD STAY TOGETHER IF POSSIBLE */
         table {
             margin-bottom: 5px;
             width: 100%;
+            page-break-inside: auto !important;  /* ✅ Allow breaking if needed */
+        }
+
+        /* ✅ DON'T BREAK TABLE ROWS */
+        table tr {
+            page-break-inside: avoid !important;
         }
 
         table th {
@@ -911,7 +932,7 @@ body.view-mode .page {
         table th:nth-child(4) { width: auto; }
         table th:nth-child(5) { width: 70px; }
         table th:nth-child(6) { width: 65px; }
-        table th:nth-child(7) { display: none; }
+        table th:nth-child(7) { display: none !important; }
 
         /* ✅ KEEP NORMAL TOTAL SIZES */
         .total-cell {
@@ -953,22 +974,6 @@ body.view-mode .page {
             print-color-adjust: exact !important;
         }
 
-        /* Page breaks */
-        .page.page-break {
-            page-break-before: always;
-        }
-
-        .page:last-child {
-            page-break-after: avoid;
-        }
-
-        /* Prevent page breaks inside sections */
-        table,
-        .terms-section,
-        .signature-section {
-            page-break-inside: avoid;
-        }
-
         /* ✅ FOOTER POSITIONING */
         .page-footer {
             position: absolute;
@@ -1001,7 +1006,7 @@ body.view-mode .page {
         }
     }
 
-    /* ==================== END PRINT STYLES ==================== */
+   /* ==================== END PRINT STYLES ==================== */
   </style>
 </head>
 
