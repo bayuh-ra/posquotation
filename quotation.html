@@ -1393,9 +1393,9 @@
             transform: scale(0.98);
         }
 
-        /* ✅ MOBILE VIEW - FIT ENTIRE PAGE WIDTH */
+        /* ✅ MOBILE VIEW - SCALE TO FIT LIKE IMAGE 1 */
         @media (max-width: 768px) {
-            /* Prevent horizontal scroll on body */
+            /* Prevent horizontal scroll */
             body.view-mode {
                 overflow-x: hidden;
                 width: 100vw;
@@ -1412,34 +1412,29 @@
                 margin: 0;
             }
 
-            /* ✅ FIT PAGE TO SCREEN WIDTH - SHOW FULL WIDTH */
+            /* ✅ SCALE THE ENTIRE PAGE TO FIT - LIKE IMAGE 1 */
             body.view-mode .page {
-                /* Scale to fit viewport width with 20px margin on each side */
-                width: calc(100vw - 20px);
+                /* Keep original page dimensions */
+                width: 8.5in;
                 height: auto;
-                max-width: calc(100vw - 20px);
+                min-height: 11in;
                 
-                /* Remove transform, use natural scaling */
-                transform: none;
+                /* Scale to fit viewport (8.5in = 816px) */
+                /* Add 20px padding on sides = 40px total */
+                transform: scale(calc((100vw - 40px) / 816));
+                transform-origin: top center;
                 
-                /* Center the page */
-                margin: 20px auto;
-                padding: 10px;
+                /* Center horizontally */
+                margin-left: auto;
+                margin-right: auto;
+                margin-top: 20px;
+                margin-bottom: 20px;
                 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.15);
                 border: 1px solid #ddd;
                 background: white;
                 
-                /* Ensure content fits */
                 box-sizing: border-box;
-                overflow: hidden;
-            }
-
-            /* Scale down all content inside the page proportionally */
-            body.view-mode .page > * {
-                transform: scale(0.85);
-                transform-origin: top left;
-                width: 117.65%; /* 100% / 0.85 to compensate for scale */
             }
 
             /* Banner */
@@ -1467,21 +1462,23 @@
             }
         }
 
-        /* ✅ SMALLER PHONES - MORE AGGRESSIVE SCALING */
+        /* ✅ SMALLER PHONES */
         @media (max-width: 480px) {
             body.view-mode .page {
-                width: calc(100vw - 16px);
-                max-width: calc(100vw - 16px);
-                padding: 8px;
-            }
-
-            body.view-mode .page > * {
-                transform: scale(0.75);
-                width: 133.33%; /* 100% / 0.75 */
+                /* Tighter margins for small phones */
+                transform: scale(calc((100vw - 30px) / 816));
             }
         }
 
-        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */    
+        /* ✅ VERY SMALL PHONES */
+        @media (max-width: 375px) {
+            body.view-mode .page {
+                /* Even tighter margins for very small phones */
+                transform: scale(calc((100vw - 20px) / 816));
+            }
+        }
+
+        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */
     </style>
 </head>
 
