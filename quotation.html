@@ -3417,7 +3417,9 @@
 
             console.log('✓ Page set to read-only mode');
         }
-    // Combined Save & Print function
+        // ✅ CRITICAL FIX for saveAndPrintQuotation function
+        // Replace lines 2570-2643 with this:
+
         async function saveAndPrintQuotation() {
             try {
                 // Get employee name
@@ -3630,25 +3632,19 @@
                 // STEP 4: Mark zero values to hide in print
                 markZeroValuesForPrint();
 
+                // ✅ STEP 5: Show success message
+                alert(`Quotation saved successfully!\n\nQuotation No: ${quotationNo}\nClient: ${clientName}`);
+
+                // ✅ STEP 6: Trigger print dialog
+                setTimeout(() => {
+                    window.print();
+                }, 300);
+
             } catch (error) {
                 console.error('Error in saveAndPrintQuotation:', error);
                 alert('Error saving quotation: ' + (error.message || 'Unknown error'));
             }
-            // After clearing quotation number and marking zero values...
-            localStorage.removeItem('currentQuotationNumber');
-
-            // STEP 4: Mark zero values to hide in print
-            markZeroValuesForPrint();
-
-            // ✅ STEP 5: Show success message
-            alert(`Quotation saved successfully!\n\nQuotation No: ${quotationNo}\nClient: ${clientName}`);
-
-            // ✅ STEP 6: Trigger print dialog
-            setTimeout(() => {
-                window.print();
-            }, 300);
-        }
-        // Function to mark zero values to hide in print
+        }        // Function to mark zero values to hide in print
         // Replaces zero-valued inputs/cells with inert spans before printing,
         // and restores the originals after print to preserve layout without showing zeros in PDFs.
         // Function to mark zero values to hide in print
