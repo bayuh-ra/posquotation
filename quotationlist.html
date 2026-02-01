@@ -36,12 +36,6 @@
                 <input type="text" id="searchInput" placeholder="Search by quotation number, client name, or employee..." onkeyup="filterQuotations()">
                 <span class="search-icon">🔍</span>
             </div>
-            <div class="filter-buttons">
-                <button class="filter-btn active" onclick="filterByStatus('all')">All</button>
-                <button class="filter-btn" onclick="filterByStatus('pending')">Pending</button>
-                <button class="filter-btn" onclick="filterByStatus('approved')">Approved</button>
-                <button class="filter-btn" onclick="filterByStatus('rejected')">Rejected</button>
-            </div>
         </div>
 
         <!-- Quotations Table -->
@@ -55,7 +49,6 @@
                         <th>Employee</th>
                         <th>Package Type</th>
                         <th>Total Amount</th>
-                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -151,11 +144,7 @@
             emptyState.style.display = 'none';
             
             let filteredQuotations = quotations;
-            
-            // Apply status filter
-            if (currentFilter !== 'all') {
-                filteredQuotations = quotations.filter(q => q.status === currentFilter);
-            }
+        
 
             // Apply search filter
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -180,7 +169,6 @@
                     <td>${q.employee_name || '-'}</td>
                     <td>${q.package_type || '-'}</td>
                     <td class="amount">₱${formatAmount(q.total || 0)}</td>
-                    <td><span class="status-badge ${q.status || 'pending'}">${capitalizeFirst(q.status || 'pending')}</span></td>
                     <td class="actions">
                         <button onclick="viewQuotation('${q.id}')" class="btn-action btn-view" title="View">👁️</button>
                         <button onclick="deleteQuotation('${q.id}')" class="btn-action btn-delete-icon" title="Delete">🗑️</button>
@@ -189,18 +177,6 @@
             `).join('');
         }
 
-        // Filter by status
-        function filterByStatus(status) {
-            currentFilter = status;
-            
-            // Update active button
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            displayQuotations();
-        }
 
         // Filter quotations by search
         function filterQuotations() {
