@@ -1324,11 +1324,13 @@
             }
         }  
 
-/* ==================== VIEW MODE MOBILE RESPONSIVE (ZOOM SAFE) ==================== */
+/* ==================== VIEW MODE (PDF-LIKE, ZOOM SAFE) ==================== */
 
-        /* Detect view mode */
+        /* Body */
         body.view-mode {
             background: #f5f5f5;
+            margin: 0;
+            overflow: auto; /* REQUIRED for zoom out */
         }
 
         /* ==================== VIEW MODE BANNER ==================== */
@@ -1361,7 +1363,6 @@
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s;
             white-space: nowrap;
         }
 
@@ -1370,10 +1371,6 @@
             color: #333;
             border: 2px solid #ddd;
             flex: 0.6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
         }
 
         .btn-delete-view {
@@ -1386,23 +1383,26 @@
             color: white;
         }
 
-        .view-mode-buttons button:active {
-            transform: scale(0.98);
-        }
-
-        /* ==================== DOCUMENT CONTAINER ==================== */
+        /* ==================== PDF CONTENT CONTAINER ==================== */
         body.view-mode #pdf-content {
-            width: 100%;
             display: flex;
-            justify-content: center;
-            padding: 20px 10px;
-            overflow-x: auto; /* allow pan + zoom */
+            flex-direction: column;   /* 🔥 STACK PAGES VERTICALLY */
+            align-items: center;
+            gap: 20px;
+
+            width: 100%;
+            padding: 20px;
+
+            overflow-x: auto;         /* 🔥 ALLOW PAN */
+            overflow-y: visible;
         }
 
-        /* ==================== PAGE STYLING (DESKTOP DEFAULT) ==================== */
+        /* ==================== PAGE ==================== */
         body.view-mode .page {
-            width: 8.5in;              /* Real document width */
-            min-width: 8.5in;
+            width: 8.5in;             /* Real page size */
+            max-width: none;          /* 🔥 DO NOT constrain */
+            min-width: unset;         /* 🔥 PREVENT SIDE-BY-SIDE */
+
             background: white;
             padding: 12px;
             box-sizing: border-box;
@@ -1414,37 +1414,21 @@
         /* ==================== MOBILE & TABLET ==================== */
         @media (max-width: 1024px) {
 
-            body.view-mode {
-                overflow-x: auto;
-            }
-
             body.view-mode #pdf-content {
                 padding: 12px;
             }
 
             body.view-mode .page {
-                margin: 0 auto 20px auto;
+                margin: 0 auto;
             }
 
-            /* Banner */
             .view-mode-banner {
                 font-size: clamp(12px, 3.5vw, 16px);
-                padding: 10px;
-            }
-
-            /* Buttons */
-            .view-mode-buttons {
-                gap: 8px;
-                padding: 0 10px 10px 10px;
             }
 
             .view-mode-buttons button {
-                font-size: clamp(11px, 2.8vw, 14px);
-                padding: clamp(10px, 2.5vw, 14px);
-            }
-
-            .btn-back-view {
-                font-size: clamp(14px, 4vw, 20px);
+                font-size: clamp(11px, 3vw, 14px);
+                padding: 10px;
             }
         }
 
@@ -1460,7 +1444,7 @@
             }
         }
 
-        /* ==================== TABLE SAFETY (NO SQUISHING) ==================== */
+        /* ==================== TABLE SAFETY ==================== */
         .quotation-table {
             width: 100%;
             border-collapse: collapse;
@@ -1483,7 +1467,7 @@
             font-size: 11px;
         }
 
-        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */
+        /* ==================== END VIEW MODE ==================== */
     </style>
 </head>
 
