@@ -15,1224 +15,998 @@
     <!-- <link rel="stylesheet" href="styles/quotation.css"> -->
 
     <style>
-        @media print {
-            /* @page {
-                size: 8.5in 14in; 
-                margin: 0.2in;
-            } */
-
-            body {
-                margin: 0;
-            }
-
-            .page {
-                width: 100%;
-                height: 11in;
-                page-break-after: always;
-            }
-        }
-
-
-        /* Mobile responsive button styles */
-        .no-print {
-            text-align: center;
-            margin: 20px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        .button-container {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .button-container button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: bold;
-            flex: 1;
-            min-width: 120px;
-            max-width: 200px;
-            transition: all 0.3s;
-        }
-
-        .button-container button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        @media (max-width: 768px) {
-            .button-container {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-            }
-
-            .button-container button {
-                flex: 1;
-                min-width: 100px;
-                max-width: none;
-                font-size: 12px;
-                padding: 10px 15px;
-                white-space: nowrap;
-            }
-        }
-
-        .add-product-btn {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .add-product-btn button {
-            background: #667eea;
-            color: white;
-            padding: 10px 30px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .add-product-btn button:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Delete Confirmation Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 0;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            animation: slideDown 0.3s;
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            padding: 20px;
-            background-color: #dc3545;
-            color: white;
-            border-radius: 8px 8px 0 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .modal-body {
-            padding: 30px 20px;
-            text-align: center;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .modal-footer {
-            padding: 15px 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .modal-footer button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .btn-cancel {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-cancel:hover {
-            background: #5a6268;
-        }
-
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background: #c82333;
-        }
-
-        /* PDF Preview Modal */
-        .pdf-preview-modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            animation: fadeIn 0.3s;
-        }
-
-        .pdf-preview-content {
-            background-color: #fff;
-            margin: 2% auto;
-            padding: 0;
-            width: 95%;
-            height: 95%;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .pdf-preview-header {
-            padding: 15px 20px;
-            background-color: #1a5276;
-            color: white;
-            border-radius: 8px 8px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .pdf-preview-header h2 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .close-preview {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-
-        .close-preview:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .pdf-preview-body {
-            flex: 1;
-            overflow: auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-
-        .pdf-preview-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .pdf-preview-footer {
-            padding: 15px 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            background: white;
-            border-radius: 0 0 8px 8px;
-        }
-
-        .pdf-preview-footer button {
-            padding: 10px 30px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .btn-close-preview {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-close-preview:hover {
-            background: #5a6268;
-        }
-
-        .btn-download-pdf {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-download-pdf:hover {
-            background: #218838;
-        }
-
-        /* Page number and footer styles */
-        .page-footer {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0.2in 0.5in;
-            z-index: 10;
-            margin-top: auto;
-        }
-
-        .page-number {
-            position: absolute;
-            left: 0.5in;
-            width: 30px;
-            height: 30px;
-            background-color: #1a5276;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .footer-link {
-            font-size: 10px;
-            color: #1a5276;
-            text-align: center;
-        }
-
-        .footer-link a {
-            color: #1a5276;
-            text-decoration: none;
-        }
-
-        /* Ensure page has relative positioning for absolute footer */
-        .page {
-            position: relative;
-            padding-bottom: 0.7in;
-            /* Make room for footer */
-        }
-
-        .hide-zero-in-print {
-            /* Intentionally empty: class is applied to mark elements for hiding only when printing. */
-        }
-
-        @media print {
-            .hide-zero-in-print {
-                display: none !important;
-            }
-
-            /* Remove input boxes/outlines in PDF while keeping text visible */
-            input,
-            textarea,
-            select {
-                border: none !important;
-                background: transparent !important;
-                box-shadow: none !important;
-                outline: none !important;
-            }
-        }
-
-        /* Editable content styling */
-        [contenteditable="true"] {
-            cursor: text;
-            transition: all 0.2s ease;
-        }
-
-        [contenteditable="true"]:hover {
-            background-color: rgba(76, 175, 80, 0.05);
-        }
-
-        [contenteditable="true"]:focus {
-            background-color: rgba(76, 175, 80, 0.1);
-            outline: none;
-        }
-
-        /* Hide edit borders when printing */
-        @media print {
-            [contenteditable="true"] {
-                border: none !important;
-                background: none !important;
-            }
-        }
-
-        /* ==================== BASE STYLES ==================== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            font-size: 11px;
-            line-height: 1.5;
-            color: #000;
-            background-color: #f5f5f5;
-            font-weight: 500;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* ==================== PAGE LAYOUT ==================== */
-        .page {
-            width: 8.5in;
-            height: 13.6in;
-            margin: 20px auto;
-            background: white;
-            padding: 0.25in 0.4in;
-            /* ← Keep compact padding */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-            padding-bottom: 0.5in;
-            /* ← Space for footer */
-            box-sizing: border-box;
-            overflow: visible;
-            /* ← Changed from hidden to visible */
-            min-height: 11in;
-        }
-
-        .page-break {
-            page-break-before: always;
-        }
-
-        /* ==================== HEADER STYLES ==================== */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 5px;
-            padding-bottom: 3px;
-        }
-
-        .company-info {
-            flex: 1;
-        }
-
-        .company-name {
-            font-size: 22px;
-            font-weight: bold;
-            color: #1a5276;
-            margin-bottom: 3px;
-        }
-
-        .company-contact {
-            font-size: 9px;
-            color: #555;
-            line-height: 1.5;
-        }
-
-        .quotation-title {
-            text-align: right;
-        }
-
-        .quotation-title h1 {
-            font-size: 26px;
-            color: #1a5276;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* ==================== INFO SECTIONS ==================== */
-        .info-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            gap: 15px;
-        }
-
-        .client-info,
-        .quote-info {
-            flex: 1;
-            padding: 10px;
-            border-radius: 4px;
-        }
-
-        .info-title {
-            font-weight: bold;
-            color: #1a5276;
-            margin-bottom: 8px;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-
-        .info-row {
-            display: flex;
-            margin-bottom: 3px;
-        }
-
-        .info-label {
-            font-weight: 700;
-            width: 110px;
-            color: #000;
-        }
-
-        .info-value {
-            color: #333;
-        }
-
-        /* ==================== PACKAGE TITLE ==================== */
-        .package-title {
-            background: #1a5276;
-            color: white;
-            padding: 8px 12px;
-            font-size: 12px;
-            font-weight: bold;
-            margin: 15px 0 0 0;
-            text-transform: uppercase;
-        }
-
-        /* ==================== TABLE STYLES ==================== */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 3px;
-            border: 1px solid #ccc;
-        }
-
-        table th {
-            background: #d6e6f0;
-            color: #000;
-            padding: 4px 3px;
-            text-align: center;
-            font-size: 9px;
-            font-weight: 700;
-            border: 1px solid #ccc;
-        }
-
-        table th:nth-child(1) {
-            width: 80px;
-            text-align: center;
-        }
-
-        table th:nth-child(2) {
-            width: 35px;
-            text-align: center;
-        }
-
-        table th:nth-child(3) {
-            width: 60px;
-            text-align: center;
-        }
-
-        table th:nth-child(4) {
-            width: auto;
-            text-align: center;
-        }
-
-        table th:nth-child(5) {
-            width: 70px;
-            text-align: center;
-        }
-
-        table th:nth-child(6) {
-            width: 65px;
-            text-align: right;
-        }
-
-        table td {
-            padding: 4px;
-            border: 1px solid #ccc;
-            vertical-align: top;
-            font-size: 8.5px;
-            line-height: 1.2;
-        }
-
-        table td:nth-child(2),
-        table td:nth-child(3) {
-            text-align: left;
-        }
-
-        table td:nth-child(5),
-        table td:nth-child(6) {
-            text-align: right;
-        }
-
-        table tfoot td {
-            border: 1px solid #ccc;
-            padding: 5px;
-        }
-
-        .item-name {
-            font-weight: 600;
-            color: #1a5276;
-        }
-
-        .item-description {
-            font-size: 10px;
-            color: #555;
-            margin-top: 2px;
-        }
-
-        .feature-list {
-            margin: 5px 0 0 15px;
-            font-size: 9px;
-            color: #333;
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .total-cell {
-                font-size: 13px !important;  /* Consistent size for all totals */
-                font-weight: bold !important;
-                text-align: right !important;
-                white-space: nowrap;
-            }
-
-        .delivery-total-cell {
-            font-size: 11px !important;  /* Consistent size for all totals */
-            font-weight: bold !important;
-             text-align: right !important;
-        }
-
-        .feature-list li {
-            margin-bottom: 2px;
-        }
-
-        .spec-list {
-            margin: 5px 0 0 15px;
-            font-size: 9px;
-            color: #666;
-        }
-
-        .spec-list li {
-            margin-bottom: 2px;
-        }
-
-        .modules-badge {
-            background: #17a2b8;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 8px;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 3px;
-        }
-
-        .free-badge {
-            background: #28a745;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-size: 9px;
-            font-weight: bold;
-        }
-
-        /* ==================== SECTIONS ==================== */
-        .service-section {
-            background: #e8f4f8;
-            padding: 10px 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            border-left: 3px solid #17a2b8;
-            font-size: 10px;
-        }
-
-        .service-title {
-            font-weight: bold;
-            color: #17a2b8;
-            margin-bottom: 3px;
-        }
-
-        .pricing-section {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 15px;
-        }
-
-        .pricing-table {
-            width: 280px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .pricing-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 12px;
-            border-bottom: 1px solid #ddd;
-            font-size: 10px;
-        }
-
-        .pricing-row:last-child {
-            border-bottom: none;
-        }
-
-        .pricing-row.total {
-            background: #1a5276;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .payment-terms {
-            background: #fff3cd;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            border-left: 3px solid #ffc107;
-        }
-
-        .payment-terms h3 {
-            color: #856404;
-            margin-bottom: 8px;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-
-        .payment-terms ol {
-            margin-left: 18px;
-            font-size: 10px;
-        }
-
-        .payment-terms li {
-            margin-bottom: 4px;
-            color: #666;
-        }
-
-        .payment-amount {
-            font-weight: bold;
-            color: #1a5276;
-        }
-
-        [contenteditable="true"] {
-            border-bottom: 1px dashed #ccc;
-            outline: none;
-            cursor: text;
-            transition: all 0.2s ease;
-        }
-
-        [contenteditable="true"]:hover {
-            background-color: rgba(76, 175, 80, 0.05);
-        }
-
-        [contenteditable="true"]:focus {
-            border-bottom: 1px dashed #667eea;
-            background-color: rgba(76, 175, 80, 0.1);
-            outline: none;
-        }
-
-        .terms-section {
-            background: white;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-
-        .terms-section h3 {
-            color: #000;
-            margin-bottom: 12px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .payment-term-line {
-            margin-bottom: 3px;
-            line-height: 1.4;
-        }
-
-        .terms-list {
-            font-size: 10px;
-            color: #000;
-            font-weight: 500;
-            line-height: 1.6;
-        }
-
-        .terms-list>li {
-            margin-bottom: 8px;
-            line-height: 1.6;
-        }
-
-        .exclusions-list {
-            margin: 5px 0 0 20px;
-            font-size: 10px;
-        }
-
-        .exclusions-list li {
-            margin-bottom: 3px;
-        }
-
-        .support-section {
-            background: #d4edda;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            border-left: 3px solid #28a745;
-        }
-
-        .support-section h3 {
-            color: #155724;
-            margin-bottom: 8px;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-
-        .support-content {
-            font-size: 10px;
-            color: #555;
-        }
-
-        .support-content p {
-            margin-bottom: 5px;
-        }
-
-        .support-methods {
-            margin: 5px 0 5px 20px;
-        }
-
-        .support-methods li {
-            margin-bottom: 2px;
-        }
-
-        /* ==================== SIGNATURE ==================== */
-        .contract-statement {
-            text-align: center;
-            font-size: 10px;
-            color: #555;
-            margin: 20px 0;
-            font-style: italic;
-        }
-
-        .signature-section {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-            gap: 40px;
-        }
-
-        .signature-box {
-            flex: 1;
-            text-align: center;
-        }
-
-        .signature-line {
-            border-top: 1px solid #333;
-            margin-top: 40px;
-            padding-top: 5px;
-        }
-
-        .signature-label {
-            font-size: 10px;
-            color: #555;
-        }
-
-        .footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 9px;
-            color: #888;
-            padding-top: 10px;
-        }
-
-        /* ==================== PAGE FOOTER ==================== */
-        .page-footer {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0.2in 0.5in;
-            z-index: 10;
-            margin-top: auto;
-        }
-
-        .page-number {
-            position: static;
-            /* left: 0.5in; */
-            width: 30px;
-            height: 30px;
-            background-color: #1a5276;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .footer-link {
-            font-size: 10px;
-            color: #1a5276;
-            text-align: center;
-        }
-
-        .footer-link a {
-            color: #1a5276;
-            text-decoration: none;
-        }
-
-        /* ==================== DROPDOWNS ==================== */
-        #packageType {
-            width: 130px;
-            font-size: 10px;
-            padding: 4px;
-            height: auto;
-            min-height: 30px;
-        }
-
-        #packageType option {
-            white-space: normal;
-            word-wrap: break-word;
-            padding: 4px;
-        }
-
-        #descriptionDropdown {
-            width: 100%;
-            max-width: 350px;
-            font-size: 10px;
-            padding: 4px;
-            margin-bottom: 10px;
-            height: auto;
-            min-height: 30px;
-        }
-
-        #descriptionDropdown option {
-            white-space: normal;
-            word-wrap: break-word;
-            padding: 4px;
-        }
-
-        /* ==================== BUTTONS ==================== */
-        .no-print {
-            text-align: center;
-            margin: 20px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        .button-container {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .button-container button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: bold;
-            flex: 1;
-            min-width: 120px;
-            max-width: 200px;
-            transition: all 0.3s;
-        }
-
-        .button-container button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .add-product-btn {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .add-product-btn button {
-            background: #667eea;
-            color: white;
-            padding: 10px 30px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .add-product-btn button:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        /* ==================== MODALS ==================== */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 0;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            animation: slideDown 0.3s;
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            padding: 20px;
-            background-color: #dc3545;
-            color: white;
-            border-radius: 8px 8px 0 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .modal-body {
-            padding: 30px 20px;
-            text-align: center;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .modal-footer {
-            padding: 15px 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .modal-footer button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .btn-cancel {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-cancel:hover {
-            background: #5a6268;
-        }
-
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background: #c82333;
-        }
-
-        .hide-zero-in-print {
-            /* Intentionally empty */
-        }
-
-        /* ==================== MOBILE RESPONSIVE ==================== */
-        @media (max-width: 768px) {
-            .button-container {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-            }
-
-            .button-container button {
-                flex: 1;
-                min-width: 100px;
-                max-width: none;
-                font-size: 12px;
-                padding: 10px 15px;
-                white-space: nowrap;
-            }
-        }
+/* ==================== BASE STYLES ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #000;
+    background-color: #f5f5f5;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==================== PAGE LAYOUT ==================== */
+.page {
+    width: 8.5in;
+    height: 13.6in;
+    margin: 20px auto;
+    background: white;
+    padding: 0.25in 0.4in;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    padding-bottom: 0.5in;
+    box-sizing: border-box;
+    overflow: visible;
+    min-height: 11in;
+}
+
+.page-break {
+    page-break-before: always;
+}
+
+/* ==================== HEADER STYLES ==================== */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 5px;
+    padding-bottom: 3px;
+}
+
+.company-info {
+    flex: 1;
+}
+
+.company-name {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1a5276;
+    margin-bottom: 3px;
+}
+
+.company-contact {
+    font-size: 9px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.quotation-title {
+    text-align: right;
+}
+
+.quotation-title h1 {
+    font-size: 26px;
+    color: #1a5276;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ==================== INFO SECTIONS ==================== */
+.info-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    gap: 15px;
+}
+
+.client-info,
+.quote-info {
+    flex: 1;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.info-title {
+    font-weight: bold;
+    color: #1a5276;
+    margin-bottom: 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 3px;
+}
+
+.info-label {
+    font-weight: 700;
+    width: 110px;
+    color: #000;
+}
+
+.info-value {
+    color: #333;
+}
+
+/* ==================== PACKAGE TITLE ==================== */
+.package-title {
+    background: #1a5276;
+    color: white;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 15px 0 0 0;
+    text-transform: uppercase;
+}
+
+/* ==================== TABLE STYLES ==================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 3px;
+    border: 1px solid #ccc;
+}
+
+table th {
+    background: #d6e6f0;
+    color: #000;
+    padding: 4px 3px;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 700;
+    border: 1px solid #ccc;
+}
+
+table th:nth-child(1) {
+    width: 80px;
+    text-align: center;
+}
+
+table th:nth-child(2) {
+    width: 35px;
+    text-align: center;
+}
+
+table th:nth-child(3) {
+    width: 60px;
+    text-align: center;
+}
+
+table th:nth-child(4) {
+    width: auto;
+    text-align: center;
+}
+
+table th:nth-child(5) {
+    width: 70px;
+    text-align: center;
+}
+
+table th:nth-child(6) {
+    width: 65px;
+    text-align: right;
+}
+
+table td {
+    padding: 4px;
+    border: 1px solid #ccc;
+    vertical-align: top;
+    font-size: 8.5px;
+    line-height: 1.2;
+}
+
+table td:nth-child(2),
+table td:nth-child(3) {
+    text-align: left;
+}
+
+table td:nth-child(5),
+table td:nth-child(6) {
+    text-align: right;
+}
+
+table tfoot td {
+    border: 1px solid #ccc;
+    padding: 5px;
+}
+
+.item-name {
+    font-weight: 600;
+    color: #1a5276;
+}
+
+.item-description {
+    font-size: 10px;
+    color: #555;
+    margin-top: 2px;
+}
+
+.feature-list {
+    margin: 5px 0 0 15px;
+    font-size: 9px;
+    color: #333;
+    list-style: none;
+    padding-left: 0;
+}
+
+.total-cell {
+    font-size: 13px !important;
+    font-weight: bold !important;
+    text-align: right !important;
+    white-space: nowrap;
+}
+
+.delivery-total-cell {
+    font-size: 11px !important;
+    font-weight: bold !important;
+    text-align: right !important;
+}
+
+.feature-list li {
+    margin-bottom: 2px;
+}
+
+.spec-list {
+    margin: 5px 0 0 15px;
+    font-size: 9px;
+    color: #666;
+}
+
+.spec-list li {
+    margin-bottom: 2px;
+}
+
+.modules-badge {
+    background: #17a2b8;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 8px;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 3px;
+}
+
+.free-badge {
+    background: #28a745;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: bold;
+}
+
+/* ==================== SECTIONS ==================== */
+.service-section {
+    background: #e8f4f8;
+    padding: 10px 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border-left: 3px solid #17a2b8;
+    font-size: 10px;
+}
+
+.service-title {
+    font-weight: bold;
+    color: #17a2b8;
+    margin-bottom: 3px;
+}
+
+.pricing-section {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.pricing-table {
+    width: 280px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.pricing-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 12px;
+    border-bottom: 1px solid #ddd;
+    font-size: 10px;
+}
+
+.pricing-row:last-child {
+    border-bottom: none;
+}
+
+.pricing-row.total {
+    background: #1a5276;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.payment-terms {
+    background: #fff3cd;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border-left: 3px solid #ffc107;
+}
+
+.payment-terms h3 {
+    color: #856404;
+    margin-bottom: 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.payment-terms ol {
+    margin-left: 18px;
+    font-size: 10px;
+}
+
+.payment-terms li {
+    margin-bottom: 4px;
+    color: #666;
+}
+
+.payment-amount {
+    font-weight: bold;
+    color: #1a5276;
+}
+
+[contenteditable="true"] {
+    border-bottom: 1px dashed #ccc;
+    outline: none;
+    cursor: text;
+    transition: all 0.2s ease;
+}
+
+[contenteditable="true"]:hover {
+    background-color: rgba(76, 175, 80, 0.05);
+}
+
+[contenteditable="true"]:focus {
+    border-bottom: 1px dashed #667eea;
+    background-color: rgba(76, 175, 80, 0.1);
+    outline: none;
+}
+
+.terms-section {
+    background: white;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.terms-section h3 {
+    color: #000;
+    margin-bottom: 12px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.payment-term-line {
+    margin-bottom: 3px;
+    line-height: 1.4;
+}
+
+.terms-list {
+    font-size: 10px;
+    color: #000;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.terms-list>li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.exclusions-list {
+    margin: 5px 0 0 20px;
+    font-size: 10px;
+}
+
+.exclusions-list li {
+    margin-bottom: 3px;
+}
+
+.support-section {
+    background: #d4edda;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border-left: 3px solid #28a745;
+}
+
+.support-section h3 {
+    color: #155724;
+    margin-bottom: 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.support-content {
+    font-size: 10px;
+    color: #555;
+}
+
+.support-content p {
+    margin-bottom: 5px;
+}
+
+.support-methods {
+    margin: 5px 0 5px 20px;
+}
+
+.support-methods li {
+    margin-bottom: 2px;
+}
+
+/* ==================== SIGNATURE ==================== */
+.contract-statement {
+    text-align: center;
+    font-size: 10px;
+    color: #555;
+    margin: 20px 0;
+    font-style: italic;
+}
+
+.signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    gap: 40px;
+}
+
+.signature-box {
+    flex: 1;
+    text-align: center;
+}
+
+.signature-line {
+    border-top: 1px solid #333;
+    margin-top: 40px;
+    padding-top: 5px;
+}
+
+.signature-label {
+    font-size: 10px;
+    color: #555;
+}
+
+.footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 9px;
+    color: #888;
+    padding-top: 10px;
+}
+
+/* ==================== PAGE FOOTER ==================== */
+.page-footer {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.2in 0.5in;
+    z-index: 10;
+    margin-top: auto;
+}
+
+.page-number {
+    position: static;
+    width: 30px;
+    height: 30px;
+    background-color: #1a5276;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-link {
+    font-size: 10px;
+    color: #1a5276;
+    text-align: center;
+}
+
+.footer-link a {
+    color: #1a5276;
+    text-decoration: none;
+}
+
+/* ==================== DROPDOWNS ==================== */
+#packageType {
+    width: 130px;
+    font-size: 10px;
+    padding: 4px;
+    height: auto;
+    min-height: 30px;
+}
+
+#packageType option {
+    white-space: normal;
+    word-wrap: break-word;
+    padding: 4px;
+}
+
+#descriptionDropdown {
+    width: 100%;
+    max-width: 350px;
+    font-size: 10px;
+    padding: 4px;
+    margin-bottom: 10px;
+    height: auto;
+    min-height: 30px;
+}
+
+#descriptionDropdown option {
+    white-space: normal;
+    word-wrap: break-word;
+    padding: 4px;
+}
+
+/* ==================== BUTTONS ==================== */
+.no-print {
+    text-align: center;
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.button-container button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    flex: 1;
+    min-width: 120px;
+    max-width: 200px;
+    transition: all 0.3s;
+}
+
+.button-container button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.add-product-btn {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.add-product-btn button {
+    background: #667eea;
+    color: white;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.add-product-btn button:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ==================== MODALS ==================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 0;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 20px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.modal-body {
+    padding: 30px 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #333;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-footer button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+}
+
+.hide-zero-in-print {
+    /* Intentionally empty */
+}
+
+/* ==================== MOBILE RESPONSIVE (NORMAL MODE) ==================== */
+@media (max-width: 768px) {
+    .button-container {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .button-container button {
+        flex: 1;
+        min-width: 100px;
+        max-width: none;
+        font-size: 12px;
+        padding: 10px 15px;
+        white-space: nowrap;
+    }
+}
 
 /* ==================== VIEW MODE (SCREEN ONLY) ==================== */
 
-        /* View mode body */
-        body.view-mode {
-            background: #f5f5f5;
-            margin: 0;
-            overflow: auto; /* REQUIRED for zoom out */
-        }
+/* View mode body */
+body.view-mode {
+    background: #f5f5f5;
+    margin: 0;
+    overflow: auto;
+}
 
-        /* ==================== VIEW MODE BANNER ==================== */
-        .view-mode-banner {
-            background: #e3f2fd;
-            border: 2px solid #2196F3;
-            padding: 12px;
-            margin: 10px;
-            text-align: center;
-            font-weight: bold;
-            color: #1565C0;
-            border-radius: 8px;
-            font-size: 16px;
-        }
+/* ==================== VIEW MODE BANNER ==================== */
+.view-mode-banner {
+    background: #e3f2fd;
+    border: 2px solid #2196F3;
+    padding: 12px;
+    margin: 10px;
+    text-align: center;
+    font-weight: bold;
+    color: #1565C0;
+    border-radius: 8px;
+    font-size: 16px;
+}
 
-        /* ==================== VIEW MODE BUTTONS ==================== */
-        .view-mode-buttons {
-            display: flex;
-            gap: 10px;
-            padding: 10px;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* ==================== VIEW MODE BUTTONS ==================== */
+.view-mode-buttons {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .view-mode-buttons button {
-            flex: 1;
-            padding: 15px 10px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            white-space: nowrap;
-        }
+.view-mode-buttons button {
+    flex: 1;
+    padding: 15px 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+}
 
-        .btn-back-view {
-            background: #f5f5f5;
-            color: #333;
-            border: 2px solid #ddd;
-            flex: 0.6;
-        }
+.btn-back-view {
+    background: #f5f5f5;
+    color: #333;
+    border: 2px solid #ddd;
+    flex: 0.6;
+}
 
-        .btn-delete-view {
-            background: #dc3545;
-            color: white;
-        }
+.btn-delete-view {
+    background: #dc3545;
+    color: white;
+}
 
-        .btn-pdf-view {
-            background: #28a745;
-            color: white;
-        }
+.btn-pdf-view {
+    background: #28a745;
+    color: white;
+}
 
+.btn-back-view:active,
+.btn-delete-view:active,
+.btn-pdf-view:active {
+    transform: scale(0.98);
+}
 
-        /* ==================== VIEW MODE PAGE ==================== */
-        body.view-mode .page {
-            display: block;            /* 🔥 force vertical stacking */
-            width: 8.5in;              /* real document width */
-            margin: 0 auto 24px auto;  /* stack pages vertically */
-        }
+/* ==================== VIEW MODE PAGE ==================== */
+body.view-mode .page {
+    display: block;
+    width: 8.5in;
+    margin: 0 auto 24px auto;
+}
 
-        /* ==================== MOBILE & TABLET ==================== */
-        @media (max-width: 1024px) {
+/* ==================== MOBILE & TABLET ==================== */
+@media (max-width: 1024px) {
+    body.view-mode #pdf-content {
+        padding: 12px;
+    }
 
-            body.view-mode #pdf-content {
-                padding: 12px;
-            }
+    body.view-mode .page {
+        margin-bottom: 20px;
+    }
 
-            body.view-mode .page {
-                margin-bottom: 20px;
-            }
+    .view-mode-banner {
+        font-size: clamp(12px, 3.5vw, 16px);
+    }
 
-            .view-mode-banner {
-                font-size: clamp(12px, 3.5vw, 16px);
-            }
+    .view-mode-buttons button {
+        font-size: clamp(11px, 3vw, 14px);
+        padding: 10px;
+    }
+}
 
-            .view-mode-buttons button {
-                font-size: clamp(11px, 3vw, 14px);
-                padding: 10px;
-            }
-        }
+/* ==================== SMALL PHONES ==================== */
+@media (max-width: 480px) {
+    body.view-mode #pdf-content {
+        padding: 8px;
+    }
 
-        /* ==================== SMALL PHONES ==================== */
-        @media (max-width: 480px) {
+    body.view-mode .page {
+        padding: 8px;
+    }
+}
 
-            body.view-mode #pdf-content {
-                padding: 8px;
-            }
+/* ==================== END VIEW MODE ==================== */
 
-            body.view-mode .page {
-                padding: 8px;
-            }
-        }
+/* ==================== PRINT STYLES ==================== */
+@media print {
+    /* ✅ PRESERVE NORMAL PAGE LAYOUT FOR PRINTING */
+    @page {
+        size: 8.5in 14in;
+        /* Legal size */
+        margin: 0.5in;
+    }
 
+    body {
+        margin: 0;
+        background: #fff;
+    }
 
+    /* ✅ KEEP NORMAL PAGE STYLES - DON'T COMPRESS */
+    .page {
+        width: 100%;
+        height: auto;
+        box-shadow: none;
+        margin: 0;
+        padding: 0.25in 0.4in;
+        padding-bottom: 0.5in;
+        page-break-after: always;
+        position: relative;
+    }
 
-        /* ==================== END VIEW MODE ==================== */
+    /* Hide UI elements */
+    .no-print,
+    .view-mode-banner,
+    .view-mode-buttons {
+        display: none !important;
+    }
+
+    /* ✅ KEEP NORMAL TABLE STYLES - DON'T COMPRESS */
+    table {
+        margin-bottom: 5px;
+    }
+
+    table th {
+        padding: 4px 3px;
+        font-size: 9px;
+    }
+
+    table td {
+        padding: 4px;
+        font-size: 8.5px;
+        line-height: 1.2;
+    }
+
+    table tfoot td {
+        padding: 5px;
+    }
+
+    /* ✅ KEEP NORMAL COLUMN WIDTHS */
+    table th:nth-child(1) {
+        width: 80px;
+    }
+
+    table th:nth-child(2) {
+        width: 35px;
+    }
+
+    table th:nth-child(3) {
+        width: 60px;
+    }
+
+    table th:nth-child(4) {
+        width: auto;
+    }
+
+    table th:nth-child(5) {
+        width: 70px;
+    }
+
+    table th:nth-child(6) {
+        width: 65px;
+    }
+
+    table th:nth-child(7) {
+        display: none;
+    }
+
+    /* ✅ KEEP NORMAL TOTAL SIZES */
+    .total-cell {
+        font-size: 13px !important;
+        font-weight: bold !important;
+        white-space: nowrap !important;
+    }
+
+    .delivery-total-cell {
+        font-size: 11px !important;
+        font-weight: bold !important;
+    }
+
+    /* Remove input styling but keep content visible */
+    input,
+    textarea,
+    select {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        outline: none !important;
+        -webkit-appearance: none !important;
+    }
+
+    /* Hide zero values */
+    .hide-zero-in-print {
+        display: none !important;
+    }
+
+    /* Remove contenteditable styling */
+    [contenteditable="true"] {
+        border: none !important;
+        background: none !important;
+    }
+
+    /* Preserve colors */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Page breaks */
+    .page.page-break {
+        page-break-before: always;
+    }
+
+    .page:last-child {
+        page-break-after: avoid;
+    }
+
+    /* Prevent page breaks inside sections */
+    table,
+    .terms-section,
+    .signature-section {
+        page-break-inside: avoid;
+    }
+
+    /* ✅ NORMAL FOOTER POSITIONING */
+    .page-footer {
+        position: absolute;
+        bottom: 0.2in;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 0.5in;
+    }
+
+    .page-number {
+        position: absolute;
+        left: 0.5in;
+        width: 30px;
+        height: 30px;
+        background-color: #1a5276;
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .footer-link {
+        font-size: 10px;
+    }
+}
+
+/* ==================== END PRINT STYLES ==================== */
     </style>
 </head>
 
