@@ -1324,7 +1324,6 @@
         }  
 
         /* ==================== VIEW MODE MOBILE RESPONSIVE ==================== */
-
         /* Detect view mode with a data attribute */
         body.view-mode {
             background: #f5f5f5;
@@ -1395,21 +1394,27 @@
 
         /* Mobile adjustments for view mode */
         @media (max-width: 768px) {
-            /* Scale down the entire page to fit mobile screen */
-            body.view-mode .page {
-                transform: scale(0.38);
-                transform-origin: top center;
-                margin: 10px auto;
-                width: 8.5in;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                border: 1px solid #ddd;
-            }
-
-            /* Adjust container spacing */
+            /* ✅ CENTER THE PDF CONTENT CONTAINER */
             body.view-mode #pdf-content {
                 width: 100%;
                 overflow-x: hidden;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
                 margin-top: 20px;
+            }
+
+            /* ✅ SCALE AND CENTER THE PAGE */
+            body.view-mode .page {
+                transform: scale(0.38);
+                transform-origin: top center;
+                margin: -150px auto 10px auto; /* Negative top margin to pull it up after scaling */
+                width: 8.5in;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                border: 1px solid #ddd;
+                position: relative;
+                left: 0 !important;
+                right: 0 !important;
             }
 
             /* Banner */
@@ -1441,6 +1446,7 @@
             /* Extra small phones */
             body.view-mode .page {
                 transform: scale(0.32);
+                margin: -180px auto 10px auto; /* More negative margin for smaller scale */
             }
 
             .view-mode-buttons button {
@@ -1453,8 +1459,7 @@
             }
         }
 
-        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */       
-    </style>
+        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */    </style>
 </head>
 
 <body>
