@@ -1309,7 +1309,7 @@
         @media print {
             @page {
                 size: auto;  /* ← Let browser/user choose paper size */
-                margin: 0.2in;
+                margin: 0.1in 0.2in;  /* ← Smaller top/bottom, keep left/right */
             }
 
             body {
@@ -1323,7 +1323,7 @@
                 height: auto;
                 box-shadow: none;
                 margin: 0;
-                padding: 0.15in 0.3in;  /* ← Reduced for smaller paper */
+                padding: 0.05in 0.3in;  /* ← Minimal top padding */
                 padding-bottom: 0.5in;  /* ← Reduced for smaller paper */
                 page-break-after: always;
                 position: relative;
@@ -1345,6 +1345,7 @@
 
             /* ✅ COMPACT SPACING for smaller paper */
             .header {
+                margin-top: 0 !important;  /* ← No top margin */
                 margin-bottom: 3px !important;
             }
 
@@ -1533,7 +1534,7 @@
                     <img src="LOGO1.png" alt="LAP I.T. Solutions Logo"
                         style="height: 130px; width: 130px; object-fit: contain;">
                 </div>
-                <div class="company-info" style="display: flex; align-items: flex-start; padding-top: 38px;">
+                <div class="company-info" style="display: flex; align-items: flex-start; padding-top: 20px;">
                     <div class="company-contact"
                         style="line-height: 1.4; font-family: 'Arial', sans-serif; font-size: 10px; font-weight: normal; color: #000;">
                         <div>Door B-3 Marcela Building 11-A, J.Palma Gil Street, Davao<br>City, Philippines, 8000</div>
