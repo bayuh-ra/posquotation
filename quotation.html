@@ -1301,8 +1301,7 @@
             }
         }
 
-/* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */
-        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */  
+        /* ==================== END VIEW MODE MOBILE RESPONSIVE ==================== */
 
         /* ==================== PRINT STYLES ==================== */
         @media print {
@@ -1323,7 +1322,7 @@
                 box-shadow: none;
                 margin: 0;
                 padding: 0.15in 0.3in;  /* ← Reduced for smaller paper */
-                padding-bottom: 0.6in;  /* ← Reduced for smaller paper */
+                padding-bottom: 0.5in;  /* ← Reduced for smaller paper */
                 page-break-after: always;
                 position: relative;
             }
@@ -1337,15 +1336,14 @@
             input, textarea, select {
                 border: none !important;
                 background: transparent !important;
-                box-shadow: none !important;
-                outline: none !important;
-                -webkit-appearance: none !important;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
             }
 
             /* ✅ COMPACT SPACING for smaller paper */
             .header {
                 margin-bottom: 3px !important;
-                padding-bottom: 2px !important;
             }
 
             .header img {
@@ -1359,7 +1357,7 @@
 
             /* ✅ COMPACT TABLE for smaller paper */
             table {
-                margin-bottom: 5px !important;
+                margin-bottom: 2px !important;
             }
 
             table th {
@@ -1369,12 +1367,12 @@
 
             table td {
                 padding: 3px !important;
-                font-size: 7.5px !important;  /* ← Smaller for Letter/A4 */
-                line-height: 1.1 !important;
+                font-size: 8px !important;  /* ← Smaller for Letter/A4 */
+                line-height: 1.2 !important;
             }
 
             table tfoot td {
-                padding: 4px !important;
+                padding: 4px 3px !important;
                 font-size: 8px !important;
             }
 
@@ -1391,7 +1389,7 @@
             .total-cell {
                 font-size: 10px !important;  /* ← Smaller for Letter/A4 */
                 font-weight: bold !important;
-                white-space: nowrap !important;
+                /* white-space: nowrap !important; */
             }
 
             .delivery-total-cell {
@@ -1401,39 +1399,42 @@
 
             /* ✅ COMPACT FOOTER */
             .page-footer {
-                position: absolute;
-                bottom: 0.15in !important;  /* ← Closer to bottom */
-                left: 0;
-                right: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 0 0.3in;
+                position: relative !important;  /* ← Key fix: changed from absolute */
+                bottom: auto !important;
+                page-break-inside: avoid !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                padding: 0.15in 0.3in !important;
+                margin-top: 0.2in !important;
             }
 
             .page-number {
-                position: absolute;
-                left: 0.3in;
-                width: 25px;
-                height: 25px;
-                background-color: #1a5276;
-                color: white;
-                font-weight: bold;
-                font-size: 11px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                position: static !important;  /* ← Key fix: changed from absolute */
+                display: inline-block !important;
+                margin-right: 10px !important;
+                width: 22px !important;
+                height: 22px !important;
+                background-color: #1a5276 !important;
+                color: white !important;
+                font-weight: bold !important;
+                font-size: 10px !important;
+                border-radius: 50% !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
 
             .footer-link {
-                font-size: 9px !important;
+                display: inline-block !important;
+                font-size: 8px !important;
+                color: #1a5276 !important;
             }
 
             /* ✅ COMPACT PAGE 2 (Terms) */
             .terms-section {
                 padding: 8px !important;
-                margin-bottom: 8px !important;
+                margin-bottom: 5px !important;
             }
 
             .terms-section h3 {
@@ -1482,18 +1483,22 @@
                 print-color-adjust: exact !important;
             }
 
-            /* Page breaks */
-            .page.page-break {
-                page-break-before: always;
+            /* ✅ FORCE EXACTLY 2 PAGES */
+            .page:nth-child(1) {
+                page-break-after: always !important;
+            }
+            
+            .page:nth-child(2) {
+                page-break-after: auto !important;
             }
 
             .page:last-child {
-                page-break-after: avoid;
+                page-break-after: auto !important;
             }
 
             /* Prevent page breaks inside sections */
             table, .terms-section, .signature-section {
-                page-break-inside: avoid;
+                page-break-inside: avoid !important;
             }
         }  
        
