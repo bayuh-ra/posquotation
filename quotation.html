@@ -446,6 +446,8 @@
             overflow: visible;
             /* ← Changed from hidden to visible */
             min-height: 11in;
+            display: flex;
+            flex-direction: column;
         }
 
         .page-break {
@@ -1399,61 +1401,64 @@
 
             /* ✅ COMPACT FOOTER */
             .page-footer {
-                position: relative !important;  /* ← Key fix: changed from absolute */
+                position: relative !important;
                 bottom: auto !important;
                 page-break-inside: avoid !important;
                 display: flex !important;
-                justify-content: center !important;
+                justify-content: space-between !important;  /* ← Changed from center */
                 align-items: center !important;
-                padding: 0.15in 0.3in !important;
-                margin-top: 0.2in !important;
+                padding: 0.15in 0.5in !important;  /* ← More side padding */
+                margin-top: 1in !important;
             }
 
             .page-number {
-                position: static !important;  /* ← Key fix: changed from absolute */
-                display: inline-block !important;
-                margin-right: 10px !important;
-                width: 22px !important;
-                height: 22px !important;
+                position: relative !important;  /* ← Changed from static */
+                left: 0 !important;
+                display: inline-flex !important;
+                margin-right: 0 !important;  /* ← Remove margin */
+                width: 30px !important;  /* ← Larger like first image */
+                height: 30px !important;
                 background-color: #1a5276 !important;
                 color: white !important;
                 font-weight: bold !important;
-                font-size: 10px !important;
+                font-size: 12px !important;  /* ← Larger font */
                 border-radius: 50% !important;
-                display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                flex-shrink: 0 !important;  /* ← Prevent shrinking */
             }
 
             .footer-link {
                 display: inline-block !important;
-                font-size: 8px !important;
+                font-size: 10px !important;  /* ← Larger font */
                 color: #1a5276 !important;
+                text-align: center !important;
+                flex: 1 !important;  /* ← Take remaining space */
             }
 
             /* ✅ COMPACT PAGE 2 (Terms) */
             .terms-section {
                 padding: 8px !important;
-                margin-bottom: 5px !important;
+                /* margin-bottom: 5px !important; */
             }
 
             .terms-section h3 {
                 font-size: 10px !important;
-                margin-bottom: 8px !important;
+                /* margin-bottom: 8px !important; */
             }
 
             .terms-list {
                 font-size: 9px !important;
-                line-height: 1.4 !important;
+                /* line-height: 1.4 !important; */
             }
 
             .terms-list > li {
-                margin-bottom: 6px !important;
+                /* margin-bottom: 6px !important; */
             }
 
             .payment-term-line {
                 font-size: 9px !important;
-                margin-bottom: 2px !important;
+                /* margin-bottom: 2px !important; */
             }
 
             .signature-section {
