@@ -1320,13 +1320,16 @@
             /* ✅ BASE PRINT STYLES - Works for ALL paper sizes */
             .page {
                 width: 100%;
-                height: auto;
+                height: auto !important;
+                min-height: auto !important;
+                max-height: none !important;
                 box-shadow: none;
                 margin: 0;
                 padding: 0.2in 0.25in;
                 padding-bottom: 0.3in;
                 page-break-after: auto;
                 position: relative;
+                overflow: visible;
             }
 
             /* Hide UI elements */
@@ -1345,17 +1348,24 @@
 
             /* ✅ COMPACT SPACING for smaller paper */
             .header {
-                margin-top: 0 !important;  /* ← No top margin */
-                margin-bottom: 3px !important;
+                margin-top: 0 !important;
+                margin-bottom: 5px !important;
+                padding-bottom: 2px !important;
             }
 
             .header img {
-                height: 80px !important;  /* ← Smaller logo */
-                width: 80px !important;
+                height: 70px !important;
+                width: 70px !important;
             }
 
             .info-section {
-                margin-bottom: 3px !important;
+                margin-bottom: 5px !important;
+            }
+
+            .package-title {
+                padding: 5px 10px !important;
+                font-size: 11px !important;
+                margin: 8px 0 5px 0 !important;
             }
 
             /* ✅ COMPACT TABLE for smaller paper */
@@ -1408,8 +1418,8 @@
                 display: flex !important;
                 justify-content: space-between !important;  /* ← Changed from center */
                 align-items: center !important;
-                padding: 0.15in 0.5in !important;  /* ← More side padding */
-                margin-top: 1in !important;
+                padding: 0.1in 0.3in !important;
+                margin-top: 0.2in !important;
             }
 
             .page-number {
@@ -1439,53 +1449,54 @@
 
             /* ✅ COMPACT PAGE 2 (Terms) */
             .terms-section {
-                padding: 5px !important;
-                margin-bottom: 0 !important;
+                padding: 3px !important;
+                margin-bottom: 5px !important;
             }
 
             .terms-section h3 {
                 font-size: 10px !important;
                 margin-top: 0 !important;
-                margin-bottom: 3px !important;
+                margin-bottom: 5px !important;
             }
 
             .terms-section p {
-                margin-top: 5px !important;
-                margin-bottom: 3px !important;
+                margin-top: 3px !important;
+                margin-bottom: 2px !important;
             }
 
             .terms-list {
                 font-size: 9px !important;
-                line-height: 1.2 !important;
+                line-height: 1.3 !important;
                 margin-top: 0 !important;
-                margin-bottom: 0 !important;
+                margin-bottom: 5px !important;
             }
 
             .terms-list > li {
-                margin-bottom: 0 !important;
-                padding-bottom: 1px !important;
+                margin-bottom: 2px !important;
+                padding-bottom: 0 !important;
             }
 
             .terms-section ul {
                 font-size: 9px !important;
-                line-height: 1.2 !important;
-                margin-top: 3px !important;
-                margin-bottom: 0 !important;
+                line-height: 1.3 !important;
+                margin-top: 2px !important;
+                margin-bottom: 3px !important;
             }
 
             .terms-section ul > li {
-                margin-bottom: 0 !important;
-                padding-bottom: 1px !important;
+                margin-bottom: 1px !important;
+                padding-bottom: 0 !important;
             }
 
             .payment-term-line {
                 font-size: 9px !important;
-                margin-bottom: 0 !important;
-                line-height: 1.2 !important;
+                margin-bottom: 2px !important;
+                line-height: 1.3 !important;
             }
 
             .signature-section {
-                margin-top: 8px !important;
+                margin-top: 10px !important;
+                margin-bottom: 5px !important;
             }
 
             /* Hide zero values */
@@ -1521,8 +1532,17 @@
             }
 
             /* Prevent page breaks inside sections */
-            table, .terms-section, .signature-section {
+            table,
+            .terms-section,
+            .signature-section,
+            .page-footer {
                 page-break-inside: avoid !important;
+            }
+
+            /* Prevent orphans and widows */
+            p, li {
+                orphans: 3;
+                widows: 3;
             }
         }  
        
