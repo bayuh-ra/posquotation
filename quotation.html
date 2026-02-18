@@ -1326,7 +1326,7 @@
                 box-shadow: none;
                 margin: 0;
                 padding: 0.2in 0.25in;
-                padding-bottom: 0.3in;
+                padding-bottom: 0.6in;
                 page-break-after: auto;
                 position: relative;
                 overflow: visible;
@@ -1412,14 +1412,16 @@
 
             /* ✅ COMPACT FOOTER */
             .page-footer {
-                position: relative !important;
-                bottom: auto !important;
+                position: absolute !important;
+                bottom: 0.15in !important;
+                left: 0 !important;
+                right: 0 !important;
                 page-break-inside: avoid !important;
                 display: flex !important;
-                justify-content: space-between !important;  /* ← Changed from center */
+                justify-content: space-between !important;
                 align-items: center !important;
                 padding: 0.1in 0.3in !important;
-                margin-top: 0.2in !important;
+                margin-top: 0 !important;
             }
 
             .page-number {
