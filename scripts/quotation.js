@@ -612,7 +612,7 @@ function calculateTotals() {
     // Update subtotal input
     const subtotalInput = document.getElementById('subtotal-input');
     if (subtotalInput) {
-        subtotalInput.value = subtotal.toFixed(2);
+        subtotalInput.value = '₱' + subtotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     // Get on-site delivery and discount values
@@ -628,7 +628,7 @@ function calculateTotals() {
     // Update total package price input
     const totalPackagePriceInput = document.getElementById('total-package-price-input');
     if (totalPackagePriceInput) {
-        totalPackagePriceInput.value = totalPackagePrice.toFixed(2);
+        totalPackagePriceInput.value = '₱' + totalPackagePrice.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     // Update total items count
@@ -725,12 +725,12 @@ async function saveQuotation() {
         const quotationNo = localStorage.getItem('currentQuotationNumber');
 
         if (!employeeName) {
-            alert('Error: No employee selected. Please go back to home and select an employee.');
+            showAlert('Error', 'No employee selected. Please go back to home and select an employee.', 'error');
             return;
         }
 
         if (!quotationNo) {
-            alert('Error: No quotation number generated. Please refresh the page.');
+            showAlert('Error', 'Error: No quotation number generated. Please refresh the page.', 'error');
             return;
         }
 
@@ -741,7 +741,7 @@ async function saveQuotation() {
         const contactNumber = document.querySelector('.client-info input[placeholder="Enter contact number"]').value;
 
         if (!clientName || !officeAddress || !contactPerson || !contactNumber) {
-            alert('Please fill in all client information fields.');
+            showAlert('Missing Info', 'Please fill in all client information fields.', 'warning');
             return;
         }
 
@@ -788,7 +788,7 @@ async function saveQuotation() {
         const quotation = await createQuotation(quotationPayload);
 
         if (!quotation || !quotation.id) {
-            alert('Error: Failed to save quotation. No response from server.');
+            showAlert('Error', 'Error: Failed to save quotation. No response from server.', 'error');
             return;
         }
 
@@ -901,7 +901,7 @@ async function saveQuotation() {
 
             if (itemsError) {
                 console.error('Error saving quotation items:', itemsError);
-                alert('Quotation saved, but failed to save items: ' + itemsError.message);
+                showAlert('Partial Save', 'Quotation saved, but failed to save items: ' + itemsError.message, 'warning');
                 return;
             }
 
@@ -909,14 +909,14 @@ async function saveQuotation() {
         }
 
         // Success!
-        alert(`Quotation saved successfully!\n\nQuotation No: ${quotation.quotation_no || quotationNo}\nPackage Type: ${packageType}\nItems Saved: ${items.length}`);
+        showAlert('Success', `Quotation saved successfully!\n\nQuotation No: ${quotation.quotation_no || quotationNo}\nPackage Type: ${packageType}\nItems Saved: ${items.length}`, 'success');
 
         // Clear the stored quotation number
         localStorage.removeItem('currentQuotationNumber');
 
     } catch (error) {
         console.error('Error saving quotation:', error);
-        alert('Error saving quotation: ' + (error.message || 'Unknown error'));
+        showAlert('Error', 'Error saving quotation: ' + (error.message || 'Unknown error'), 'error');
     }
 }
 
@@ -928,12 +928,12 @@ async function saveAndPrintPDF() {
         const quotationNo = localStorage.getItem('currentQuotationNumber');
 
         if (!employeeName) {
-            alert('Error: No employee selected. Please go back to home and select an employee.');
+            showAlert('Error', 'No employee selected. Please go back to home and select an employee.', 'error');
             return;
         }
 
         if (!quotationNo) {
-            alert('Error: No quotation number generated. Please refresh the page.');
+            showAlert('Error', 'Error: No quotation number generated. Please refresh the page.', 'error');
             return;
         }
 
@@ -944,7 +944,7 @@ async function saveAndPrintPDF() {
         const contactNumber = document.querySelector('.client-info input[placeholder="Enter contact number"]').value;
 
         if (!clientName || !officeAddress || !contactPerson || !contactNumber) {
-            alert('Please fill in all client information fields.');
+            showAlert('Missing Info', 'Please fill in all client information fields.', 'warning');
             return;
         }
 
@@ -991,7 +991,7 @@ async function saveAndPrintPDF() {
         const quotation = await createQuotation(quotationPayload);
 
         if (!quotation || !quotation.id) {
-            alert('Error: Failed to save quotation. No response from server.');
+            showAlert('Error', 'Error: Failed to save quotation. No response from server.', 'error');
             return;
         }
 
@@ -1104,7 +1104,7 @@ async function saveAndPrintPDF() {
 
             if (itemsError) {
                 console.error('Error saving quotation items:', itemsError);
-                alert('Quotation saved, but failed to save items: ' + itemsError.message);
+                showAlert('Partial Save', 'Quotation saved, but failed to save items: ' + itemsError.message, 'warning');
                 return;
             }
 
@@ -1116,13 +1116,14 @@ async function saveAndPrintPDF() {
 
         // Now trigger the print dialog
         console.log('Quotation saved successfully. Opening print dialog...');
+        window.__redirectToListAfterPrint = true;
         setTimeout(() => {
             window.print();
         }, 500);
 
     } catch (error) {
         console.error('Error in saveAndPrintPDF:', error);
-        alert('Error saving quotation: ' + (error.message || 'Unknown error'));
+        showAlert('Error', 'Error saving quotation: ' + (error.message || 'Unknown error'), 'error');
     }
 }
 

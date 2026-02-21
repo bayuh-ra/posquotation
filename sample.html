@@ -331,12 +331,13 @@
             .no-print { display: none !important; }
             .hide-zero-in-print { display: none !important; }
             .page {
-                width: 100% !important; height: 100vh !important;
-                min-height: 0 !important; max-height: 100vh !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important; max-height: none !important;
                 box-shadow: none !important; margin: 0 !important;
-                padding: 0.15in 0.2in 0.25in !important;
+                padding: 0 !important;
                 page-break-after: always !important; page-break-inside: avoid !important;
-                position: relative !important; overflow: hidden !important;
+                position: relative !important; overflow: visible !important;
                 box-sizing: border-box !important;
                 border-bottom: none !important; border-radius: 0 !important;
             }
@@ -1617,14 +1618,14 @@
             try {
                 const employeeName = localStorage.getItem('selectedEmployeeName');
                 const quotationNo = localStorage.getItem('currentQuotationNumber');
-                if (!employeeName) { showAlert('Error', 'No employee selected. Please go back to home and select an employee.', 'error'); return; }
-                if (!quotationNo) { showAlert('Error', 'Error: No quotation number generated. Please refresh the page.', 'error'); return; }
+                if (!employeeName) { showAlert('Missing Employee', 'No employee selected. Please go back to home and select an employee.', 'error'); return; }
+                if (!quotationNo) { showAlert('Missing Quotation Number', 'No quotation number generated. Please refresh the page.', 'error'); return; }
 
                 const clientName = document.querySelector('.client-info input[placeholder="Enter recipient name"]').value;
                 const officeAddress = document.querySelector('.client-info input[placeholder="Enter office address"]').value;
                 const contactPerson = document.querySelector('.client-info input[placeholder="Enter contact person"]').value;
                 const contactNumber = document.querySelector('.client-info input[placeholder="Enter contact number"]').value;
-                if (!clientName || !officeAddress || !contactPerson || !contactNumber) { showAlert('Missing Info', 'Please fill in all client information fields.', 'warning'); return; }
+                if (!clientName || !officeAddress || !contactPerson || !contactNumber) { showAlert('Incomplete Information', 'Please fill in all client information fields before saving.', 'warning'); return; }
 
                 const packageTypeSelect = document.getElementById('packageType');
                 const packageType = packageTypeSelect.options[packageTypeSelect.selectedIndex]?.text || '';
@@ -1656,7 +1657,7 @@
                         quotation = await createQuotation(payloadWithoutPage2);
                     } else throw e;
                 }
-                if (!quotation || !quotation.id) { showAlert('Error', 'Error: Failed to save quotation. No response from server.', 'error'); return; }
+                if (!quotation || !quotation.id) { showAlert('Save Failed', 'Failed to save quotation. No response from server.', 'error'); return; }
 
                 const items = [];
                 let rowOrder = 0;
@@ -1702,8 +1703,9 @@
 
                 localStorage.removeItem('currentQuotationNumber');
                 markZeroValuesForPrint();
-                window.__redirectToListAfterPrint = true;
-                showAlert('Success', `Quotation saved successfully!\n\nQuotation No: ${quotationNo}\nClient: ${clientName}`, 'success', () => setTimeout(() => window.print(), 300));
+                showAlert('Saved Successfully! 🎉', `Quotation No: ${quotationNo}\nClient: ${clientName}\n\nPrinting PDF now...`, 'success', function () {
+                    window.print();
+                });
             } catch (error) {
                 showAlert('Error', 'Error saving quotation: ' + (error.message || 'Unknown error'), 'error');
             }
@@ -1756,13 +1758,7 @@
                         try { r.cell.innerHTML = r.originalHTML; r.cell.style.display = r.originalDisplay || ''; r.cell.dataset.zeroReplaced = ''; } catch (e) { }
                     }
                 });
-            } catch (e) { } finally {
-                window.__zeroReplacements = [];
-                if (window.__redirectToListAfterPrint) {
-                    window.__redirectToListAfterPrint = false;
-                    setTimeout(() => { window.location.href = 'quotationlist.html'; }, 150);
-                }
-            }
+            } catch (e) { } finally { window.__zeroReplacements = []; }
         });
 
         function setPaperSize(paperSize) {
