@@ -1719,15 +1719,18 @@
 
                 localStorage.removeItem('currentQuotationNumber');
                 markZeroValuesForPrint();
-                window.__redirectToListAfterPrint = true;
+                const isMobileView = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+                window.__redirectToListAfterPrint = !isMobileView;
                 showAlert('Saved Successfully! 🎉', `Quotation No: ${quotationNo}\nClient: ${clientName}\n\nPrinting PDF now...`, 'success', function () {
                     window.print();
-                    setTimeout(function () {
-                        if (window.__redirectToListAfterPrint) {
-                            window.__redirectToListAfterPrint = false;
-                            window.location.href = 'quotationlist.html';
-                        }
-                    }, 4000);
+                    if (window.__redirectToListAfterPrint) {
+                        setTimeout(function () {
+                            if (window.__redirectToListAfterPrint) {
+                                window.__redirectToListAfterPrint = false;
+                                window.location.href = 'quotationlist.html';
+                            }
+                        }, 4000);
+                    }
                 });
             } catch (error) {
                 showAlert('Error', 'Error saving quotation: ' + (error.message || 'Unknown error'), 'error');
