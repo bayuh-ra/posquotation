@@ -349,9 +349,9 @@
             .page {
                 width: 8.27in !important;
                 height: auto !important;
-                min-height: 11.69in !important; max-height: none !important;
+                min-height: 11.2in !important; max-height: none !important;
                 box-shadow: none !important; margin: 0 !important;
-                padding: 0.35in 0.45in 0.7in !important;
+                padding: 0.3in 0.4in 0.6in !important;
                 page-break-after: always !important; page-break-inside: avoid !important;
                 position: relative !important; overflow: visible !important;
                 box-sizing: border-box !important;
@@ -360,8 +360,8 @@
             .page:last-of-type { page-break-after: avoid !important; }
             .page-inner { transform-origin: top left; width: 100%; zoom: 1 !important; }
 
-            /* Enlarge page 2 for print */
-            .page.page-break .page-inner { min-height: 11.2in !important; }
+            /* Enlarge page 2 for print but keep within one sheet */
+            .page.page-break .page-inner { min-height: 10.6in !important; }
             #page2-content, #page2-content p, #page2-content li, #page2-content ul { font-size: 12px !important; line-height: 1.5 !important; }
             #page2-content h3 { font-size: 14px !important; }
             #page2-content .terms-section { padding: 18px 20px !important; }
