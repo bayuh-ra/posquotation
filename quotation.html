@@ -108,22 +108,35 @@
         /* On desktop, show full label. On mobile, show icon only when scrolled */
         @media screen and (max-width: 768px) {
             #fab-add-product {
-                bottom: 18px;
-                right: 12px;
+                bottom: 72px;
+                right: 16px;
+                top: auto;
                 width: 52px;
                 height: 52px;
             }
             #fab-add-product .fab-icon {
                 width: 28px; height: 28px; font-size: 20px;
             }
+
+            /* Mobile-friendly add product modal */
+            #addProductModalBox {
+                width: 100% !important;
+                max-width: 100% !important;
+                height: 92vh !important;
+                max-height: 92vh !important;
+                margin: 0 !important;
+                border-radius: 18px 18px 0 0 !important;
+            }
+            #addProductModal { align-items: flex-end !important; }
         }
 
         /* --- Modals (display toggled by JS, animations) --- */
         .modal {
-            display: none; position: fixed; z-index: 3000; left: 0; top: 0;
+            display: none; position: fixed; z-index: 5000; left: 0; top: 0;
             width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.3s;
             align-items: center; justify-content: center;
         }
+        .modal.open { display: flex !important; opacity: 1 !important; visibility: visible !important; }
         @keyframes modalSlideUp {
             from { opacity:0; transform:translateY(30px) scale(0.97); }
             to   { opacity:1; transform:translateY(0)    scale(1); }
@@ -1091,6 +1104,7 @@
             if (badge) badge.style.display = 'none';
             const modal = document.getElementById('addProductModal');
             modal.classList.add('open');
+            modal.style.display = 'flex';
             const fab = document.getElementById('fab-add-product');
             if (fab) fab.style.display = 'none';
 
@@ -1260,6 +1274,7 @@
         function closeAddProductModal() {
             const modal = document.getElementById('addProductModal');
             modal.classList.remove('open');
+            modal.style.display = 'none';
             const fab = document.getElementById('fab-add-product');
             if (fab) fab.style.display = 'inline-flex';
             _addModalSelected = new Set();
