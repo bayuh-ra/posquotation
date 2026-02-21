@@ -71,14 +71,16 @@
             bottom: 28px;
             right: 24px;
             z-index: 999;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
             background: linear-gradient(135deg, #1a5276, #2471a3);
             color: white;
             border: none;
-            border-radius: 50px;
-            padding: 14px 22px 14px 16px;
+            border-radius: 999px;
+            width: 56px;
+            height: 56px;
+            padding: 0;
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
@@ -108,19 +110,19 @@
             #fab-add-product {
                 bottom: 20px;
                 right: 16px;
-                padding: 16px 20px 16px 14px;
-                font-size: 14px;
-                border-radius: 50px;
+                width: 52px;
+                height: 52px;
             }
             #fab-add-product .fab-icon {
-                width: 30px; height: 30px; font-size: 20px;
+                width: 28px; height: 28px; font-size: 20px;
             }
         }
 
         /* --- Modals (display toggled by JS, animations) --- */
         .modal {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            display: none; position: fixed; z-index: 3000; left: 0; top: 0;
             width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.3s;
+            align-items: center; justify-content: center;
         }
         @keyframes modalSlideUp {
             from { opacity:0; transform:translateY(30px) scale(0.97); }
@@ -325,16 +327,16 @@
 
         /* --- Print styles (must be in <style>) --- */
         @media print {
-            @page { size: A4; margin: 0.4in 0.35in; }
-            body { margin: 0; background: #fff; overflow-x: visible !important; }
+            @page { size: A4; margin: 0.25in 0.25in; }
+            body { margin: 0; background: #fff; overflow-x: visible !important; font-size: 12px !important; }
             #pdf-content { max-width: none !important; overflow-x: visible !important; }
             .no-print { display: none !important; }
             .hide-zero-in-print { display: none !important; }
             .page {
-                width: 100% !important; height: 100vh !important;
-                min-height: 0 !important; max-height: 100vh !important;
+                width: 8.27in !important; min-height: 11.69in !important; height: auto !important;
+                max-height: none !important; transform: none !important; zoom: 1 !important;
                 box-shadow: none !important; margin: 0 !important;
-                padding: 0.15in 0.2in 0.25in !important;
+                padding: 0.25in 0.3in 0.35in !important;
                 page-break-after: always !important; page-break-inside: avoid !important;
                 position: relative !important; overflow: hidden !important;
                 box-sizing: border-box !important;
@@ -342,6 +344,11 @@
             }
             .page:last-of-type { page-break-after: avoid !important; }
             .page-inner { transform-origin: top left; width: 100%; zoom: 1 !important; }
+
+            /* Enlarge table text for print readability */
+            table th { font-size: 11px !important; padding: 6px 4px !important; }
+            table td { font-size: 10.5px !important; padding: 5px 4px !important; }
+            table tfoot td { font-size: 11px !important; }
 
             /* --- Reset mobile header layout back to row --- */
             .header {
@@ -798,11 +805,10 @@
     <!-- Floating Action Button — Add Product -->
     <button id="fab-add-product" class="no-print" onclick="openAddProductModal()" title="Add Product">
         <div class="fab-icon">+</div>
-        <span>Add Product</span>
     </button>
 
     <!-- Add Product Modal -->
-    <div id="addProductModal" class="modal no-print" style="display:none; align-items:center; justify-content:center;">
+    <div id="addProductModal" class="modal no-print">
         <div id="addProductModalBox" style="
             background:#fff; border-radius:16px; width:95%; max-width:680px;
             max-height:90vh; display:flex; flex-direction:column;
@@ -1084,7 +1090,9 @@
             const badge = document.getElementById('selected-count-badge');
             if (badge) badge.style.display = 'none';
             const modal = document.getElementById('addProductModal');
-            modal.style.display = 'flex';
+            modal.classList.add('open');
+            const fab = document.getElementById('fab-add-product');
+            if (fab) fab.style.display = 'none';
 
             const list = document.getElementById('add-product-list');
             list.innerHTML = `
@@ -1251,7 +1259,9 @@
 
         function closeAddProductModal() {
             const modal = document.getElementById('addProductModal');
-            modal.style.display = 'none';
+            modal.classList.remove('open');
+            const fab = document.getElementById('fab-add-product');
+            if (fab) fab.style.display = 'inline-flex';
             _addModalSelected = new Set();
         }
 
