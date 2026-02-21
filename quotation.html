@@ -68,20 +68,21 @@
         /* --- Floating Action Button (FAB) for Add Product --- */
         #fab-add-product {
             position: fixed;
-            bottom: 24px;
-            right: 18px;
-            z-index: 4000;
-            display: inline-flex !important;
+            bottom: 20px;
+            right: 16px;
+            top: auto;
+            z-index: 3200;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, #1a5276, #2471a3);
             color: white;
             border: none;
-            border-radius: 999px;
+            border-radius: 50%;
             width: 56px;
             height: 56px;
             padding: 0;
-            font-size: 15px;
+            font-size: 22px;
             font-weight: 700;
             cursor: pointer;
             box-shadow: 0 6px 20px rgba(26,82,118,0.45), 0 2px 8px rgba(0,0,0,0.2);
@@ -91,52 +92,39 @@
             opacity: 1;
         }
         #fab-add-product:hover {
-            transform: translateY(-3px) scale(1.04);
+            transform: translateY(-2px) scale(1.03);
             box-shadow: 0 10px 28px rgba(26,82,118,0.55), 0 4px 12px rgba(0,0,0,0.2);
         }
         #fab-add-product:active {
-            transform: scale(0.96);
+            transform: scale(0.95);
         }
         #fab-add-product .fab-icon {
-            width: 32px; height: 32px;
+            width: 30px; height: 30px;
             background: rgba(255,255,255,0.2);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 22px; font-weight: 300; line-height: 1;
+            font-size: 20px; font-weight: 600; line-height: 1;
             flex-shrink: 0;
         }
-        /* On desktop, show full label. On mobile, show icon only when scrolled */
         @media screen and (max-width: 768px) {
             #fab-add-product {
-                bottom: 72px;
-                right: 16px;
+                bottom: 18px;
+                right: 14px;
                 top: auto;
                 width: 52px;
                 height: 52px;
+                font-size: 20px;
             }
             #fab-add-product .fab-icon {
-                width: 28px; height: 28px; font-size: 20px;
+                width: 26px; height: 26px; font-size: 18px;
             }
-
-            /* Mobile-friendly add product modal */
-            #addProductModalBox {
-                width: 100% !important;
-                max-width: 100% !important;
-                height: 92vh !important;
-                max-height: 92vh !important;
-                margin: 0 !important;
-                border-radius: 18px 18px 0 0 !important;
-            }
-            #addProductModal { align-items: flex-end !important; }
         }
 
         /* --- Modals (display toggled by JS, animations) --- */
         .modal {
-            display: none; position: fixed; z-index: 5000; left: 0; top: 0;
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
             width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.3s;
-            align-items: center; justify-content: center;
         }
-        .modal.open { display: flex !important; opacity: 1 !important; visibility: visible !important; }
         @keyframes modalSlideUp {
             from { opacity:0; transform:translateY(30px) scale(0.97); }
             to   { opacity:1; transform:translateY(0)    scale(1); }
@@ -340,28 +328,25 @@
 
         /* --- Print styles (must be in <style>) --- */
         @media print {
-            @page { size: A4; margin: 0.25in 0.25in; }
-            body { margin: 0; background: #fff; overflow-x: visible !important; font-size: 12px !important; }
+            @page { size: A4; margin: 0.4in 0.35in; }
+            body { margin: 0; background: #fff; overflow-x: visible !important; }
             #pdf-content { max-width: none !important; overflow-x: visible !important; }
             .no-print { display: none !important; }
+            #addProductModal, #deleteModal, #customAlertModal { display: none !important; }
             .hide-zero-in-print { display: none !important; }
             .page {
-                width: 8.27in !important; min-height: 11.69in !important; height: auto !important;
-                max-height: none !important; transform: none !important; zoom: 1 !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important; max-height: none !important;
                 box-shadow: none !important; margin: 0 !important;
-                padding: 0.25in 0.3in 0.35in !important;
+                padding: 0 !important;
                 page-break-after: always !important; page-break-inside: avoid !important;
-                position: relative !important; overflow: hidden !important;
+                position: relative !important; overflow: visible !important;
                 box-sizing: border-box !important;
                 border-bottom: none !important; border-radius: 0 !important;
             }
             .page:last-of-type { page-break-after: avoid !important; }
             .page-inner { transform-origin: top left; width: 100%; zoom: 1 !important; }
-
-            /* Enlarge table text for print readability */
-            table th { font-size: 11px !important; padding: 6px 4px !important; }
-            table td { font-size: 10.5px !important; padding: 5px 4px !important; }
-            table tfoot td { font-size: 11px !important; }
 
             /* --- Reset mobile header layout back to row --- */
             .header {
@@ -821,7 +806,7 @@
     </button>
 
     <!-- Add Product Modal -->
-    <div id="addProductModal" class="modal no-print">
+    <div id="addProductModal" class="modal" style="display:none; align-items:center; justify-content:center;">
         <div id="addProductModalBox" style="
             background:#fff; border-radius:16px; width:95%; max-width:680px;
             max-height:90vh; display:flex; flex-direction:column;
@@ -897,7 +882,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal no-print">
+    <div id="deleteModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <span style="font-size:24px;">⚠️</span>
@@ -1098,27 +1083,35 @@
         }
 
         async function openAddProductModal() {
-            _addModalSelected = new Set();
-            document.getElementById('selected-count-label').textContent = 'No products selected';
-            const badge = document.getElementById('selected-count-badge');
-            if (badge) badge.style.display = 'none';
-            const modal = document.getElementById('addProductModal');
-            modal.classList.add('open');
-            modal.style.display = 'flex';
-            const fab = document.getElementById('fab-add-product');
-            if (fab) fab.style.display = 'none';
+            try {
+                _addModalSelected = new Set();
+                const label = document.getElementById('selected-count-label');
+                if (label) label.textContent = 'No products selected';
+                const badge = document.getElementById('selected-count-badge');
+                if (badge) badge.style.display = 'none';
 
-            const list = document.getElementById('add-product-list');
-            list.innerHTML = `
-                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; gap:12px; color:#aaa;">
-                    <div style="font-size:32px;">⏳</div>
-                    <div style="font-size:13px;">Loading products...</div>
-                </div>`;
+                const fab = document.getElementById('fab-add-product');
+                if (fab) fab.style.display = 'none';
 
-            if (!_addModalProducts || _addModalProducts.length === 0) {
-                _addModalProducts = await getProducts() || [];
+                const modal = document.getElementById('addProductModal');
+                if (!modal) { console.error('Modal not found'); return; }
+                modal.style.display = 'flex';
+                modal.classList.add('open');
+
+                const list = document.getElementById('add-product-list');
+                if (list) list.innerHTML = `
+                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:12px;color:#aaa;">
+                        <div style="font-size:32px;">⏳</div>
+                        <div style="font-size:13px;">Loading products...</div>
+                    </div>`;
+
+                if (!_addModalProducts || _addModalProducts.length === 0) {
+                    _addModalProducts = await getProducts() || [];
+                }
+                renderAddProductList(_addModalProducts, '');
+            } catch (e) {
+                console.error('openAddProductModal error:', e);
             }
-            renderAddProductList(_addModalProducts, '');
         }
 
         function renderAddProductList(products, searchTerm) {
@@ -1273,8 +1266,8 @@
 
         function closeAddProductModal() {
             const modal = document.getElementById('addProductModal');
-            modal.classList.remove('open');
             modal.style.display = 'none';
+            modal.classList.remove('open');
             const fab = document.getElementById('fab-add-product');
             if (fab) fab.style.display = 'inline-flex';
             _addModalSelected = new Set();
@@ -1642,14 +1635,14 @@
             try {
                 const employeeName = localStorage.getItem('selectedEmployeeName');
                 const quotationNo = localStorage.getItem('currentQuotationNumber');
-                if (!employeeName) { showAlert('Error', 'No employee selected. Please go back to home and select an employee.', 'error'); return; }
-                if (!quotationNo) { showAlert('Error', 'Error: No quotation number generated. Please refresh the page.', 'error'); return; }
+                if (!employeeName) { showAlert('Missing Employee', 'No employee selected. Please go back to home and select an employee.', 'error'); return; }
+                if (!quotationNo) { showAlert('Missing Quotation Number', 'No quotation number generated. Please refresh the page.', 'error'); return; }
 
                 const clientName = document.querySelector('.client-info input[placeholder="Enter recipient name"]').value;
                 const officeAddress = document.querySelector('.client-info input[placeholder="Enter office address"]').value;
                 const contactPerson = document.querySelector('.client-info input[placeholder="Enter contact person"]').value;
                 const contactNumber = document.querySelector('.client-info input[placeholder="Enter contact number"]').value;
-                if (!clientName || !officeAddress || !contactPerson || !contactNumber) { showAlert('Missing Info', 'Please fill in all client information fields.', 'warning'); return; }
+                if (!clientName || !officeAddress || !contactPerson || !contactNumber) { showAlert('Incomplete Information', 'Please fill in all client information fields before saving.', 'warning'); return; }
 
                 const packageTypeSelect = document.getElementById('packageType');
                 const packageType = packageTypeSelect.options[packageTypeSelect.selectedIndex]?.text || '';
@@ -1681,7 +1674,7 @@
                         quotation = await createQuotation(payloadWithoutPage2);
                     } else throw e;
                 }
-                if (!quotation || !quotation.id) { showAlert('Error', 'Error: Failed to save quotation. No response from server.', 'error'); return; }
+                if (!quotation || !quotation.id) { showAlert('Save Failed', 'Failed to save quotation. No response from server.', 'error'); return; }
 
                 const items = [];
                 let rowOrder = 0;
@@ -1727,8 +1720,9 @@
 
                 localStorage.removeItem('currentQuotationNumber');
                 markZeroValuesForPrint();
-                window.__redirectToListAfterPrint = true;
-                showAlert('Success', `Quotation saved successfully!\n\nQuotation No: ${quotationNo}\nClient: ${clientName}`, 'success', () => setTimeout(() => window.print(), 300));
+                showAlert('Saved Successfully! 🎉', `Quotation No: ${quotationNo}\nClient: ${clientName}\n\nPrinting PDF now...`, 'success', function () {
+                    window.print();
+                });
             } catch (error) {
                 showAlert('Error', 'Error saving quotation: ' + (error.message || 'Unknown error'), 'error');
             }
@@ -1781,13 +1775,7 @@
                         try { r.cell.innerHTML = r.originalHTML; r.cell.style.display = r.originalDisplay || ''; r.cell.dataset.zeroReplaced = ''; } catch (e) { }
                     }
                 });
-            } catch (e) { } finally {
-                window.__zeroReplacements = [];
-                if (window.__redirectToListAfterPrint) {
-                    window.__redirectToListAfterPrint = false;
-                    setTimeout(() => { window.location.href = 'quotationlist.html'; }, 150);
-                }
-            }
+            } catch (e) { } finally { window.__zeroReplacements = []; }
         });
 
         function setPaperSize(paperSize) {
@@ -1812,8 +1800,6 @@
                         }
                     });
                 } catch (err) { }
-                const fab = document.getElementById('fab-add-product');
-                if (fab && !window.isViewMode) { fab.style.display = 'inline-flex'; }
             }, 250);
         });
 
