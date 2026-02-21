@@ -147,7 +147,7 @@
         @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .modal-header { padding: 20px; background-color: #dc3545; color: white; border-radius: 8px 8px 0 0; display: flex; align-items: center; gap: 10px; }
         .modal-header h2 { margin: 0; font-size: 18px; font-weight: bold; }
-        .modal-body { padding: 30px 20px; text-align: center; font-size: 14px; color: #333; }
+        .modal-body { padding: 30px 20px; text-align: center; font-size: 14px; color: #000000; }
         .modal-footer { padding: 15px 20px; display: flex; gap: 10px; justify-content: flex-end; }
         .modal-footer button { padding: 10px 20px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
         .btn-cancel { background: #6c757d; color: white; }
@@ -181,7 +181,7 @@
         }
         .view-mode-buttons { display: flex; gap: 15px; padding: 15px 20px; justify-content: space-between; align-items: stretch; width: 100%; box-sizing: border-box; }
         .view-mode-buttons button { flex: 1; padding: 18px 20px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.3s; white-space: nowrap; min-height: 50px; }
-        .btn-back-view { background: #f5f5f5; color: #333; border: 2px solid #ddd; flex: 0.6; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 20px; }
+        .btn-back-view { background: #f5f5f5; color: #000000; border: 2px solid #ddd; flex: 0.6; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 20px; }
         .btn-delete-view { background: #dc3545; color: white; flex: 1.2; }
         .btn-pdf-view { background: #28a745; color: white; flex: 1.2; }
         .btn-back-view:active, .btn-delete-view:active, .btn-pdf-view:active { transform: scale(0.98); }
@@ -1643,10 +1643,10 @@
             }
 
             document.querySelectorAll('input, select, textarea').forEach(input => {
-                input.disabled = true; input.style.cursor = 'not-allowed'; input.style.opacity = '0.7';
+                input.disabled = true; input.style.cursor = 'not-allowed'; input.style.opacity = '1';
             });
             document.querySelectorAll('[contenteditable="true"]').forEach(element => {
-                element.contentEditable = 'false'; element.style.cursor = 'not-allowed'; element.style.opacity = '0.7';
+                element.contentEditable = 'false'; element.style.cursor = 'not-allowed'; element.style.opacity = '1';
             });
             document.querySelectorAll('button[onclick*="deleteRow"]').forEach(btn => btn.style.display = 'none');
             const fab = document.getElementById('fab-add-product');
