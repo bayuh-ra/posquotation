@@ -274,8 +274,8 @@
             #packageType { min-width: unset !important; width: 100% !important; font-size: 13px !important; padding: 10px !important; }
 
             /* qty/price inputs inside table cells */
-            .qty-input { width: 44px !important; font-size: 11px !important; }
-            .unit-display { width: 48px !important; font-size: 10px !important; }
+            .qty-input { width: 44px !important; font-size: 11px !important; color: #000 !important; font-weight: 700 !important; }
+            .unit-display { width: 48px !important; font-size: 10px !important; color: #000 !important; font-weight: 700 !important; }
             .price-input { width: 70px !important; font-size: 11px !important; }
 
             /* tfoot summary rows */
@@ -360,6 +360,11 @@
             .page:last-of-type { page-break-after: avoid !important; }
             .page-inner { transform-origin: top left; width: 100%; zoom: 1 !important; }
 
+            /* Global black text and base sizing */
+            * { color: #000 !important; }
+            a { color: #000 !important; text-decoration: none !important; }
+            body { font-size: 11px !important; }
+
             /* Enlarge page 2 for print but keep within one sheet */
             .page.page-break .page-inner { min-height: 10.6in !important; }
             #page2-content, #page2-content p, #page2-content li, #page2-content ul { font-size: 12px !important; line-height: 1.5 !important; }
@@ -372,10 +377,10 @@
                 display: flex !important; flex-direction: row !important;
                 align-items: flex-start !important; text-align: left !important;
                 gap: 0 !important; margin-top: 0 !important;
-                margin-bottom: 3px !important; padding-bottom: 2px !important;
+                margin-bottom: 8px !important; padding-bottom: 3px !important;
             }
-            .header > div:first-child { width: 130px !important; margin-right: 15px !important; flex-shrink: 0 !important; }
-            .header img { height: 55px !important; width: 55px !important; }
+            .header > div:first-child { width: 170px !important; margin-right: 18px !important; flex-shrink: 0 !important; }
+            .header img { height: 95px !important; width: 95px !important; }
             .header > div:nth-child(2) { padding-top: 20px !important; text-align: left !important; }
             .header > div:nth-child(2) div { font-size: 10px !important; }
 
@@ -400,8 +405,8 @@
             }
             .client-info span { width: 110px !important; font-size: 8.5px !important; flex-shrink: 0 !important; }
             .client-info input.info-value {
-                width: 180px !important; font-size: 8px !important;
-                padding: 0 !important; border: none !important;
+                width: 220px !important; font-size: 11px !important; color: #000 !important;
+                padding: 1px 0 !important; border: none !important;
                 border-radius: 0 !important; background: transparent !important;
             }
 
@@ -443,14 +448,14 @@
             /* --- Reset inputs --- */
             input, textarea, select { border: none !important; background: transparent !important; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
             #packageType { width: auto !important; min-width: 250px !important; font-size: 11px !important; padding: 8px !important; }
-            .qty-input   { width: 50px !important; font-size: 10px !important; }
-            .unit-display { width: 100% !important; font-size: 10px !important; }
+            .qty-input   { width: 50px !important; font-size: 10px !important; color: #000 !important; font-weight: 700 !important; }
+            .unit-display { width: 100% !important; font-size: 10px !important; color: #000 !important; font-weight: 700 !important; }
             .price-input { width: 80px !important; font-size: 10px !important; }
             #subtotal-input, #onsite-delivery-input, #discount-input, #total-package-price-input { width: 120px !important; }
 
             .package-title { padding: 3px 8px !important; font-size: 10px !important; margin: 4px 0 3px 0 !important; }
-            .total-cell { font-size: 8px !important; font-weight: bold !important; }
-            .delivery-total-cell { font-size: 8px !important; font-weight: bold !important; }
+            .total-cell { font-size: 11px !important; font-weight: bold !important; }
+            .delivery-total-cell { font-size: 11px !important; font-weight: bold !important; }
             .page-footer { position: absolute !important; bottom: 0.35in !important; left: 0 !important; right: 0 !important; page-break-inside: avoid !important; display: flex !important; justify-content: center !important; align-items: center !important; padding: 0 0.3in !important; margin-top: 0 !important; }
             .page-number { position: absolute !important; left: 0.3in !important; display: inline-flex !important; width: 24px !important; height: 24px !important; background-color: #1a5276 !important; color: white !important; font-weight: bold !important; font-size: 10px !important; border-radius: 50% !important; align-items: center !important; justify-content: center !important; }
             .footer-link { display: inline-block !important; font-size: 9px !important; color: #1a5276 !important; text-align: center !important; }
@@ -489,9 +494,9 @@
             <div class="page-inner">
 
             <!-- Header -->
-            <div class="header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px; padding-bottom:3px;">
-                <div style="display:flex; flex-direction:column; align-items:center; margin-right:15px; width:130px; flex-shrink:0;">
-                    <img src="LOGO1.png" alt="LAP I.T. Solutions Logo" style="height:130px; width:130px; object-fit:contain;">
+            <div class="header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; padding-bottom:4px;">
+                <div style="display:flex; flex-direction:column; align-items:center; margin-right:18px; width:170px; flex-shrink:0;">
+                    <img src="LOGO1.png" alt="LAP I.T. Solutions Logo" style="height:170px; width:170px; object-fit:contain;">
                 </div>
                 <div style="flex:1; display:flex; align-items:flex-start; padding-top:20px;">
                     <div style="line-height:1.4; font-family:'Arial',sans-serif; font-size:10px; font-weight:normal; color:#000;">
@@ -506,23 +511,23 @@
             </div>
 
             <!-- Client & Quotation Info -->
-            <div class="info-section" style="display:flex; justify-content:space-between; margin-bottom:5px; gap:15px;">
+            <div class="info-section" style="display:flex; justify-content:space-between; margin-bottom:8px; gap:15px;">
                 <div class="client-info" style="flex:1; padding:10px; border-radius:4px;">
-                    <div style="display:flex; margin-bottom:3px;">
+                    <div style="display:flex; margin-bottom:5px;">
                         <span style="font-weight:700; width:110px; color:#000;">To:</span>
-                        <input type="text" class="info-value" style="width:180px; color:#333;" placeholder="Enter recipient name">
+                        <input type="text" class="info-value" style="width:220px; color:#000; font-size:13px; font-weight:bold;" placeholder="Enter recipient name">
                     </div>
-                    <div style="display:flex; margin-bottom:3px;">
+                    <div style="display:flex; margin-bottom:5px;">
                         <span style="font-weight:700; width:110px; color:#000;">Office Address:</span>
-                        <input type="text" class="info-value" style="width:180px; color:#333;" placeholder="Enter office address">
+                        <input type="text" class="info-value" style="width:220px; color:#000; font-size:13px;" placeholder="Enter office address">
                     </div>
-                    <div style="display:flex; margin-bottom:3px;">
+                    <div style="display:flex; margin-bottom:5px;">
                         <span style="font-weight:700; width:110px; color:#000;">Contact Person:</span>
-                        <input type="text" class="info-value" style="width:180px; color:#333;" placeholder="Enter contact person">
+                        <input type="text" class="info-value" style="width:220px; color:#000; font-size:13px;" placeholder="Enter contact person">
                     </div>
-                    <div style="display:flex; margin-bottom:3px;">
+                    <div style="display:flex; margin-bottom:5px;">
                         <span style="font-weight:700; width:110px; color:#000;">Contact No:</span>
-                        <input type="text" class="info-value" style="width:180px; color:#333;" placeholder="Enter contact number">
+                        <input type="text" class="info-value" style="width:220px; color:#000; font-size:13px;" placeholder="Enter contact number">
                     </div>
                 </div>
                 <div class="quote-info" style="flex:1; padding:10px; border-radius:4px; text-align:right;">
@@ -539,11 +544,11 @@
                     <tr style="background:#e8f4f8; border:2px solid #1a5276;">
                         <td colspan="7" style="padding:15px; vertical-align:middle;">
                             <div style="display:flex; align-items:center; gap:15px;">
-                                <label style="font-weight:bold; color:#1a5276; white-space:nowrap;">Select Package Type:</label>
+                                <label style="font-weight:bold; color:#000; white-space:nowrap;">Select Package Type:</label>
                                 <select id="packageType" onchange="handlePackageTypeChange(this)"
-                                    style="font-weight:bold; font-size:11px; padding:8px; border:2px solid #1a5276; border-radius:4px; cursor:pointer; flex:1; min-width:250px;">
-                                    <option value="" selected disabled>Select package type</option>
-                                    <option value="CUSTOMIZE" style="color:#dc3545; font-weight:bold;">🎨 CUSTOMIZE (Clear All)</option>
+                                    style="font-weight:700; font-size:11px; padding:8px; border:2px solid #1a5276; border-radius:4px; cursor:pointer; flex:1; min-width:250px; color:#000;">
+                                    <option value="" selected disabled style="color:#000; font-weight:700;">Select package type</option>
+                                    <option value="CUSTOMIZE" style="color:#000; font-weight:700;">🎨 CUSTOMIZE (Clear All)</option>
                                 </select>
                             </div>
                         </td>
@@ -556,25 +561,25 @@
                         <th style="background:#d6e6f0; color:#000; padding:4px 3px; text-align:center; font-size:9px; font-weight:700; border:1px solid #ccc; width:60px;">Unit</th>
                         <th style="background:#d6e6f0; color:#000; padding:4px 3px; text-align:center; font-size:9px; font-weight:700; border:1px solid #ccc;">Description</th>
                         <th style="background:#d6e6f0; color:#000; padding:4px 3px; text-align:center; font-size:9px; font-weight:700; border:1px solid #ccc; width:70px;">Price (Php)</th>
-                        <th style="background:#d6e6f0; color:#000; padding:4px 3px; text-align:right; font-size:9px; font-weight:700; border:1px solid #ccc; width:65px;">Total (Php)</th>
+                        <th style="background:#d6e6f0; color:#000; padding:4px 3px; text-align:right; font-size:11px; font-weight:700; border:1px solid #ccc; width:65px;">Total (Php)</th>
                         <th class="no-print" style="background:#d6e6f0; color:#000; padding:4px 3px; text-align:center; font-size:9px; font-weight:700; border:1px solid #ccc; width:60px;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="quotation-tbody">
                     <!-- Package row -->
                     <tr id="package-type-row">
-                        <td class="item-number-cell" style="padding:4px; border:1px solid #ccc; vertical-align:top; font-size:8.5px; line-height:1.2; text-align:center; font-weight:bold; font-size:12px;">1</td>
+                        <td class="item-number-cell" style="padding:4px; border:1px solid #ccc; vertical-align:top; font-size:12px; line-height:1.2; text-align:center; font-weight:bold; color:#000;">1</td>
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;">
-                            <input type="number" value="1" min="0" class="qty-input" style="width:50px; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:3px; text-align:right;">
+                            <input type="number" value="1" min="0" class="qty-input" style="width:50px; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:3px; text-align:right; color:#000; font-weight:bold;">
                         </td>
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;">
-                            <input type="text" class="unit-display" readonly style="font-size:10px; padding:2px 4px; border:1px solid #e0e0e0; border-radius:3px; background:#f5f5f5; width:100%; text-align:center;">
+                            <input type="text" class="unit-display" readonly style="font-size:10px; padding:2px 4px; border:1px solid #e0e0e0; border-radius:3px; background:#f5f5f5; width:100%; text-align:center; color:#000; font-weight:bold;">
                         </td>
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;">
-                            <div id="description-display" style="font-weight:bold; font-size:10px; color:#666; font-style:italic;">Select a package type above to load products</div>
+                            <div id="description-display" style="font-weight:bold; font-size:10px; color:#000; font-style:italic;">Select a package type above to load products</div>
                         </td>
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;">
-                            <input type="number" class="price-input" value="" step="0.01" style="width:80px; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:3px; text-align:right;">
+                            <input type="number" class="price-input" value="" step="0.01" style="width:80px; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:3px; text-align:right; color:#000; font-weight:bold;">
                         </td>
                         <td class="total-cell" style="padding:4px; border:1px solid #ccc; vertical-align:top; text-align:right; font-weight:bold;"></td>
                         <td class="no-print" style="padding:4px; border:1px solid #ccc; vertical-align:top;"></td>
@@ -584,14 +589,14 @@
                     <tr class="product-row">
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;"></td>
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;">
-                            <input type="number" value="0" min="0" class="qty-input" style="width:50px; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:3px; text-align:right;">
+                            <input type="number" value="0" min="0" class="qty-input" style="width:50px; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:3px; text-align:right; color:#000; font-weight:bold;">
                         </td>
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;">
-                            <input type="text" class="unit-display" readonly style="font-size:10px; padding:2px 4px; border:1px solid #e0e0e0; border-radius:3px; background:#f5f5f5; width:100%; text-align:center;">
+                            <input type="text" class="unit-display" readonly style="font-size:10px; padding:2px 4px; border:1px solid #e0e0e0; border-radius:3px; background:#f5f5f5; width:100%; text-align:center; color:#000; font-weight:bold;">
                         </td>
-                        <td style="padding:4px; border:1px solid #ccc; vertical-align:top; font-size:10px; color:#999; font-style:italic;">Product will appear here when package is selected</td>
+                        <td style="padding:4px; border:1px solid #ccc; vertical-align:top; font-size:10px; color:#000; font-style:italic;">Product will appear here when package is selected</td>
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;">
-                            <input type="number" class="price-input" value="" step="0.01" style="width:80px; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:3px; text-align:right;">
+                            <input type="number" class="price-input" value="" step="0.01" style="width:80px; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:3px; text-align:right; color:#000; font-weight:bold;">
                         </td>
                         <td class="total-cell" style="padding:4px; border:1px solid #ccc; vertical-align:top; text-align:right; font-weight:bold;"></td>
                         <td class="no-print" style="padding:4px; border:1px solid #ccc; vertical-align:top;">
@@ -615,7 +620,7 @@
                             <input type="number" class="delivery-price-input" value="0" step="0.01" placeholder="0 = FREE"
                                 style="width:80px; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:3px; text-align:right;">
                         </td>
-                        <td class="delivery-total-cell" style="padding:4px; border:1px solid #ccc; vertical-align:top; text-align:right; font-weight:bold; color:#28a745;">FREE</td>
+                        <td class="delivery-total-cell" style="padding:4px; border:1px solid #ccc; vertical-align:top; text-align:right; font-weight:bold; color:#000;">FREE</td>
                         <td class="no-print" style="padding:4px; border:1px solid #ccc; vertical-align:top;"></td>
                     </tr>
                 </tbody>
