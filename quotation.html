@@ -68,10 +68,10 @@
         /* --- Floating Action Button (FAB) for Add Product --- */
         #fab-add-product {
             position: fixed;
-            bottom: 28px;
-            right: 24px;
-            z-index: 999;
-            display: inline-flex;
+            bottom: 24px;
+            right: 18px;
+            z-index: 4000;
+            display: inline-flex !important;
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, #1a5276, #2471a3);
@@ -108,8 +108,8 @@
         /* On desktop, show full label. On mobile, show icon only when scrolled */
         @media screen and (max-width: 768px) {
             #fab-add-product {
-                bottom: 20px;
-                right: 16px;
+                bottom: 18px;
+                right: 12px;
                 width: 52px;
                 height: 52px;
             }
@@ -1797,6 +1797,8 @@
                         }
                     });
                 } catch (err) { }
+                const fab = document.getElementById('fab-add-product');
+                if (fab && !window.isViewMode) { fab.style.display = 'inline-flex'; }
             }, 250);
         });
 
