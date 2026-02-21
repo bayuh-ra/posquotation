@@ -1656,7 +1656,14 @@
                 const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value.replace(/[₱,]/g, '')) || 0 : 0;
                 const discount = discountInput ? parseFloat(discountInput.value.replace(/[₱,]/g, '')) || 0 : 0;
                 const page2Content = document.getElementById('page2-content');
-                const page2Html = page2Content ? page2Content.innerHTML : null;
+                let page2Html = null;
+                if (page2Content) {
+                    const clone = page2Content.cloneNode(true);
+                    clone.querySelectorAll('input, textarea').forEach(function (el) {
+                        el.setAttribute('value', el.value || '');
+                    });
+                    page2Html = clone.innerHTML;
+                }
 
                 const quotationPayload = {
                     quotation_no: quotationNo, quotation_date: quotationDate, client_name: clientName,
@@ -1665,15 +1672,7 @@
                     onsite_delivery: onsiteDelivery, page2_html: page2Html, employee_name: employeeName, status: 'pending'
                 };
 
-                let quotation;
-                try { quotation = await createQuotation(quotationPayload); }
-                catch (e) {
-                    const msg = (e && e.message) ? e.message : String(e || '');
-                    if (msg.toLowerCase().includes('page2_html') || msg.toLowerCase().includes('column')) {
-                        const { page2_html, ...payloadWithoutPage2 } = quotationPayload;
-                        quotation = await createQuotation(payloadWithoutPage2);
-                    } else throw e;
-                }
+                const quotation = await createQuotation(quotationPayload);
                 if (!quotation || !quotation.id) { showAlert('Save Failed', 'Failed to save quotation. No response from server.', 'error'); return; }
 
                 const items = [];
@@ -1720,6 +1719,7 @@
 
                 localStorage.removeItem('currentQuotationNumber');
                 markZeroValuesForPrint();
+                window.__redirectToListAfterPrint = true;
                 showAlert('Saved Successfully! 🎉', `Quotation No: ${quotationNo}\nClient: ${clientName}\n\nPrinting PDF now...`, 'success', function () {
                     window.print();
                 });
@@ -1775,7 +1775,13 @@
                         try { r.cell.innerHTML = r.originalHTML; r.cell.style.display = r.originalDisplay || ''; r.cell.dataset.zeroReplaced = ''; } catch (e) { }
                     }
                 });
-            } catch (e) { } finally { window.__zeroReplacements = []; }
+            } catch (e) { } finally {
+                window.__zeroReplacements = [];
+                if (window.__redirectToListAfterPrint) {
+                    window.__redirectToListAfterPrint = false;
+                    window.location.href = 'quotationlist.html';
+                }
+            }
         });
 
         function setPaperSize(paperSize) {
