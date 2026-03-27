@@ -54,6 +54,7 @@
         [contenteditable="true"]:focus { border-bottom: 1px dashed #667eea; background-color: rgba(76, 175, 80, 0.1); outline: none; }
 
         .print-only { display: none; }
+        .screen-only { display: inline; }
 
         /* --- Buttons (hover can't be inline) --- */
         .no-print {
@@ -349,6 +350,7 @@
             body { margin: 0; background: #fff; overflow-x: visible !important; }
             #pdf-content { max-width: none !important; overflow-x: visible !important; }
             .no-print { display: none !important; }
+            .screen-only { display: none !important; }
             .print-only { display: inline !important; }
             #addProductModal, #deleteModal, #customAlertModal { display: none !important; }
             table thead:first-of-type tr { border: 1px solid #ccc !important; background: #d6e6f0 !important; }
@@ -560,7 +562,7 @@
                     <tr style="background:#e8f4f8; border:2px solid #1a5276;">
                         <td colspan="7" style="padding:15px; vertical-align:middle;">
                             <div style="display:flex; align-items:center; gap:15px;">
-                                <label class="no-print" style="font-weight:bold; color:#000; white-space:nowrap;">Select Package Type:</label>
+                                <label class="screen-only" style="font-weight:bold; color:#000; white-space:nowrap;">Select Package Type:</label>
                                 <span class="print-only" style="font-weight:bold; color:#000; white-space:nowrap;">Package Type:</span>
                                 <select id="packageType" onchange="handlePackageTypeChange(this)"
                                     style="font-weight:700; font-size:11px; padding:8px; border:2px solid #1a5276; border-radius:4px; cursor:pointer; flex:1; min-width:250px; color:#000;">
@@ -1783,13 +1785,13 @@
             document.querySelectorAll('.total-cell, .delivery-total-cell').forEach(cell => {
                 try {
                     const txt = String(cell.textContent || '').trim();
-                    if (txt === '' || txt === '₱0' || txt === '₱0.00' || txt === '0') {
+                    if (txt === '' || txt === '₱0' || txt === '₱0.00' || txt === '0' || txt === 'P0' || txt === '₱0,00') {
                         if (cell.dataset.zeroReplaced === 'true') return;
                         const originalHTML = cell.innerHTML;
-                        cell.style.visibility = 'none';
+                        cell.innerHTML = '';
                         cell.dataset.originalHTML = originalHTML;
                         cell.dataset.zeroReplaced = 'true';
-                        window.__zeroReplacements.push({ type: 'cell', cell, originalHTML, originalDisplay: cell.style.display || '' });
+                        window.__zeroReplacements.push({ type: 'cell', cell, originalHTML, originalDisplay: '' });
                     }
                 } catch (e) { }
             });
@@ -1811,6 +1813,22 @@
                     } else {
                         input.style.border = 'none'; input.style.background = 'none';
                         input.style.outline = 'none'; input.style.boxShadow = 'none'; input.style.padding = '0';
+                    }
+                } catch (e) { }
+            });
+
+            document.querySelectorAll('.price-input, .delivery-price-input').forEach(input => {
+                try {
+                    const value = parseFloat(String(input.value || '').replace(/[₱,]/g, '').trim()) || 0;
+                    if (value === 0) {
+                        if (input.dataset.zeroReplaced === 'true') return;
+                        const span = document.createElement('span');
+                        span.className = 'zero-replacement';
+                        span.style.display = 'none';
+                        span.textContent = '';
+                        window.__zeroReplacements.push({ type: 'input', original: input, replacement: span });
+                        if (input.parentNode) input.parentNode.replaceChild(span, input);
+                        input.dataset.zeroReplaced = 'true';
                     }
                 } catch (e) { }
             });
