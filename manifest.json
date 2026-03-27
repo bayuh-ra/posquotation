@@ -1,0 +1,16 @@
+{
+  "name": "LAP I.T. Solutions",
+  "short_name": "LAP I.T.",
+  "icons": [
+    {
+      "src": "Logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/posquotation/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#003da5"
+}
