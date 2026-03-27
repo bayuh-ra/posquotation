@@ -607,6 +607,8 @@
                     if (!employee || employee.password_hash !== password) {
                         passwordErrorText.textContent = 'Incorrect password. Please try again.';
                         passwordError.classList.add('active');
+                        employeePassword.value = '';
+                        employeePassword.focus();
                         return;
                     }
                     
