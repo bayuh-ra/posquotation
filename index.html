@@ -699,9 +699,9 @@
                         const amount = q.total ? '₱' + Number(q.total).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '—';
                         const border = i < data.length - 1 ? ' border-b border-gray-50' : '';
                         return `<div class="flex items-center justify-between px-4 py-3${border} hover:bg-gray-50 cursor-pointer" onclick="window.location.href='quotationlist.html'">
-                            <div class="min-w-0">
+                            <div class="min-w-0 flex-1">
                                 <p class="text-sm font-semibold text-gray-800 truncate">${q.client_name || '—'}</p>
-                                <p class="text-xs text-gray-400">${q.quotation_no || 'No #'} · ${q.package_type || '—'}</p>
+                                <p class="text-xs text-gray-400 truncate">${q.quotation_no || 'No #'} · ${q.package_type || '—'}</p>
                             </div>
                             <div class="text-right flex-shrink-0 ml-3">
                                 <p class="text-sm font-bold text-blue-700">${amount}</p>
