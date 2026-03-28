@@ -650,22 +650,11 @@ function calculateTotalFromInputs() {
     // Calculate total: subtotal + on-site delivery - discount
     const totalPackagePrice = subtotal + onsiteDelivery - discount;
 
-    // ✅ UPDATED: Format with peso sign and smart decimals
     if (totalPackagePriceInput) {
-        // Check if total has decimals
-        const hasDecimals = totalPackagePrice % 1 !== 0;
-
-        if (hasDecimals) {
-            totalPackagePriceInput.value = '₱' + totalPackagePrice.toLocaleString('en-PH', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            });
-        } else {
-            totalPackagePriceInput.value = '₱' + totalPackagePrice.toLocaleString('en-PH', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            });
-        }
+        totalPackagePriceInput.value = '₱' + totalPackagePrice.toLocaleString('en-PH', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
     }
 }
 
@@ -1311,7 +1300,7 @@ function calculateRowTotal(row) {
 
         // ✅ UPDATED: Use innerHTML to make cell truly empty (no text node)
         if (total > 0) {
-            totalCell.textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            totalCell.textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         } else {
             totalCell.innerHTML = ''; // ← Completely empty HTML
         }

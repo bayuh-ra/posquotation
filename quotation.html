@@ -1054,11 +1054,11 @@
             const totalPackagePriceInput = document.getElementById('total-package-price-input');
             if (subtotalInput && subtotalInput.value) {
                 const value = parseFloat(subtotalInput.value) || 0;
-                subtotalInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+                subtotalInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
             if (totalPackagePriceInput && totalPackagePriceInput.value) {
                 const value = parseFloat(totalPackagePriceInput.value) || 0;
-                totalPackagePriceInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+                totalPackagePriceInput.value = '₱' + value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
         });
 
@@ -1238,7 +1238,7 @@
 
                     const metaEl = document.createElement('div');
                     if (product.base_price > 0) {
-                        metaEl.innerHTML = `<span style="font-size:11px;font-weight:700;color:${colors.text};">₱${parseFloat(product.base_price).toLocaleString('en-PH')}</span>`;
+                        metaEl.innerHTML = `<span style="font-size:11px;font-weight:700;color:${colors.text};">₱${parseFloat(product.base_price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
                     }
 
                     card.appendChild(checkBadge);
@@ -1408,7 +1408,7 @@
             if (qtyInput && priceInput && totalCell) {
                 const qty = parseFloat(qtyInput.value) || 0;
                 const price = parseFloat(priceInput.value) || 0;
-                totalCell.textContent = '₱' + (qty * price).toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+                totalCell.textContent = '₱' + (qty * price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
         }
 
@@ -1547,7 +1547,7 @@
                         const onsiteDelivery = parseFloat(quotation.onsite_delivery) || 0;
                         const discount = parseFloat(quotation.discount) || 0;
                         const totalPackagePrice = parseFloat(quotation.total) || (subtotal + onsiteDelivery - discount);
-                        const formatPeso = (value) => '₱' + (value || 0).toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+                        const formatPeso = (value) => '₱' + (value || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                         if (subtotalInput) subtotalInput.value = formatPeso(subtotal);
                         if (onsiteDeliveryInput) onsiteDeliveryInput.value = onsiteDelivery > 0 ? formatPeso(onsiteDelivery) : '';
                         if (discountInput) discountInput.value = discount > 0 ? formatPeso(discount) : '';
@@ -1598,8 +1598,8 @@
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;"><input type="number" value="${item.quantity}" disabled class="qty-input" style="width:50px; font-size:10px; padding:2px 4px; text-align:right;"></td>
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;"><input type="text" value="${unit}" disabled class="unit-display" readonly style="font-size:10px; padding:2px 4px; width:100%; text-align:center;"></td>
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;">${descriptionContent}</td>
-                        <td style="padding:4px; border:1px solid #ccc; vertical-align:top;"><input type="number" value="${item.price}" disabled class="price-input" style="width:80px; font-size:10px; padding:2px 4px; text-align:right;"></td>
-                        <td class="total-cell" style="padding:4px; border:1px solid #ccc; vertical-align:top;">₱${parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</td>
+                        <td style="padding:4px; border:1px solid #ccc; vertical-align:top;"><input type="text" value="₱${parseFloat(item.price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" disabled class="price-input" style="width:80px; font-size:10px; padding:2px 4px; text-align:right;"></td>
+                        <td class="total-cell" style="padding:4px; border:1px solid #ccc; vertical-align:top;">₱${parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         <td class="no-print" style="padding:4px; border:1px solid #ccc; vertical-align:top;"></td>`;
                     tbody.appendChild(row);
                     itemNumber++;
@@ -1612,8 +1612,8 @@
                         <td style="padding:4px; border:1px solid #ccc;"></td>
                         <td style="padding:4px; border:1px solid #ccc;"></td>
                         <td style="padding:4px; border:1px solid #ccc; vertical-align:top;"><div style="font-style:italic;"><strong>Delivery, setup, installation, and training</strong><br><strong>Guaranteed (1) year technical support via text, call and remote access</strong><br>Via text, call and remote access</div></td>
-                        <td style="padding:4px; border:1px solid #ccc; vertical-align:top;"><input type="number" value="${item.price}" disabled class="delivery-price-input" style="width:80px; font-size:10px; padding:2px 4px; text-align:right;"></td>
-                        <td class="delivery-total-cell" style="padding:4px; border:1px solid #ccc; vertical-align:top; text-align:right; font-weight:bold; color:${isFree ? '#28a745' : '#000'};">${isFree ? 'FREE' : '₱' + parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</td>
+                        <td style="padding:4px; border:1px solid #ccc; vertical-align:top;"><input type="text" value="${isFree ? '0.00' : '₱' + parseFloat(item.price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}" disabled class="delivery-price-input" style="width:80px; font-size:10px; padding:2px 4px; text-align:right;"></td>
+                        <td class="delivery-total-cell" style="padding:4px; border:1px solid #ccc; vertical-align:top; text-align:right; font-weight:bold; color:${isFree ? '#28a745' : '#000'};">${isFree ? 'FREE' : '₱' + parseFloat(item.total).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         <td class="no-print" style="padding:4px; border:1px solid #ccc;"></td>`;
                     tbody.appendChild(deliveryRow);
                 }
@@ -1664,6 +1664,41 @@
             document.querySelectorAll('input, select, textarea').forEach(input => {
                 input.disabled = true; input.style.cursor = 'not-allowed'; input.style.opacity = '1';
             });
+
+            // Remove box appearance from footer inputs and table inputs in view mode
+            const noBoxIds = ['subtotal-input', 'total-package-price-input', 'onsite-delivery-input', 'discount-input'];
+            noBoxIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const span = document.createElement('span');
+                    span.textContent = el.value;
+                    span.style.cssText = 'font-size:' + (el.style.fontSize || '12px') + '; font-weight:bold; display:block; text-align:right; width:100%;';
+                    el.parentNode.replaceChild(span, el);
+                }
+            });
+
+            // Remove box appearance from qty, unit, price inputs in table rows
+            document.querySelectorAll('.qty-input, .unit-display, .price-input, .delivery-price-input').forEach(el => {
+                el.style.border = 'none';
+                el.style.background = 'transparent';
+                el.style.boxShadow = 'none';
+                el.style.cursor = 'default';
+                el.style.outline = 'none';
+                el.style.padding = '2px 4px';
+            });
+
+            // Remove box appearance from package type select
+            const pkgSelect = document.getElementById('packageType');
+            if (pkgSelect) {
+                pkgSelect.style.border = 'none';
+                pkgSelect.style.background = 'transparent';
+                pkgSelect.style.boxShadow = 'none';
+                pkgSelect.style.cursor = 'default';
+                pkgSelect.style.outline = 'none';
+                pkgSelect.style.appearance = 'none';
+                pkgSelect.style.webkitAppearance = 'none';
+                pkgSelect.style.padding = '0';
+            }
             document.querySelectorAll('[contenteditable="true"]').forEach(element => {
                 element.contentEditable = 'false'; element.style.cursor = 'not-allowed'; element.style.opacity = '1';
             });
@@ -1870,7 +1905,7 @@
                         if (el) {
                             const num = parseFloat(String(el.value || '').replace(/[₱,]/g, '').trim()) || 0;
                             if ((id === 'onsite-delivery-input' || id === 'discount-input') && num === 0) el.value = '';
-                            else el.value = '₱' + num.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+                            else el.value = '₱' + num.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                         }
                     });
                 } catch (err) { }

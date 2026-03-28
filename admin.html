@@ -3,195 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Management - LAP I.T. Solutions</title>
+    <link rel="icon" type="image/png" href="Logo.png">
+    <title>Data Management - LAP I.T. Solutions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="backend/config.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            padding: 0;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        
-        /* Header Section */
-        .admin-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .admin-header h1 {
-            font-size: 2rem;
-            margin: 0;
+        /* Tab nav */
+        .tab-bar {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 4px;
+            padding: 8px 0;
+            width: 100%;
         }
-
-        .admin-header h1::before {
-            content: "🛠️";
-            font-size: 2.5rem;
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 0;
-            margin: 0;
-            background: #f7fafc;
-            padding: 0 40px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        
         .tab {
-            padding: 18px 28px;
+            flex: 1;
+            padding: 7px 8px;
             background: transparent;
             border: none;
             cursor: pointer;
-            font-size: 15px;
-            font-weight: 600;
-            color: #718096;
-            transition: all 0.3s;
-            white-space: nowrap;
-            position: relative;
-            border-bottom: 3px solid transparent;
-        }
-
-        .tab:hover {
-            color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
-        }
-        
-        .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-            background: white;
-        }
-        
-        .content-wrapper {
-            padding: 30px 40px;
-            min-height: 500px;
-        }
-
-        #tab-content-container {
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .btn-secondary {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            transition: all 0.3s;
-            background: #e2e8f0;
-            color: #4a5568;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .btn-secondary:hover {
-            background: #cbd5e0;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
             color: #718096;
-            font-size: 18px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .tab:hover { color: #0a57b0; background: #e8f1fc; }
+        .tab.active {
+            color: #fff;
+            background: #0a57b0;
         }
 
+        /* Loading animation */
+        .loading { text-align: center; padding: 60px 20px; color: #718096; font-size: 16px; }
         .loading::after {
             content: '...';
             animation: dots 1.5s steps(4, end) infinite;
         }
-
         @keyframes dots {
             0%, 20% { content: '.'; }
             40% { content: '..'; }
             60%, 100% { content: '...'; }
         }
 
-        /* Mobile Styles */
+        /* Fade in for tab content */
+        #tab-content-container {
+            animation: fadeIn 0.3s ease-in;
+            padding: 28px 32px 40px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .admin-header {
-                padding: 20px;
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .admin-header h1 {
-                font-size: 1.5rem;
-            }
-
-            .content-wrapper {
-                padding: 20px;
-            }
-
-            .tabs {
-                padding: 0 20px;
-            }
-
-            .tab {
-                padding: 14px 20px;
-                font-size: 13px;
-            }
+            #tab-content-container { padding: 16px 16px 32px; }
+            .tab { padding: 6px 13px; font-size: 13px; }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <!-- Modern Header -->
-        <div class="admin-header">
-            <h1>Database Management</h1>
-            <button class="btn-secondary" onclick="goBack()">← Back to Home</button>
-        </div>
+<body class="bg-gray-100 min-h-screen">
 
-        <!-- Tabs Navigation -->
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('units', 'admin/units.html')">Units</button>
-            <button class="tab" onclick="switchTab('categories', 'admin/categories.html')">Product Categories</button>
-            <button class="tab" onclick="switchTab('products', 'admin/products.html')">Products</button>
-            <button class="tab" onclick="switchTab('pos', 'admin/pospackages.html')">POS Packages</button>
-            <button class="tab" onclick="switchTab('employees', 'admin/employees.html')">Employees</button>
+    <!-- Header — matches index.html -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 md:px-6 py-3 md:py-4">
+            <!-- Mobile header -->
+            <div class="flex items-center justify-between md:hidden">
+                <button onclick="goBack()" title="Back to Home" style="width:36px;height:36px;border-radius:50%;background:#0a57b0;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s;" onmouseover="this.style.background='#1a68c4'" onmouseout="this.style.background='#0a57b0'">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <img src="LOGO1.png" alt="LAP I.T. Solutions" class="h-10 w-10 object-contain">
+                <div class="text-right">
+                    <p id="header-date-mobile" class="text-xs font-semibold text-gray-700"></p>
+                    <p id="header-time-mobile" class="text-sm font-bold text-blue-900"></p>
+                </div>
+            </div>
+            <!-- Desktop header -->
+            <div class="hidden md:flex items-center justify-between">
+                <button onclick="goBack()" title="Back to Home" style="width:40px;height:40px;border-radius:50%;background:#0a57b0;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s;" onmouseover="this.style.background='#1a68c4'" onmouseout="this.style.background='#0a57b0'">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <div class="flex items-center gap-4">
+                    <img src="LOGO1.png" alt="LAP I.T. Solutions" class="h-16 w-16 object-contain flex-shrink-0">
+                    <div>
+                        <h1 class="text-2xl font-bold text-blue-900">LAP I.T. Solutions</h1>
+                        <p class="text-sm text-gray-600">Data Management</p>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <p id="header-date" class="text-sm font-semibold text-gray-700"></p>
+                    <p id="header-time" class="text-xl font-bold text-blue-900"></p>
+                </div>
+            </div>
         </div>
-        
-        <!-- Content Area - Loads external HTML files -->
-        <div class="content-wrapper">
-            <div id="tab-content-container">
+    </header>
+
+    <!-- Tab navigation -->
+    <div class="bg-white border-b border-gray-100 shadow-sm">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="tab-bar">
+                <button class="tab active" onclick="switchTab('products', 'admin/products.html')">Products</button>
+                <button class="tab" onclick="switchTab('pos', 'admin/pospackages.html')">POS Packages</button>
+                <button class="tab" onclick="switchTab('employees', 'admin/employees.html')">Employees</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab content -->
+    <div class="px-4 md:px-8 py-6">
+        <div class="max-w-screen-xl mx-auto bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div id="tab-content-container" style="min-height: 500px;">
                 <div class="loading">Loading</div>
             </div>
         </div>
@@ -206,79 +129,66 @@
             supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
             window.lapSupabaseClient = supabaseClient;
         }
-        
-        // Make supabaseClient globally available for loaded tabs
         window.supabaseClient = supabaseClient;
 
-        // Navigation
         function goBack() {
             window.location.href = 'index.html';
         }
 
-        // Current active tab
-        let currentTab = 'units';
+        let currentTab = 'products';
 
-        // Tab switching with dynamic file loading
         async function switchTab(tabName, filePath) {
-            // Update active tab styling
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
-            
             currentTab = tabName;
-            
-            // Load the content from external file
             await loadTabContent(filePath);
         }
 
-        // Load tab content from external HTML file
         async function loadTabContent(filePath) {
             const container = document.getElementById('tab-content-container');
-            
             try {
-                // Show loading state
                 container.innerHTML = '<div class="loading">Loading</div>';
-                
-                // Fetch the HTML file
                 const response = await fetch(filePath);
-                
-                if (!response.ok) {
-                    throw new Error(`Failed to load ${filePath}`);
-                }
-                
+                if (!response.ok) throw new Error(`Failed to load ${filePath}`);
                 const html = await response.text();
-                
-                // Insert the HTML content
                 container.innerHTML = html;
-                
-                // Execute any scripts in the loaded content
-                const scripts = container.querySelectorAll('script');
-                scripts.forEach(oldScript => {
+                container.querySelectorAll('script').forEach(oldScript => {
                     const newScript = document.createElement('script');
-                    Array.from(oldScript.attributes).forEach(attr => {
-                        newScript.setAttribute(attr.name, attr.value);
-                    });
-                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.appendChild(document.createTextNode(oldScript.textContent));
                     oldScript.parentNode.replaceChild(newScript, oldScript);
                 });
-                
             } catch (error) {
-                console.error('Error loading tab content:', error);
                 container.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #e53e3e;">
-                        <h3 style="margin-bottom: 10px;">⚠️ Error Loading Content</h3>
+                    <div style="text-align:center;padding:40px;color:#e53e3e;">
+                        <h3 style="margin-bottom:10px;">⚠️ Error Loading Content</h3>
                         <p>Could not load ${filePath}</p>
-                        <p style="font-size: 14px; color: #718096; margin-top: 10px;">${error.message}</p>
-                    </div>
-                `;
+                        <p style="font-size:14px;color:#718096;margin-top:10px;">${error.message}</p>
+                    </div>`;
             }
         }
 
-        // Load initial tab on page load
         window.addEventListener('DOMContentLoaded', () => {
-            loadTabContent('admin/units.html');
+            loadTabContent('admin/products.html');
         });
 
-        // Utility function to show messages (available to all tabs)
+        // Clock
+        function updateClock() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            const dateEl = document.getElementById('header-date');
+            const timeEl = document.getElementById('header-time');
+            const dateMEl = document.getElementById('header-date-mobile');
+            const timeMEl = document.getElementById('header-time-mobile');
+            if (dateEl) dateEl.textContent = dateStr;
+            if (timeEl) timeEl.textContent = timeStr;
+            if (dateMEl) dateMEl.textContent = dateStr;
+            if (timeMEl) timeMEl.textContent = timeStr;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
         function showMessage(elementId, message, isError = false) {
             const el = document.getElementById(elementId);
             if (el) {

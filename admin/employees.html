@@ -1,300 +1,710 @@
-<link rel="stylesheet" href="admin/shared.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employees</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<h2>Manage Employees</h2>
-<div style="margin-bottom: 20px;">
-    <button class="btn btn-primary" onclick="openAddEmployeeModal()">+ Add New Employee</button>
-</div>
-<div id="employees-message"></div>
-<div class="table-container" id="employees-list">
-    <div class="loading">Loading...</div>
-</div>
+    :root {
+      --purple: #0a57b0;
+      --purple-light: #e8f1fc;
+      --purple-mid: #1a68c4;
+      --text-primary: #1a1a2e;
+      --text-secondary: #6b7280;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 2px 12px rgba(10,87,176,0.07);
+    }
 
-<!-- Add Employee Modal -->
-<div id="addEmployeeModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Add New Employee</h3>
-            <button class="close-btn" onclick="closeAddEmployeeModal()">&times;</button>
-        </div>
-        <form onsubmit="event.preventDefault(); addEmployee();" autocomplete="off">
-            <div id="add-employee-message"></div>
-            <div class="form-group">
-                <label>Employee Code</label>
-                <input type="text" id="add-employee-code" placeholder="e.g., EMP001" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="add-employee-name" placeholder="e.g., John Doe" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="add-employee-password" placeholder="Enter password" autocomplete="new-password">
-            </div>
-            <div class="form-group">
-                <label>Status</label>
-                <select id="add-employee-status">
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
-                </select>
-            </div>
-            <div style="display: flex; gap: 10px;">
-                <button type="submit" class="btn btn-primary" style="flex: 1;">Add Employee</button>
-                <button type="button" class="btn btn-secondary" onclick="closeAddEmployeeModal()" style="flex: 1;">Cancel</button>
-            </div>
-        </form>
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: transparent;
+      color: var(--text-primary);
+      padding-bottom: 40px;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .page-title h1 { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+    .page-title p  { font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px; }
+
+    .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    /* ── View toggle ── */
+    .view-toggle {
+      display: flex; background: #dde3ec; border-radius: 10px; padding: 3px; gap: 2px;
+    }
+    .view-toggle button {
+      border: none; background: transparent; border-radius: 8px; padding: 7px 10px;
+      cursor: pointer; color: var(--text-secondary); display: flex; align-items: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .view-toggle button.active { background: var(--purple); color: #fff; }
+    .view-toggle button svg { width: 16px; height: 16px; }
+
+    /* ── FAB ── */
+    .fab {
+      position: fixed; bottom: 28px; right: 28px;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--purple); color: #fff; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(10,87,176,0.45);
+      z-index: 100;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+    .fab:hover { background: var(--purple-mid); transform: translateY(-2px); box-shadow: 0 6px 28px rgba(10,87,176,0.55); }
+    .fab:active { transform: translateY(0); }
+    .fab svg { width: 24px; height: 24px; }
+
+    /* ── Search bar ── */
+    .filter-card {
+      background: white; border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 12px 16px; display: flex; gap: 12px;
+      margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .search-wrap {
+      display: flex; align-items: center; gap: 8px;
+      flex: 1; min-width: 180px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 9px 13px; transition: border-color 0.15s;
+    }
+    .search-wrap:focus-within { border-color: var(--purple); }
+    .search-wrap svg { width: 15px; height: 15px; color: var(--text-secondary); flex-shrink: 0; }
+    .search-wrap input { border: none; outline: none; font-size: 0.9rem; width: 100%; font-family: inherit; color: var(--text-primary); }
+
+    /* ── States ── */
+    .loading-state, .empty-state, .error-state {
+      text-align: center; padding: 64px 24px; color: var(--text-secondary);
+    }
+    .loading-state .spinner {
+      width: 36px; height: 36px; border: 3px solid var(--purple-light);
+      border-top-color: var(--purple); border-radius: 50%;
+      animation: spin 0.7s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Employees grid ── */
+    .employees-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+
+    /* ── Swipe wrapper (card) ── */
+    .emp-swipe-wrapper {
+      position: relative; overflow: hidden;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow); border: 1px solid var(--border);
+      animation: fadeUp 0.25s ease both;
+      user-select: none; -webkit-user-select: none;
+    }
+    .emp-swipe-wrapper:nth-child(1) { animation-delay: 0.05s; }
+    .emp-swipe-wrapper:nth-child(2) { animation-delay: 0.10s; }
+    .emp-swipe-wrapper:nth-child(3) { animation-delay: 0.15s; }
+    .emp-swipe-wrapper:nth-child(4) { animation-delay: 0.20s; }
+    .emp-swipe-wrapper:nth-child(5) { animation-delay: 0.25s; }
+    .emp-swipe-wrapper:nth-child(n+6) { animation-delay: 0.30s; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Card inner */
+    .emp-card {
+      background: white; cursor: pointer;
+      position: relative;
+      transition: transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .emp-swipe-wrapper:hover .emp-card { background: #fafafe; }
+    .emp-swipe-wrapper.revealed .emp-card { transform: translateX(-130px); }
+    .emp-swipe-wrapper.selected .emp-card { background: var(--purple-light) !important; }
+
+    .card-top {
+      background: var(--purple-light);
+      padding: 16px 16px 14px;
+    }
+    .emp-swipe-wrapper.selected .card-top { background: #d0e3f8 !important; }
+
+    .emp-code {
+      font-size: 0.78rem; font-weight: 700; color: var(--purple);
+      font-family: 'Courier New', monospace; letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .emp-fullname {
+      font-size: 0.97rem; font-weight: 700; color: #0a3a80;
+      line-height: 1.3; overflow: hidden;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    }
+
+    /* Swipe action buttons (off-screen by default) */
+    .emp-swipe-btns {
+      position: absolute; right: 0; top: 0; bottom: 0;
+      width: 130px; display: flex;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .emp-swipe-wrapper.revealed .emp-swipe-btns { transform: translateX(0); }
+    .emp-swipe-btn {
+      flex: 1; border: none; cursor: pointer;
+      font-size: 0.75rem; font-weight: 700;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 5px; font-family: inherit;
+    }
+    .emp-swipe-btn.edit   { background: var(--purple); color: #fff; }
+    .emp-swipe-btn.delete { background: #e53e3e; color: #fff; }
+    .emp-swipe-btn svg { width: 17px; height: 17px; }
+
+    /* ── List view ── */
+    .employees-list-table {
+      background: white; border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+    .list-header-row {
+      display: grid; grid-template-columns: 1fr 2fr;
+      padding: 10px 20px; font-size: 0.7rem; font-weight: 700;
+      color: #0a3a80; letter-spacing: 0.09em;
+      text-transform: uppercase;
+      background: var(--purple-light);
+      border-bottom: 1px solid #c5d8f0;
+    }
+    .swipe-wrapper {
+      position: relative; overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      user-select: none; -webkit-user-select: none;
+    }
+    .swipe-wrapper:last-child { border-bottom: none; }
+    .emp-list-row {
+      display: grid; grid-template-columns: 1fr 2fr;
+      padding: 14px 20px; align-items: center; gap: 12px;
+      background: white; position: relative; z-index: 1;
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .swipe-wrapper:hover .emp-list-row { background: #f9f8ff; }
+    .swipe-wrapper.revealed .emp-list-row { transform: translateX(-130px); }
+    .swipe-wrapper.selected .emp-list-row { background: var(--purple-light) !important; border-left: 3px solid var(--purple); }
+    .list-cell-code { font-size: 0.85rem; font-weight: 700; color: var(--purple); font-family: 'Courier New', monospace; }
+    .list-cell-name { font-size: 0.9rem; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .swipe-action-btns { position: absolute; right: 0; top: 0; bottom: 0; width: 130px; display: flex; z-index: 0; }
+    .swipe-btn {
+      flex: 1; border: none; cursor: pointer; font-size: 0.75rem; font-weight: 700;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 5px; font-family: inherit;
+    }
+    .swipe-btn.edit   { background: var(--purple); color: #fff; }
+    .swipe-btn.delete { background: #e53e3e; color: #fff; }
+    .swipe-btn svg { width: 16px; height: 16px; }
+
+    /* ── Side panel ── */
+    .side-panel {
+      position: fixed; top: 0; right: 0; bottom: 0; width: 340px;
+      background: white; border-left: 1px solid var(--border);
+      box-shadow: -4px 0 28px rgba(10,87,176,0.10);
+      padding: 28px 24px; overflow-y: auto; z-index: 200;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .side-panel.active { transform: translateX(0); }
+
+    .panel-top-bar { display: flex; justify-content: flex-start; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .panel-top-title { flex: 1; text-align: right; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+    .panel-close-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; background: #0a57b0;
+      border: none; border-radius: 50%; cursor: pointer;
+      color: #fff; transition: background 0.15s;
+    }
+    .panel-close-btn:hover { background: #1a68c4; }
+    .panel-close-btn svg { width: 16px; height: 16px; }
+
+    .panel-detail-header {
+      background: var(--purple-light); border-radius: 10px;
+      padding: 18px 16px; margin-bottom: 20px;
+    }
+    .panel-detail-code {
+      font-size: 0.78rem; font-weight: 700; color: var(--purple);
+      font-family: 'Courier New', monospace; letter-spacing: 0.04em; margin-bottom: 6px;
+    }
+    .panel-detail-name { font-size: 1.15rem; font-weight: 700; color: #0a3a80; line-height: 1.3; }
+
+    .panel-detail-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 0; border-bottom: 1px solid var(--border); gap: 12px;
+    }
+    .panel-detail-row:last-child { border-bottom: none; }
+    .panel-detail-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-secondary); }
+    .panel-detail-value { font-size: 0.9rem; color: var(--text-primary); font-weight: 500; }
+
+    .panel-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .btn-edit-panel {
+      display: flex; align-items: center; gap: 7px; justify-content: center;
+      flex: 1; background: var(--purple); color: #fff; border: none; border-radius: 10px;
+      padding: 11px 16px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      transition: background 0.15s; font-family: inherit;
+    }
+    .btn-edit-panel:hover { background: var(--purple-mid); }
+    .btn-delete-panel {
+      display: flex; align-items: center; gap: 7px; justify-content: center;
+      flex: 1; background: #fff; color: #e53e3e; border: 2px solid #e53e3e;
+      border-radius: 10px; padding: 11px 16px; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; transition: background 0.15s, color 0.15s; font-family: inherit;
+    }
+    .btn-delete-panel:hover { background: #e53e3e; color: #fff; }
+    .btn-edit-panel svg, .btn-delete-panel svg { width: 14px; height: 14px; }
+
+    @media (max-width: 768px) { .side-panel { width: 100%; border-left: none; } }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .form-group input, .form-group select {
+      width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 9px;
+      font-size: 0.95rem; outline: none; transition: border-color 0.15s; font-family: inherit; background: white;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--purple); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
+    .btn-cancel {
+      background: var(--border); color: var(--text-secondary); border: none; border-radius: 9px;
+      padding: 10px 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-cancel:hover { background: #cbd5e0; }
+    .btn-save {
+      background: var(--purple); color: #fff; border: none; border-radius: 9px;
+      padding: 10px 22px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-save:hover { background: var(--purple-mid); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px; background: #1a1a2e; color: #fff;
+      padding: 12px 20px; border-radius: 10px; font-size: 0.88rem; font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2); opacity: 0; transform: translateY(10px);
+      transition: opacity 0.25s, transform 0.25s; pointer-events: none; z-index: 9999; max-width: 320px;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { background: #e53e3e; }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Employees</h1>
+      <p id="emp-count">Loading…</p>
     </div>
-</div>
-
-<!-- Edit Employee Modal -->
-<div id="editEmployeeModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Edit Employee</h3>
-            <button class="close-btn" onclick="closeEditEmployeeModal()">&times;</button>
-        </div>
-        <form onsubmit="event.preventDefault(); updateEmployee();" autocomplete="off">
-            <div id="edit-employee-message"></div>
-            <input type="hidden" id="edit-employee-id">
-            <div class="form-group">
-                <label>Employee Code</label>
-                <input type="text" id="edit-employee-code" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="edit-employee-fullname" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label>New Password (leave blank to keep current)</label>
-                <input type="password" id="edit-employee-password" autocomplete="new-password">
-            </div>
-            <div class="form-group">
-                <label>Status</label>
-                <select id="edit-employee-active">
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
-                </select>
-            </div>
-            <div style="display: flex; gap: 10px;">
-                <button type="submit" class="btn btn-primary">Update</button>
-                <button type="button" class="btn btn-secondary" onclick="closeEditEmployeeModal()">Cancel</button>
-            </div>
-        </form>
+    <div class="header-actions">
+      <div class="view-toggle">
+        <button class="active" id="btn-grid" title="Card view" onclick="setEmpView('grid')">
+          <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>
+        </button>
+        <button id="btn-list" title="List view" onclick="setEmpView('list')">
+          <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2.5" rx="1.2"/><rect x="1" y="6.75" width="14" height="2.5" rx="1.2"/><rect x="1" y="11.5" width="14" height="2.5" rx="1.2"/></svg>
+        </button>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- Employee Detail Modal -->
-<div id="detailEmployeeModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Employee Details</h3>
-            <button class="close-btn" onclick="closeDetailEmployeeModal()">&times;</button>
-        </div>
-        <div style="padding: 10px 0;">
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">EMPLOYEE CODE</label>
-                <div id="detail-employee-code" style="font-size: 18px; font-weight: bold; color: #2d3748; margin-top: 5px;"></div>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">FULL NAME</label>
-                <div id="detail-employee-name" style="font-size: 16px; color: #2d3748; margin-top: 5px;"></div>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">STATUS</label>
-                <div id="detail-employee-status" style="font-size: 14px; margin-top: 5px;"></div>
-            </div>
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
-            <button class="btn btn-warning" onclick="editEmployeeFromDetail()" style="flex: 1;">Edit</button>
-            <button class="btn btn-danger" onclick="deleteEmployeeFromDetail()" style="flex: 1;">Delete</button>
-        </div>
+  <!-- Search bar -->
+  <div class="filter-card">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="emp-search" placeholder="Search employees…" oninput="searchEmployees()" />
     </div>
-</div>
+  </div>
 
-<script>
-(function() {
-    // Access the globally available supabaseClient
+  <div id="emp-container">
+    <div class="loading-state"><div class="spinner"></div>Loading employees…</div>
+  </div>
+
+  <!-- Side panel (view + form) -->
+  <div class="side-panel" id="emp-side-panel">
+    <div class="panel-top-bar">
+      <button class="panel-close-btn" onclick="closeEmpPanel()" title="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="panel-top-title" id="emp-top-title"></span>
+    </div>
+
+    <!-- Detail view -->
+    <div id="emp-panel-view">
+      <div id="emp-panel-content"></div>
+      <div class="panel-actions">
+        <button class="btn-edit-panel" onclick="editFromPanel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit
+        </button>
+        <button class="btn-delete-panel" onclick="deleteFromPanel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- Add / Edit form -->
+    <div id="emp-panel-form" style="display:none; padding: 0 0 32px;">
+      <input type="hidden" id="edit-id">
+      <div class="form-group">
+        <label>Employee Code</label>
+        <input type="text" id="emp-code" placeholder="e.g., EMP001" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="emp-name" placeholder="e.g., Juan dela Cruz" autocomplete="off">
+      </div>
+      <div class="form-group" id="emp-password-group">
+        <label id="emp-password-label">Password</label>
+        <input type="password" id="emp-password" placeholder="Enter password" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="emp-status">
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="cancelEmpForm()">Cancel</button>
+        <button type="button" class="btn-save" id="emp-save-btn" onclick="saveEmployee()">Add Employee</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="emp-toast" class="toast"></div>
+
+  <script>
+  (function () {
     const supabase = window.supabaseClient || window.lapSupabaseClient;
+    let empData = [];
+    let viewMode = 'grid';
+    let viewingEmp = null;
 
-    window.loadEmployees = async function() {
-        const container = document.getElementById('employees-list');
-        const { data, error } = await supabase.from('employees').select('*').order('employee_code');
-        
-        if (error) {
-            container.innerHTML = '<p class="error">Error loading employees: ' + error.message + '</p>';
-            return;
-        }
-        
-        let html = '<table><tr><th>Employee Code</th><th>Full Name</th><th>Status</th></tr>';
-        data.forEach((emp, index) => {
-            const rowId = `employee-row-${index}`;
-            html += `<tr id="${rowId}" style="cursor: pointer;" 
-                data-id="${emp.id}" 
-                data-code="${encodeURIComponent(emp.employee_code)}" 
-                data-name="${encodeURIComponent(emp.full_name)}" 
-                data-active="${emp.is_active}">
-                <td>${emp.employee_code}</td>
-                <td>${emp.full_name}</td>
-                <td>${emp.is_active ? '<span style="color: green;">Active</span>' : '<span style="color: red;">Inactive</span>'}</td>
-            </tr>`;
+    /* ── Toast ── */
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('emp-toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    /* ── Search ── */
+    window.searchEmployees = function () {
+      const q = document.getElementById('emp-search').value.toLowerCase();
+      const filtered = empData.filter(e =>
+        e.employee_code.toLowerCase().includes(q) || e.full_name.toLowerCase().includes(q)
+      );
+      renderEmployees(filtered);
+    };
+
+    /* ── View toggle ── */
+    window.setEmpView = function (mode) {
+      viewMode = mode;
+      document.getElementById('btn-grid').classList.toggle('active', mode === 'grid');
+      document.getElementById('btn-list').classList.toggle('active', mode === 'list');
+      searchEmployees();
+    };
+
+    /* ── Render ── */
+    function renderEmployees(list) {
+      const container = document.getElementById('emp-container');
+      const countEl   = document.getElementById('emp-count');
+      countEl.textContent = empData.length + ' employee' + (empData.length !== 1 ? 's' : '');
+
+      if (!list.length) {
+        container.innerHTML = '<div class="empty-state">No employees found.</div>';
+        return;
+      }
+
+      if (viewMode === 'list') {
+        let html = `<div class="employees-list-table">
+          <div class="list-header-row"><span>Code</span><span>Full Name</span></div>`;
+        list.forEach(emp => {
+          const id   = emp.id;
+          const code = encodeURIComponent(emp.employee_code);
+          const name = encodeURIComponent(emp.full_name);
+          html += `
+            <div class="swipe-wrapper" data-id="${id}">
+              <div class="emp-list-row">
+                <div class="list-cell-code">${emp.employee_code}</div>
+                <div class="list-cell-name">${emp.full_name}</div>
+              </div>
+              <div class="swipe-action-btns">
+                <button class="swipe-btn edit" onclick="openEditModal('${id}','${code}','${name}',${emp.is_active})">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Edit
+                </button>
+                <button class="swipe-btn delete" onclick="deleteEmployee('${id}','${name}')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                  Delete
+                </button>
+              </div>
+            </div>`;
         });
-        html += '</table>';
+        html += '</div>';
         container.innerHTML = html;
-        
-        // Add click listeners
-        data.forEach((emp, index) => {
-            const row = document.getElementById(`employee-row-${index}`);
-            if (row) {
-                row.addEventListener('click', function() {
-                    showEmployeeDetail(
-                        this.dataset.id,
-                        decodeURIComponent(this.dataset.code),
-                        decodeURIComponent(this.dataset.name),
-                        this.dataset.active === 'true'
-                    );
-                });
-            }
+        initListSwipe();
+        return;
+      }
+
+      // Grid / card view
+      let html = '<div class="employees-grid">';
+      list.forEach(emp => {
+        const id   = emp.id;
+        const code = encodeURIComponent(emp.employee_code);
+        const name = encodeURIComponent(emp.full_name);
+        html += `
+          <div class="emp-swipe-wrapper" data-id="${id}">
+            <div class="emp-card">
+              <div class="card-top">
+                <div class="emp-code">${emp.employee_code}</div>
+                <div class="emp-fullname">${emp.full_name}</div>
+              </div>
+            </div>
+            <div class="emp-swipe-btns">
+              <button class="emp-swipe-btn edit" onclick="openEditModal('${id}','${code}','${name}',${emp.is_active})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit
+              </button>
+              <button class="emp-swipe-btn delete" onclick="deleteEmployee('${id}','${name}')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                Delete
+              </button>
+            </div>
+          </div>`;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+      initCardSwipe();
+    }
+
+    /* ── Swipe: card grid ── */
+    function initCardSwipe() {
+      let revealed = null;
+      document.querySelectorAll('.emp-swipe-wrapper').forEach(wrapper => {
+        let startX, startY, dragged = false;
+        const card = wrapper.querySelector('.emp-card');
+
+        function onStart(x, y) { startX = x; startY = y; dragged = false; }
+        function onMove(x, y) {
+          if (Math.abs(y - startY) > Math.abs(x - startX)) return;
+          const dx = x - startX;
+          if (Math.abs(dx) > 8) dragged = true;
+          if (dx < -20 && wrapper !== revealed) {
+            if (revealed) revealed.classList.remove('revealed');
+            wrapper.classList.add('revealed'); revealed = wrapper;
+          } else if (dx > 20 && wrapper === revealed) {
+            wrapper.classList.remove('revealed'); revealed = null;
+          }
+        }
+
+        wrapper.addEventListener('touchstart', e => onStart(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+        wrapper.addEventListener('touchmove',  e => onMove(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+        wrapper.addEventListener('mousedown',  e => { if (e.button !== 0) return; onStart(e.clientX, e.clientY); wrapper._md = true; });
+        document.addEventListener('mousemove', e => { if (wrapper._md) onMove(e.clientX, e.clientY); });
+        document.addEventListener('mouseup',   e => { if (wrapper._md) { wrapper._md = false; } });
+
+        card.addEventListener('click', e => {
+          if (dragged) { dragged = false; return; }
+          if (e.target.closest('.emp-swipe-btns')) return;
+          if (wrapper.classList.contains('revealed')) { wrapper.classList.remove('revealed'); revealed = null; return; }
+          const id = wrapper.dataset.id;
+          const emp = empData.find(x => x.id == id);
+          if (emp) openEmpPanel(emp);
         });
-    };
+      });
 
-    window.showEmployeeDetail = function(id, code, name, isActive) {
-        document.getElementById('detail-employee-code').textContent = code;
-        document.getElementById('detail-employee-name').textContent = name;
-        const statusHtml = isActive ? '<span style="color: green; font-weight: bold;">Active</span>' : '<span style="color: red; font-weight: bold;">Inactive</span>';
-        document.getElementById('detail-employee-status').innerHTML = statusHtml;
-        
-        document.getElementById('detailEmployeeModal').dataset.id = id;
-        document.getElementById('detailEmployeeModal').dataset.code = code;
-        document.getElementById('detailEmployeeModal').dataset.name = name;
-        document.getElementById('detailEmployeeModal').dataset.active = isActive;
-        document.getElementById('detailEmployeeModal').classList.add('active');
-    };
-
-    window.closeDetailEmployeeModal = function() {
-        document.getElementById('detailEmployeeModal').classList.remove('active');
-    };
-
-    window.editEmployeeFromDetail = function() {
-        const modal = document.getElementById('detailEmployeeModal');
-        editEmployee(
-            modal.dataset.id,
-            modal.dataset.code,
-            modal.dataset.name,
-            modal.dataset.active === 'true'
-        );
-        closeDetailEmployeeModal();
-    };
-
-    window.deleteEmployeeFromDetail = function() {
-        const modal = document.getElementById('detailEmployeeModal');
-        deleteEmployee(modal.dataset.id, modal.dataset.name);
-        closeDetailEmployeeModal();
-    };
-
-    window.addEmployee = async function() {
-        const code = document.getElementById('add-employee-code').value.trim();
-        const name = document.getElementById('add-employee-name').value.trim();
-        const password = document.getElementById('add-employee-password').value;
-        const isActive = document.getElementById('add-employee-status').value === 'true';
-        
-        if (!code || !name || !password) {
-            showMessage('add-employee-message', 'Please fill in all fields', true);
-            return;
+      document.addEventListener('click', e => {
+        if (revealed && !revealed.contains(e.target) && !e.target.closest('.side-panel')) {
+          revealed.classList.remove('revealed'); revealed = null;
         }
-        
-        const { error } = await supabase.from('employees').insert([{
-            employee_code: code,
-            full_name: name,
-            password_hash: password,
-            is_active: isActive
-        }]);
-        
-        if (error) {
-            showMessage('add-employee-message', 'Error: ' + error.message, true);
-            return;
+      }, true);
+    }
+
+    /* ── Swipe: list view ── */
+    function initListSwipe() {
+      let revealed = null;
+      document.querySelectorAll('.swipe-wrapper').forEach(wrapper => {
+        let startX, startY, dragged = false;
+
+        wrapper.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; dragged = false; }, { passive: true });
+        wrapper.addEventListener('touchmove', e => {
+          const dx = e.touches[0].clientX - startX;
+          const dy = e.touches[0].clientY - startY;
+          if (Math.abs(dx) < Math.abs(dy)) return;
+          if (Math.abs(dx) > 8) dragged = true;
+          if (dx < -20 && wrapper !== revealed) {
+            if (revealed) revealed.classList.remove('revealed');
+            wrapper.classList.add('revealed'); revealed = wrapper;
+          } else if (dx > 20 && wrapper === revealed) {
+            wrapper.classList.remove('revealed'); revealed = null;
+          }
+        }, { passive: true });
+
+        wrapper.querySelector('.emp-list-row').addEventListener('click', e => {
+          if (dragged) { dragged = false; return; }
+          if (wrapper.classList.contains('revealed')) { wrapper.classList.remove('revealed'); revealed = null; return; }
+          const id = wrapper.dataset.id;
+          const emp = empData.find(x => x.id == id);
+          if (emp) openEmpPanel(emp);
+        });
+      });
+
+      document.addEventListener('click', e => {
+        if (revealed && !revealed.contains(e.target) && !e.target.closest('.side-panel')) {
+          revealed.classList.remove('revealed'); revealed = null;
         }
-        
-        showMessage('employees-message', 'Employee added successfully!');
-        document.getElementById('add-employee-code').value = '';
-        document.getElementById('add-employee-name').value = '';
-        document.getElementById('add-employee-password').value = '';
-        closeAddEmployeeModal();
-        loadEmployees();
+      }, true);
+    }
+
+    /* ── Side panel ── */
+    function setSelectedEmp(id) {
+      document.querySelectorAll('.emp-swipe-wrapper.selected, .swipe-wrapper.selected').forEach(el => el.classList.remove('selected'));
+      if (id != null) {
+        const el = document.querySelector(`.emp-swipe-wrapper[data-id="${id}"], .swipe-wrapper[data-id="${id}"]`);
+        if (el) el.classList.add('selected');
+      }
+    }
+
+    function openEmpPanel(emp) {
+      viewingEmp = emp;
+      setSelectedEmp(emp.id);
+      document.getElementById('emp-panel-content').innerHTML = `
+        <div class="panel-detail-header">
+          <div class="panel-detail-code">${emp.employee_code}</div>
+          <div class="panel-detail-name">${emp.full_name}</div>
+        </div>
+        <div class="panel-detail-row">
+          <span class="panel-detail-label">Status</span>
+          <span class="panel-detail-value">${emp.is_active ? 'Active' : 'Inactive'}</span>
+        </div>`;
+      document.getElementById('emp-panel-view').style.display = 'block';
+      document.getElementById('emp-panel-form').style.display = 'none';
+      document.getElementById('emp-side-panel').classList.add('active');
+    }
+
+    window.closeEmpPanel = function () {
+      document.getElementById('emp-side-panel').classList.remove('active');
+      setSelectedEmp(null);
+      viewingEmp = null;
+      document.getElementById('emp-top-title').textContent = '';
+      document.getElementById('emp-panel-view').style.display = 'block';
+      document.getElementById('emp-panel-form').style.display = 'none';
     };
 
-    window.openAddEmployeeModal = function() {
-        document.getElementById('addEmployeeModal').classList.add('active');
+    window.editFromPanel = function () {
+      if (!viewingEmp) return;
+      openEditModal(viewingEmp.id, encodeURIComponent(viewingEmp.employee_code), encodeURIComponent(viewingEmp.full_name), viewingEmp.is_active);
     };
 
-    window.closeAddEmployeeModal = function() {
-        document.getElementById('addEmployeeModal').classList.remove('active');
-        document.getElementById('add-employee-message').innerHTML = '';
+    window.deleteFromPanel = function () {
+      if (!viewingEmp) return;
+      const empId = viewingEmp.id;
+      const empName = encodeURIComponent(viewingEmp.full_name);
+      closeEmpPanel();
+      deleteEmployee(empId, empName);
     };
 
-    window.editEmployee = function(id, code, name, isActive) {
-        document.getElementById('edit-employee-id').value = id;
-        document.getElementById('edit-employee-code').value = code;
-        document.getElementById('edit-employee-fullname').value = name;
-        document.getElementById('edit-employee-password').value = '';
-        document.getElementById('edit-employee-active').value = isActive.toString();
-        document.getElementById('editEmployeeModal').classList.add('active');
+    /* ── Load ── */
+    window.loadEmployees = async function () {
+      const container = document.getElementById('emp-container');
+      container.innerHTML = '<div class="loading-state"><div class="spinner"></div>Loading employees…</div>';
+      const { data, error } = await supabase.from('employees').select('*').order('employee_code');
+      if (error) { container.innerHTML = '<div class="error-state">Failed to load employees.</div>'; return; }
+      empData = data || [];
+      searchEmployees();
     };
 
-    window.closeEditEmployeeModal = function() {
-        document.getElementById('editEmployeeModal').classList.remove('active');
+    /* ── Add / Edit (panel form) ── */
+    window.openAddModal = function () {
+      document.getElementById('emp-top-title').textContent = 'Add Employee';
+      document.getElementById('emp-save-btn').textContent = 'Add Employee';
+      document.getElementById('edit-id').value = '';
+      document.getElementById('emp-code').value = '';
+      document.getElementById('emp-name').value = '';
+      document.getElementById('emp-password').value = '';
+      document.getElementById('emp-status').value = 'true';
+      document.getElementById('emp-password-label').textContent = 'Password';
+      document.getElementById('emp-password').placeholder = 'Enter password';
+      document.getElementById('emp-panel-view').style.display = 'none';
+      document.getElementById('emp-panel-form').style.display = 'block';
+      document.getElementById('emp-side-panel').classList.add('active');
+      document.getElementById('emp-code').focus();
     };
 
-    window.updateEmployee = async function() {
-        const id = document.getElementById('edit-employee-id').value;
-        const code = document.getElementById('edit-employee-code').value.trim();
-        const name = document.getElementById('edit-employee-fullname').value.trim();
-        const password = document.getElementById('edit-employee-password').value;
-        const isActive = document.getElementById('edit-employee-active').value === 'true';
-        
-        if (!code || !name) {
-            showMessage('edit-employee-message', 'Please fill in all required fields', true);
-            return;
-        }
-        
-        const updateData = {
-            employee_code: code,
-            full_name: name,
-            is_active: isActive
-        };
-        
-        // Only update password if a new one is provided
-        if (password) {
-            updateData.password_hash = password;
-        }
-        
-        const { error } = await supabase
-            .from('employees')
-            .update(updateData)
-            .eq('id', id);
-        
-        if (error) {
-            showMessage('edit-employee-message', 'Error: ' + error.message, true);
-            return;
-        }
-        
-        showMessage('employees-message', 'Employee updated successfully!');
-        closeEditEmployeeModal();
-        loadEmployees();
+    window.openEditModal = function (id, code, name, isActive) {
+      document.getElementById('emp-top-title').textContent = 'Edit Employee';
+      document.getElementById('emp-save-btn').textContent = 'Save Changes';
+      document.getElementById('edit-id').value = id;
+      document.getElementById('emp-code').value = decodeURIComponent(code);
+      document.getElementById('emp-name').value = decodeURIComponent(name);
+      document.getElementById('emp-password').value = '';
+      document.getElementById('emp-status').value = String(isActive);
+      document.getElementById('emp-password-label').textContent = 'New Password (leave blank to keep current)';
+      document.getElementById('emp-password').placeholder = 'Leave blank to keep current';
+      document.getElementById('emp-panel-view').style.display = 'none';
+      document.getElementById('emp-panel-form').style.display = 'block';
+      document.getElementById('emp-side-panel').classList.add('active');
     };
 
-    window.deleteEmployee = async function(id, name) {
-        if (!confirm(`Delete employee "${name}"?`)) return;
-        
-        const { error } = await supabase.from('employees').delete().eq('id', id);
-        if (error) {
-            alert('Error: ' + error.message);
-            return;
-        }
-        
-        showMessage('employees-message', 'Employee deleted successfully!');
-        loadEmployees();
+    window.cancelEmpForm = function () {
+      if (viewingEmp) {
+        document.getElementById('emp-top-title').textContent = '';
+        document.getElementById('emp-panel-form').style.display = 'none';
+        document.getElementById('emp-panel-view').style.display = 'block';
+      } else {
+        closeEmpPanel();
+      }
     };
 
-    // Load data when this tab loads
+    window.saveEmployee = async function () {
+      const id = document.getElementById('edit-id').value;
+      const code = document.getElementById('emp-code').value.trim();
+      const name = document.getElementById('emp-name').value.trim();
+      const password = document.getElementById('emp-password').value;
+      const isActive = document.getElementById('emp-status').value === 'true';
+
+      if (!id) {
+        // Add mode
+        if (!code || !name || !password) { showToast('Please fill in all fields.', true); return; }
+        const { error } = await supabase.from('employees').insert([{ employee_code: code, full_name: name, password_hash: password, is_active: isActive }]);
+        if (error) { showToast('Error: ' + error.message, true); return; }
+        showToast('Employee added successfully.');
+      } else {
+        // Edit mode
+        if (!code || !name) { showToast('Please fill in all required fields.', true); return; }
+        const updateData = { employee_code: code, full_name: name, is_active: isActive };
+        if (password) updateData.password_hash = password;
+        const { error } = await supabase.from('employees').update(updateData).eq('id', id);
+        if (error) { showToast('Error: ' + error.message, true); return; }
+        showToast('Employee updated successfully.');
+      }
+      closeEmpPanel();
+      loadEmployees();
+    };
+
+    /* ── Delete ── */
+    window.deleteEmployee = async function (id, name) {
+      if (!confirm(`Delete employee "${decodeURIComponent(name)}"?`)) return;
+      const { error } = await supabase.from('employees').delete().eq('id', id);
+      if (error) { showToast('Error: ' + error.message, true); return; }
+      showToast('Employee deleted.');
+      loadEmployees();
+    };
+
     loadEmployees();
-})();
-</script>
+  })();
+  </script>
+<button class="fab" onclick="openAddModal()" title="Add Employee">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+</button>
+</body>
+</html>

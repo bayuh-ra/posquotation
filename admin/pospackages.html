@@ -1,300 +1,991 @@
-<link rel="stylesheet" href="admin/shared.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Package Types</title>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<style>
-/* Sub-navigation styles */
-.sub-navigation {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 0;
-}
-
-.sub-tab {
-    padding: 12px 24px;
-    background: transparent;
-    border: none;
-    border-bottom: 3px solid transparent;
-    cursor: pointer;
-    font-weight: 600;
-    color: #718096;
-    transition: all 0.3s;
-}
-
-.sub-tab:hover {
-    color: #667eea;
-}
-
-.sub-tab.active {
-    color: #667eea;
-    border-bottom-color: #667eea;
-}
-</style>
-
-<h2>Manage POS Packages</h2>
-
-<!-- Sub-navigation -->
-<div class="sub-navigation">
-    <button class="sub-tab active" onclick="switchPOSSubTab('pgtype')">
-        Package Types
-    </button>
-    <button class="sub-tab" onclick="switchPOSSubTab('pgproducts')">
-        Package Products
-    </button>
-</div>
-
-<!-- Content container for dynamically loaded sub-tabs -->
-<div id="pos-sub-content">
-    <div class="loading">Loading...</div>
-</div>
-
-<!-- PACKAGE TYPES MODALS -->
-
-<!-- Add Package Type Modal -->
-<div id="addPackageTypeModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Add New Package Type</h3>
-            <button class="close-btn" onclick="closeAddPackageTypeModal()">&times;</button>
-        </div>
-        <div id="add-package-type-message"></div>
-        <div class="form-group">
-            <label>Package Name *</label>
-            <input type="text" id="add-package-name" placeholder="e.g., Standard POS Retail Package">
-        </div>
-        <div class="form-group">
-            <label>Description/Inclusions</label>
-            <textarea id="add-package-description" placeholder="Package inclusions and details"></textarea>
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn btn-primary" onclick="addPackageType()" style="flex: 1;">Add Package Type</button>
-            <button class="btn btn-secondary" onclick="closeAddPackageTypeModal()" style="flex: 1;">Cancel</button>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Package Type Modal -->
-<div id="editPackageModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Edit Package Type</h3>
-            <button class="close-btn" onclick="closeEditPackageModal()">&times;</button>
-        </div>
-        <div id="edit-package-message"></div>
-        <input type="hidden" id="edit-package-old-name">
-        <div class="form-group">
-            <label>Package Name *</label>
-            <input type="text" id="edit-package-name">
-        </div>
-        <div class="form-group">
-            <label>Description/Inclusions</label>
-            <textarea id="edit-package-description"></textarea>
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn btn-primary" onclick="updatePackageType()">Update</button>
-            <button class="btn btn-secondary" onclick="closeEditPackageModal()">Cancel</button>
-        </div>
-    </div>
-</div>
-
-<!-- Package Type Detail Modal -->
-<div id="detailPackageModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Package Type Details</h3>
-            <button class="close-btn" onclick="closeDetailPackageModal()">&times;</button>
-        </div>
-        <div style="padding: 10px 0;">
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">NAME</label>
-                <div id="detail-package-name" style="font-size: 18px; font-weight: bold; color: #2d3748; margin-top: 5px;"></div>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">DESCRIPTION</label>
-                <div id="detail-package-description" style="font-size: 14px; color: #2d3748; margin-top: 5px; line-height: 1.6;"></div>
-            </div>
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
-            <button class="btn btn-warning" onclick="editPackageFromDetail()" style="flex: 1;">Edit</button>
-            <button class="btn btn-danger" onclick="deletePackageFromDetail()" style="flex: 1;">Delete</button>
-        </div>
-    </div>
-</div>
-
-<!-- PACKAGE PRODUCTS MODALS -->
-
-<!-- Package Products Detail Modal -->
-<div id="packageProductsModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="package-products-modal-title">Package Products</h3>
-            <button class="close-btn" onclick="closePackageProductsModal()">&times;</button>
-        </div>
-        <div class="table-container" id="package-products-modal-content">
-            <div class="loading">Loading...</div>
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
-            <button class="btn btn-secondary" onclick="closePackageProductsModal()" style="flex: 1;">Close</button>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Package Products Modal -->
-<div id="editPackageProductsModal" class="modal-overlay">
-    <div class="modal-content" style="max-width: 600px;">
-        <div class="modal-header">
-            <h3>Edit Package Product</h3>
-            <button class="close-btn" onclick="closeEditPackageProductModal()">&times;</button>
-        </div>
-        <div id="edit-package-product-message"></div>
-
-        <div class="form-group">
-            <label>Package Name:</label>
-            <div id="edit-pkg-name" style="padding: 10px; background: #f7fafc; border-radius: 8px; font-weight: 600; color: #2d3748;"></div>
-        </div>
-
-        <div class="form-group">
-            <label>Current Product:</label>
-            <div id="edit-pkg-current-product" style="padding: 10px; background: #f7fafc; border-radius: 8px; color: #2d3748;"></div>
-        </div>
-
-        <div class="form-group">
-            <label>Select New Product (to replace current):</label>
-            <select id="edit-pkg-product-select">
-                <option value="">-- Keep Current Product --</option>
-            </select>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-top: 25px;">
-            <button class="btn btn-primary" onclick="updatePackageProductChange()" style="flex: 1;">Replace Product</button>
-            <button class="btn btn-danger" onclick="deleteCurrentEditProduct()" style="flex: 1;">Delete</button>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <button class="btn btn-secondary" onclick="closeEditPackageProductModal()" style="flex: 1;">Cancel</button>
-        </div>
-
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
-            <h4 style="margin-bottom: 15px; color: #2d3748;">Or Add More Products to Package</h4>
-            <div class="product-checkbox-list" id="edit-pkg-products-list">
-                <div class="loading">Loading products...</div>
-            </div>
-            <button class="btn btn-success" onclick="addMoreProductsToPackage()" style="width: 100%; margin-top: 15px;">Add Selected Products</button>
-        </div>
-    </div>
-</div>
-
-<!-- Add Package Product Modal -->
-<div id="addPackageProductModal" class="modal-overlay">
-    <div class="modal-content" style="max-width: 600px;">
-        <div class="modal-header">
-            <h3>Add Products to Package</h3>
-            <button class="close-btn" onclick="closeAddPackageProductModal()">&times;</button>
-        </div>
-        <div id="add-package-product-message"></div>
-        
-        <div class="form-group">
-            <label>Select Package Type *</label>
-            <select id="pp-package-type-select">
-                <option value="">Select a package type</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Selected Package: <strong id="selected-package-name-new" style="color: #667eea;">None</strong></label>
-        </div>
-
-        <div class="form-group">
-            <label>Select Products (Check all that apply):</label>
-            <div class="product-checkbox-list" id="products-checkbox-list-new">
-                <div class="loading">Please select a package type first...</div>
-            </div>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button class="btn btn-primary" onclick="addMultipleProductsNew()" style="flex: 1;">Add Selected Products</button>
-            <button class="btn btn-secondary" onclick="closeAddPackageProductModal()" style="flex: 1;">Cancel</button>
-        </div>
-    </div>
-</div>
-
-<!-- Package Product Filter Modal -->
-<div id="packageProductFilterModal" class="modal-overlay">
-    <div class="modal-content" style="max-width: 500px;">
-        <div class="modal-header">
-            <h3>Filter Package Products</h3>
-            <button class="close-btn" onclick="closePackageProductFilterModal()">&times;</button>
-        </div>
-        <div class="form-group">
-            <label>Filter by Package Type</label>
-            <select id="filter-package-type">
-                <option value="">All Package Types</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Filter by Product</label>
-            <select id="filter-product">
-                <option value="">All Products</option>
-            </select>
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button class="btn btn-primary" onclick="applyPackageProductFilter()" style="flex: 1;">Apply Filter</button>
-            <button class="btn btn-secondary" onclick="clearPackageProductFilters()" style="flex: 1;">Clear All</button>
-        </div>
-    </div>
-</div>
-
-<script>
-(function() {
-    let currentSubTab = null;
-
-    // Function to load sub-tab content dynamically
-    async function loadSubTabContent(filePath) {
-        const container = document.getElementById('pos-sub-content');
-        
-        try {
-            const response = await fetch(filePath);
-            if (!response.ok) {
-                throw new Error(`Failed to load ${filePath}`);
-            }
-            
-            const html = await response.text();
-            container.innerHTML = html;
-            
-            // Execute scripts in the loaded content
-            const scripts = container.querySelectorAll('script');
-            scripts.forEach(oldScript => {
-                try {
-                    const scriptContent = oldScript.innerHTML;
-                    const scriptFunction = new Function(scriptContent);
-                    scriptFunction();
-                } catch (error) {
-                    console.error('Error executing sub-tab script:', error);
-                }
-            });
-        } catch (error) {
-            container.innerHTML = '<p class="error">Error loading sub-tab: ' + error.message + '</p>';
-            console.error('Error loading sub-tab:', error);
-        }
+    :root {
+      --bg: #eaf0f6;
+      --card-bg: #ffffff;
+      --purple: #0a57b0;
+      --purple-light: #e8f1fc;
+      --purple-mid: #1a68c4;
+      --text-primary: #1a1a2e;
+      --text-secondary: #6b7280;
+      --price-color: #e8192c;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 2px 12px rgba(10,87,176,0.07);
     }
 
-    // Function to switch between sub-tabs
-    window.switchPOSSubTab = async function(subTabName) {
-        // Don't reload if already on this tab
-        if (currentSubTab === subTabName) return;
-        
-        currentSubTab = subTabName;
-        
-        // Update active state on buttons
-        document.querySelectorAll('.sub-tab').forEach(tab => tab.classList.remove('active'));
-        event.target.classList.add('active');
-        
-        // Load the corresponding HTML file
-        const filePath = `admin/${subTabName}.html`;
-        await loadSubTabContent(filePath);
-    };
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: transparent;
+      color: var(--text-primary);
+    }
 
-    // Load the default tab (Package Types) on page load
-    loadSubTabContent('admin/pgtype.html');
-})();
+    /* ── Header row ── */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .page-title h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .page-title p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ── View toggle ── */
+    .view-toggle {
+      display: flex;
+      background: #dde3ec;
+      border-radius: 10px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .view-toggle button {
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      padding: 7px 10px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .view-toggle button.active {
+      background: var(--purple);
+      color: #fff;
+    }
+
+    .view-toggle button svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ── FAB ── */
+    .fab {
+      position: fixed; bottom: 28px; right: 28px;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--purple); color: #fff; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(10,87,176,0.45);
+      z-index: 100;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+    .fab:hover { background: var(--purple-mid); transform: translateY(-2px); box-shadow: 0 6px 28px rgba(10,87,176,0.55); }
+    .fab:active { transform: translateY(0); }
+    .fab svg { width: 24px; height: 24px; }
+
+    /* ── States ── */
+    .loading-state, .empty-state, .error-state {
+      text-align: center;
+      padding: 64px 24px;
+      color: var(--text-secondary);
+    }
+
+    .loading-state .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--purple-light);
+      border-top-color: var(--purple);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Grid layout ── */
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ── List layout ── */
+    .packages-list {
+      width: 100%;
+    }
+
+    .list-table {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      width: 100%;
+    }
+
+    .list-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      padding: 10px 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #0a3a80;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      background: var(--purple-light);
+      border-bottom: 1px solid #c5d8f0;
+    }
+
+    /* list rows inside swipe wrappers */
+    .list-table .swipe-wrapper {
+      border-radius: 0;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      box-shadow: none;
+      animation: none;
+    }
+
+    .list-table .swipe-wrapper:last-child { border-bottom: none; }
+    .list-table .swipe-wrapper:hover { transform: none; box-shadow: none; background: #f9f8ff; }
+
+    .list-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      padding: 12px 20px;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+
+    .list-name-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .list-pkg-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-pkg-price {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--price-color);
+    }
+
+    .count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--purple-light);
+      color: var(--purple);
+      border-radius: 20px;
+      padding: 3px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      min-width: 36px;
+    }
+
+    .list-price {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--price-color);
+      text-align: right;
+    }
+
+    /* ── Card ── */
+    /* ── Swipe wrapper (card + list) ── */
+    .swipe-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      animation: fadeUp 0.3s ease both;
+      transition: box-shadow 0.2s, transform 0.15s;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .swipe-wrapper:hover {
+      box-shadow: 0 6px 24px rgba(10,87,176,0.13);
+      transform: translateY(-2px);
+    }
+    .swipe-wrapper.selected { border-color: var(--purple); box-shadow: 0 0 0 2px var(--purple); }
+    .swipe-wrapper.selected .pkg-card { background: var(--purple-light) !important; }
+    .swipe-wrapper.selected .card-top { background: #cfe0f8 !important; }
+    .swipe-wrapper.selected .card-body { background: var(--purple-light) !important; }
+    .swipe-wrapper.selected .list-row { background: var(--purple-light) !important; border-left: 3px solid var(--purple); }
+
+    .swipe-wrapper:nth-child(1) { animation-delay: 0.05s; }
+    .swipe-wrapper:nth-child(2) { animation-delay: 0.10s; }
+    .swipe-wrapper:nth-child(3) { animation-delay: 0.15s; }
+    .swipe-wrapper:nth-child(4) { animation-delay: 0.20s; }
+    .swipe-wrapper:nth-child(5) { animation-delay: 0.25s; }
+    .swipe-wrapper:nth-child(6) { animation-delay: 0.30s; }
+
+    /* Slide content left when swiped */
+    .swipe-wrapper.revealed .pkg-card,
+    .swipe-wrapper.revealed .list-row {
+      transform: translateX(-130px);
+    }
+
+    /* Action buttons revealed on swipe */
+    .swipe-action-btns {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 130px;
+      display: flex;
+      z-index: 0;
+    }
+
+    .action-btn {
+      flex: 1;
+      border: none;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      letter-spacing: 0.02em;
+    }
+
+    .action-btn-edit  { background: var(--purple); color: #fff; }
+    .action-btn-delete { background: #e53e3e; color: #fff; }
+
+    .action-btn svg { width: 18px; height: 18px; }
+
+    .pkg-card {
+      background: var(--card-bg);
+      padding: 20px 20px 16px 20px;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--purple-light);
+      border-radius: 14px 14px 0 0;
+      margin: -20px -20px 18px -20px;
+      padding: 16px 20px;
+    }
+
+    .card-name-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .pkg-icon {
+      width: 40px; height: 40px;
+      background: var(--purple);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .pkg-icon svg { width: 20px; height: 20px; color: #fff; }
+
+    .pkg-name {
+      font-size: 0.97rem;
+      font-weight: 600;
+      color: #0a3a80;
+      line-height: 1.3;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .btn-edit {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #b0b8c9;
+      padding: 4px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .btn-edit:hover { color: var(--purple); background: var(--purple-light); }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 16px;
+    }
+
+    .item-count {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .pkg-price {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--price-color);
+    }
+
+    .btn-manage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      background: var(--purple-light);
+      color: var(--purple);
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-manage:hover { background: #d0e3f8; }
+
+    .btn-manage svg { width: 15px; height: 15px; }
+
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+    }
+
+    .form-group input:focus { border-color: var(--purple); }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      justify-content: flex-end;
+    }
+
+    .btn-cancel {
+      background: var(--border);
+      color: var(--text-secondary);
+      border: none;
+      border-radius: 9px;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-save {
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: 10px 22px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-save:hover { background: var(--purple-mid); }
+
+    /* ── Form Side Panel ── */
+    .form-panel {
+      position: fixed; top: 0; right: 0; bottom: 0; width: 400px;
+      background: white; border-left: 1px solid var(--border);
+      box-shadow: -4px 0 28px rgba(10,87,176,0.10);
+      padding: 0; overflow-y: auto; z-index: 200;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .form-panel.active { transform: translateX(0); }
+    @media (max-width: 768px) { .form-panel { width: 100%; border-left: none; } }
+    .panel-top-bar { display: flex; justify-content: flex-start; align-items: center; gap: 12px; padding: 16px 20px; }
+    .panel-top-title { flex: 1; text-align: right; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+    .panel-close-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; background: #0a57b0;
+      border: none; border-radius: 50%; cursor: pointer;
+      color: #fff; transition: background 0.15s;
+    }
+    .panel-close-btn:hover { background: #1a68c4; }
+    .panel-close-btn svg { width: 16px; height: 16px; }
+
+    /* ── Manage Items Panel ── */
+    #manage-panel { width: 600px; }
+    @media (max-width: 768px) { #manage-panel { width: 100%; } }
+    #manage-panel-body { padding: 24px 24px 40px; transition: opacity 0.15s ease; }
+    .panel-form-body { padding: 8px 24px 32px; }
+    .panel-form-title { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
+
+    .toast {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      background: #1a1a2e;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      z-index: 2000;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-title">
+    <h1>Package Types</h1>
+    <p id="pkg-count">Loading...</p>
+  </div>
+  <div class="header-actions">
+    <div class="view-toggle">
+      <button class="active" id="btn-grid" title="Grid view" onclick="setView('grid')">
+        <svg viewBox="0 0 16 16" fill="currentColor">
+          <rect x="1" y="1" width="6" height="6" rx="1.2"/>
+          <rect x="9" y="1" width="6" height="6" rx="1.2"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.2"/>
+          <rect x="9" y="9" width="6" height="6" rx="1.2"/>
+        </svg>
+      </button>
+      <button id="btn-list" title="List view" onclick="setView('list')">
+        <svg viewBox="0 0 16 16" fill="currentColor">
+          <rect x="1" y="2" width="14" height="2.5" rx="1.2"/>
+          <rect x="1" y="6.75" width="14" height="2.5" rx="1.2"/>
+          <rect x="1" y="11.5" width="14" height="2.5" rx="1.2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Search bar -->
+<div style="background:white;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 16px;margin-bottom:20px;">
+  <div style="display:flex;align-items:center;gap:8px;border:1.5px solid var(--border);border-radius:10px;padding:9px 13px;transition:border-color 0.15s;" id="pkg-search-wrap">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="pkg-search" placeholder="Search packages…" oninput="searchPackages()" style="border:none;outline:none;font-size:0.9rem;width:100%;font-family:inherit;color:#1a1a2e;" />
+  </div>
+</div>
+
+<div id="packages-container" class="packages-grid">
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading package types…</p>
+  </div>
+</div>
+
+<div class="form-panel" id="pkg-form-panel">
+  <div class="panel-top-bar">
+    <button class="panel-close-btn" onclick="closeFormPanel()" title="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+    <span class="panel-top-title" id="pkg-panel-title">Add Package Type</span>
+  </div>
+  <div class="panel-form-body">
+    <div class="form-group">
+      <label>Package Name</label>
+      <input type="text" id="input-name" placeholder="e.g. Basic R5 FASTFOOD POS Package" />
+    </div>
+    <div class="form-group">
+      <label>Price (₱)</label>
+      <input type="number" id="input-price" placeholder="e.g. 45000" />
+    </div>
+    <div class="form-group">
+      <label>Description (optional)</label>
+      <input type="text" id="input-desc" placeholder="Brief description…" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeFormPanel()">Cancel</button>
+      <button class="btn-save" onclick="savePackage()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manage Items Side Panel -->
+<div class="form-panel" id="manage-panel">
+  <div id="manage-panel-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── STATE ────────────────────────────────────────────────
+  var packages = [];
+  var managePanelHtml = null;
+  var selectedPkgId = null;
+
+  function setSelectedPkg(id) {
+    document.querySelectorAll('.swipe-wrapper.selected').forEach(function(el) { el.classList.remove('selected'); });
+    selectedPkgId = id;
+    if (id) {
+      var el = document.querySelector('.swipe-wrapper[data-id="' + id + '"]');
+      if (el) el.classList.add('selected');
+    }
+  }
+  var viewMode = 'grid';
+  var editingId = null;
+
+  // Use the shared Supabase client initialised by admin.html
+  var db = window.supabaseClient || window.lapSupabaseClient;
+
+  // ─── INIT ─────────────────────────────────────────────────
+  loadPackages();
+
+  async function loadPackages() {
+    const container = document.getElementById('packages-container');
+    container.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>Loading package types…</p></div>`;
+
+    try {
+      const { data: pkgData, error: pkgErr } = await db
+        .from('package_type')
+        .select('id,name,description,package_price')
+        .order('created_at', { ascending: true });
+
+      if (pkgErr) throw new Error(pkgErr.message);
+      packages = pkgData || [];
+
+      // Load item counts from package_type_products
+      const { data: itemData } = await db
+        .from('package_type_products')
+        .select('package_type_name');
+
+      const counts = {};
+      if (itemData) {
+        itemData.forEach(function(r) {
+          counts[r.package_type_name] = (counts[r.package_type_name] || 0) + 1;
+        });
+      }
+      packages = packages.map(function(p) {
+        return Object.assign({}, p, { item_count: counts[p.name] || 0 });
+      });
+
+      render();
+    } catch (err) {
+      container.innerHTML = `<div class="error-state">⚠️ Failed to load: ${err.message}</div>`;
+    }
+  }
+
+  // ─── RENDER ───────────────────────────────────────────────
+  function render() {
+    const container = document.getElementById('packages-container');
+    const countEl = document.getElementById('pkg-count');
+
+    countEl.textContent = `${packages.length} package type${packages.length !== 1 ? 's' : ''}`;
+
+    const q = (document.getElementById('pkg-search') ? document.getElementById('pkg-search').value : '').toLowerCase();
+    const list = q ? packages.filter(p => p.name.toLowerCase().includes(q)) : packages;
+
+    if (list.length === 0) {
+      container.className = 'packages-grid';
+      container.innerHTML = packages.length === 0
+        ? `<div class="empty-state"><p>No package types yet. Click <strong>+ Add Package Type</strong> to get started.</p></div>`
+        : `<div class="empty-state"><p>No packages match your search.</p></div>`;
+      return;
+    }
+
+    if (viewMode === 'list') {
+      container.className = 'packages-list';
+      const rows = list.map(pkg => {
+        const price = parseFloat(pkg.package_price || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 });
+        const count = pkg.item_count || 0;
+        return `<div class="swipe-wrapper" data-id="${pkg.id}">
+          <div class="list-row">
+            <div class="list-name-cell">
+              <span class="list-pkg-name">${escHtml(pkg.name)}</span>
+              <span class="list-pkg-price">&#8369;${price}</span>
+            </div>
+            <span class="count-badge">${count}</span>
+          </div>
+          <div class="swipe-action-btns">
+            <button class="action-btn action-btn-edit" data-id="${pkg.id}">
+              ${editIconSVG()} Edit
+            </button>
+            <button class="action-btn action-btn-delete" data-id="${pkg.id}">
+              ${trashIconSVG()} Delete
+            </button>
+          </div>
+        </div>`;
+      }).join('');
+      container.innerHTML = `<div class="list-table">
+        <div class="list-header">
+          <span>Package Name</span>
+          <span>Items</span>
+        </div>
+        ${rows}
+      </div>`;
+      attachSwipeGestures();
+      return;
+    }
+
+    container.className = 'packages-grid';
+    container.innerHTML = list.map(pkg => renderCard(pkg)).join('');
+    attachSwipeGestures();
+  }
+
+  function renderCard(pkg) {
+    const price = parseFloat(pkg.package_price || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 });
+    const count = pkg.item_count || 0;
+
+    return `
+      <div class="swipe-wrapper" data-id="${pkg.id}">
+        <div class="pkg-card">
+          <div class="card-top">
+            <div class="card-name-row">
+              <span class="pkg-name">${escHtml(pkg.name)}</span>
+            </div>
+          </div>
+          <div class="card-meta">
+            <span class="item-count">${count} item${count !== 1 ? 's' : ''}</span>
+            <span class="pkg-price">&#8369;${price}</span>
+          </div>
+          <button class="btn-manage">
+            ${boxIconSVG()} Manage Items &rsaquo;
+          </button>
+        </div>
+        <div class="swipe-action-btns">
+          <button class="action-btn action-btn-edit" data-id="${pkg.id}">
+            ${editIconSVG()} Edit
+          </button>
+          <button class="action-btn action-btn-delete" data-id="${pkg.id}">
+            ${trashIconSVG()} Delete
+          </button>
+        </div>
+      </div>`;
+  }
+
+  // ─── SEARCH ──────────────────────────────────────────────
+  window.searchPackages = function () {
+    render();
+  };
+
+  // ─── VIEW TOGGLE ─────────────────────────────────────────
+  function setView(mode) {
+    viewMode = mode;
+    document.getElementById('btn-grid').classList.toggle('active', mode === 'grid');
+    document.getElementById('btn-list').classList.toggle('active', mode === 'list');
+    render();
+  }
+
+  // ─── FORM PANEL ──────────────────────────────────────────
+  function openAddModal() {
+    editingId = null;
+    document.getElementById('pkg-panel-title').textContent = 'Add Package Type';
+    document.getElementById('input-name').value = '';
+    document.getElementById('input-price').value = '';
+    document.getElementById('input-desc').value = '';
+    document.getElementById('pkg-form-panel').classList.add('active');
+  }
+
+  function openEditModal(id) {
+    const pkg = packages.find(p => p.id === id);
+    if (!pkg) return;
+    editingId = id;
+    document.getElementById('pkg-panel-title').textContent = 'Edit Package Type';
+    document.getElementById('input-name').value = pkg.name || '';
+    document.getElementById('input-price').value = pkg.package_price || '';
+    document.getElementById('input-desc').value = pkg.description && pkg.description !== 'EMPTY' ? pkg.description : '';
+    document.getElementById('pkg-form-panel').classList.add('active');
+  }
+
+  function closeFormPanel() {
+    document.getElementById('pkg-form-panel').classList.remove('active');
+  }
+
+  window.openEditFromManage = function(id) {
+    closeManagePanel();
+    openEditModal(id);
+  };
+
+  async function savePackage() {
+    const name = document.getElementById('input-name').value.trim();
+    const price = parseFloat(document.getElementById('input-price').value);
+    const desc = document.getElementById('input-desc').value.trim() || null;
+
+    if (!name) { showToast('Please enter a package name.'); return; }
+    if (isNaN(price) || price < 0) { showToast('Please enter a valid price.'); return; }
+
+    const body = { name, package_price: price, description: desc };
+
+    try {
+      let error;
+      if (editingId) {
+        ({ error } = await db.from('package_type').update(body).eq('id', editingId));
+      } else {
+        ({ error } = await db.from('package_type').insert(body));
+      }
+
+      if (error) throw new Error(error.message);
+      closeFormPanel();
+      showToast(editingId ? 'Package updated!' : 'Package added!');
+      await loadPackages();
+    } catch (err) {
+      showToast('Error: ' + err.message);
+    }
+  }
+
+  // ─── NAVIGATE TO MANAGE ITEMS ─────────────────────────────
+  function openManageItems(id) {
+    const pkg = packages.find(p => p.id === id);
+    if (!pkg) return;
+    window.selectedPackage = pkg;
+    setSelectedPkg(id);
+    const panel = document.getElementById('manage-panel');
+    const body = document.getElementById('manage-panel-body');
+    const isOpen = panel.classList.contains('active');
+
+    function injectHtml(html) {
+      body.innerHTML = html;
+      body.querySelectorAll('script').forEach(function(old) {
+        var s = document.createElement('script');
+        Array.from(old.attributes).forEach(function(a) { s.setAttribute(a.name, a.value); });
+        s.textContent = old.textContent;
+        old.parentNode.replaceChild(s, old);
+      });
+      window.goBackToPackages = function() { closeManagePanel(); };
+      body.style.opacity = '1';
+    }
+
+    panel.classList.add('active');
+
+    if (managePanelHtml) {
+      // Already cached — fade out → swap → fade in
+      if (isOpen) body.style.opacity = '0';
+      setTimeout(function() { injectHtml(managePanelHtml); }, isOpen ? 150 : 0);
+    } else {
+      body.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#718096">Loading…</div>';
+      fetch('admin/pgmanageitems.html')
+        .then(r => r.text())
+        .then(function(html) {
+          managePanelHtml = html;
+          injectHtml(html);
+        })
+        .catch(function() {
+          body.innerHTML = '<div style="padding:20px;color:#e53e3e">Failed to load.</div>';
+        });
+    }
+  }
+
+  function closeManagePanel() {
+    document.getElementById('manage-panel').classList.remove('active');
+    document.getElementById('manage-panel-body').innerHTML = '';
+    document.getElementById('manage-panel-body').style.opacity = '1';
+    setSelectedPkg(null);
+  }
+
+  // ─── DELETE PACKAGE ───────────────────────────────────────
+  async function deletePackage(id) {
+    if (!confirm('Delete this package type? This cannot be undone.')) return;
+    closeAllSwipes();
+    const { error } = await db.from('package_type').delete().eq('id', id);
+    if (error) { showToast('Error: ' + error.message); return; }
+    showToast('Package deleted.');
+    await loadPackages();
+  }
+
+  // ─── SWIPE GESTURES ───────────────────────────────────────
+  function closeAllSwipes() {
+    document.querySelectorAll('.swipe-wrapper.revealed').forEach(function(w) {
+      w.classList.remove('revealed');
+    });
+  }
+
+  function attachSwipeGestures() {
+    document.querySelectorAll('.swipe-wrapper').forEach(function(wrapper) {
+      var startX, startY, dragged;
+
+      function onDragStart(x, y) {
+        startX = x; startY = y; dragged = false;
+      }
+
+      function onDragEnd(x, y) {
+        var dx = x - startX;
+        var dy = y - startY;
+        if (Math.abs(dx) > 8) dragged = true;
+        if (dragged && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+          if (dx < 0) { closeAllSwipes(); wrapper.classList.add('revealed'); }
+          else { wrapper.classList.remove('revealed'); }
+        }
+      }
+
+      // Touch
+      wrapper.addEventListener('touchstart', function(e) {
+        onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+
+      wrapper.addEventListener('touchend', function(e) {
+        onDragEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      }, { passive: true });
+
+      // Mouse (desktop)
+      wrapper.addEventListener('mousedown', function(e) {
+        if (e.button !== 0) return;
+        onDragStart(e.clientX, e.clientY);
+        wrapper._mouseDown = true;
+      });
+
+      window.addEventListener('mousemove', function(e) {
+        if (!wrapper._mouseDown) return;
+        if (Math.abs(e.clientX - startX) > 8) dragged = true;
+      });
+
+      window.addEventListener('mouseup', function(e) {
+        if (!wrapper._mouseDown) return;
+        wrapper._mouseDown = false;
+        onDragEnd(e.clientX, e.clientY);
+      });
+
+      // Click navigates (only if not a drag)
+      wrapper.addEventListener('click', function(e) {
+        if (dragged) { dragged = false; return; }
+        if (e.target.closest('.swipe-action-btns')) return;
+        if (wrapper.classList.contains('revealed')) { closeAllSwipes(); return; }
+        openManageItems(wrapper.dataset.id);
+      });
+
+      // Edit button
+      var editBtn = wrapper.querySelector('.action-btn-edit');
+      if (editBtn) {
+        editBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          closeAllSwipes();
+          closeManagePanel();
+          openEditModal(editBtn.dataset.id);
+        });
+      }
+
+      // Delete button
+      var delBtn = wrapper.querySelector('.action-btn-delete');
+      if (delBtn) {
+        delBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          deletePackage(delBtn.dataset.id);
+        });
+      }
+    });
+
+    // Close swipe when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.swipe-wrapper')) closeAllSwipes();
+    });
+  }
+
+  // ─── TOAST ───────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ─── HELPERS ─────────────────────────────────────────────
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function iconSVG() {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    </svg>`;
+  }
+
+  function boxIconSVG() {
+    return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+    </svg>`;
+  }
+
+  function trashIconSVG() {
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      <path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+    </svg>`;
+  }
+
+  function editIconSVG() {
+    return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>`;
+  }
+
 </script>
+<button class="fab" onclick="openAddModal()" title="Add Package Type">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+</button>
+</body>
+</html>

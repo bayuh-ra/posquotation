@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Items</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #0a57b0;
+      --purple-light: #e8f1fc;
+      --purple-mid: #1a68c4;
+      --text-primary: #1a1a2e;
+      --text-secondary: #6b7280;
+      --price-color: #e8192c;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 2px 12px rgba(10,87,176,0.07);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: var(--text-primary);
+      padding-bottom: 40px;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .btn-back {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: #0a57b0;
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(10,87,176,0.35);
+      transition: background 0.15s;
+    }
+
+    .btn-back:hover { background: #1a68c4; }
+    .btn-back svg { width: 16px; height: 16px; }
+
+    .header-info {
+      flex: 1;
+      text-align: right;
+    }
+
+    .btn-edit-pkg {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: #0a57b0;
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(10,87,176,0.35);
+      transition: background 0.15s;
+    }
+    .btn-edit-pkg:hover { background: #1a68c4; }
+    .btn-edit-pkg svg { width: 15px; height: 15px; }
+
+    .header-info h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .header-info p {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .header-info .price { color: var(--price-color); font-weight: 600; }
+
+    /* ── Section cards ── */
+    .section-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    /* ── Add product ── */
+    .section-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px 0;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .count-badge {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--purple-light);
+      color: var(--purple);
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .add-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 16px 16px;
+      position: relative;
+    }
+
+    /* ── Custom dropdown ── */
+    .dropdown-wrap {
+      position: static;
+      flex: 1;
+    }
+
+    .dropdown-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: border-color 0.15s;
+      user-select: none;
+    }
+
+    .dropdown-trigger.open { border-color: var(--purple); }
+    .dropdown-trigger .trigger-text { flex: 1; text-align: left; }
+    .dropdown-trigger .trigger-text.selected { color: var(--text-primary); font-weight: 500; }
+    .dropdown-trigger svg { width: 14px; height: 14px; flex-shrink: 0; transition: transform 0.2s; }
+    .dropdown-trigger.open svg { transform: rotate(180deg); }
+
+    .dropdown-panel {
+      position: absolute;
+      top: calc(100% - 10px);
+      left: 0; right: 0;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      z-index: 999;
+      display: none;
+    }
+
+    .dropdown-panel.open { display: block; }
+
+    .dropdown-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dropdown-search svg { width: 14px; height: 14px; color: var(--text-secondary); flex-shrink: 0; }
+
+    .dropdown-search input {
+      border: none; outline: none;
+      font-size: 0.88rem; width: 100%;
+      font-family: inherit; color: var(--text-primary);
+    }
+
+    .dropdown-list { max-height: 220px; overflow-y: auto; }
+
+    .dropdown-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: background 0.12s;
+      gap: 10px;
+    }
+
+    .dropdown-option:hover { background: #f9f8ff; }
+    .dropdown-option.active { background: var(--purple-light); }
+
+    .option-name {
+      font-size: 0.88rem; font-weight: 500;
+      color: var(--text-primary);
+      flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .option-badge {
+      background: var(--purple-light);
+      color: var(--purple);
+      font-size: 0.75rem; font-weight: 600;
+      padding: 3px 9px; border-radius: 20px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    .dropdown-empty {
+      padding: 20px; text-align: center;
+      color: var(--text-secondary); font-size: 0.85rem;
+    }
+
+    /* ── Add button ── */
+    .btn-add-item {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--purple); color: #fff;
+      border: none; border-radius: 12px;
+      padding: 11px 20px;
+      font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+      transition: background 0.15s; flex-shrink: 0;
+    }
+
+    .btn-add-item:hover { background: var(--purple-mid); }
+    .btn-add-item svg { width: 13px; height: 13px; }
+
+    /* ── Item rows with swipe ── */
+    .item-swipe-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .item-row {
+      display: flex;
+      align-items: center;
+      padding: 13px 20px;
+      gap: 10px;
+      background: white;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+      cursor: default;
+    }
+
+    .item-bullet {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--purple);
+      flex-shrink: 0;
+    }
+
+    .item-name {
+      flex: 1;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .swipe-hint {
+      font-size: 0.75rem;
+      color: #c4cad6;
+      font-style: italic;
+      white-space: nowrap;
+    }
+
+    /* Delete action revealed on swipe */
+    .item-delete-action {
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 90px;
+      background: #e53e3e;
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.82rem; font-weight: 700;
+      z-index: 0;
+      cursor: pointer;
+      gap: 5px;
+    }
+
+    .item-delete-action svg { width: 15px; height: 15px; }
+
+    .item-swipe-wrapper.revealed .item-row {
+      transform: translateX(-90px);
+    }
+
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border);
+    }
+
+    .empty-state svg { width: 36px; height: 36px; margin-bottom: 10px; opacity: 0.3; }
+    .empty-state p { font-size: 0.88rem; font-weight: 600; margin-bottom: 3px; }
+    .empty-state span { font-size: 0.8rem; }
+
+    /* ── Loading ── */
+    .loading-state { text-align: center; padding: 32px; color: var(--text-secondary); border-top: 1px solid var(--border); }
+    .spinner {
+      width: 26px; height: 26px;
+      border: 3px solid var(--purple-light);
+      border-top-color: var(--purple);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: #1a1a2e; color: #fff;
+      padding: 11px 18px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 500;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none; z-index: 2000;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="page-header">
+  <button class="btn-back" onclick="goBackToPackages()" title="Back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+  </button>
+  <div class="header-info">
+    <h1 id="pkg-title">Package Items</h1>
+    <p id="pkg-subtitle"></p>
+  </div>
+</div>
+
+<!-- Add Product -->
+<div class="section-card" style="overflow:visible">
+  <div class="section-label-row">
+    <span class="section-label">Add Product</span>
+  </div>
+  <div class="add-row">
+    <div class="dropdown-wrap" id="dropdown-wrap">
+      <div class="dropdown-trigger" id="dropdown-trigger" onclick="toggleDropdown()">
+        <span class="trigger-text" id="trigger-text">Select a product…</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <div class="dropdown-panel" id="dropdown-panel">
+        <div class="dropdown-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="search-input" placeholder="Search products…" oninput="filterOptions()" />
+        </div>
+        <div class="dropdown-list" id="dropdown-list"></div>
+      </div>
+    </div>
+    <button class="btn-add-item" onclick="addItem()">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M7 1v12M1 7h12"/>
+      </svg>
+      Add
+    </button>
+  </div>
+</div>
+
+<!-- Items in this package -->
+<div class="section-card" id="items-section">
+  <div class="section-label-row">
+    <span class="section-label">Items in this Package</span>
+    <span class="count-badge" id="items-count-badge">0</span>
+  </div>
+  <div id="items-container">
+    <div class="loading-state"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  var db = window.supabaseClient || window.lapSupabaseClient;
+  var pkg = window.selectedPackage;
+
+  var allProducts = [];
+  var packageItems = [];
+  var selectedProduct = null;
+
+  if (!pkg) {
+    document.getElementById('items-container').innerHTML =
+      '<div class="empty-state"><p>No package selected.</p></div>';
+  } else {
+    document.getElementById('pkg-title').textContent = pkg.name;
+    updateSubtitle();
+    init();
+  }
+
+  function updateSubtitle() {
+    var count = packageItems.length;
+    var price = parseFloat(pkg.package_price || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 });
+    document.getElementById('pkg-subtitle').innerHTML =
+      count + ' item' + (count !== 1 ? 's' : '') +
+      ' &middot; <span class="price">&#8369;' + price + '</span>';
+    document.getElementById('items-count-badge').textContent = count;
+  }
+
+  async function init() {
+    await Promise.all([loadProducts(), loadItems()]);
+  }
+
+  async function loadProducts() {
+    var result = await db.from('products').select('id, name, base_price, unit').order('name', { ascending: true });
+    if (result.error) return;
+    allProducts = result.data || [];
+  }
+
+  async function loadItems() {
+    document.getElementById('items-container').innerHTML =
+      '<div class="loading-state"><div class="spinner"></div></div>';
+
+    var result = await db.from('package_type_products')
+      .select('id, product_name')
+      .eq('package_type_name', pkg.name)
+      .order('product_name', { ascending: true });
+
+    if (result.error) {
+      document.getElementById('items-container').innerHTML =
+        '<div class="empty-state"><p>&#9888; ' + result.error.message + '</p></div>';
+      return;
+    }
+
+    packageItems = result.data || [];
+    updateSubtitle();
+    renderItems();
+    rebuildDropdownList();
+  }
+
+  function renderItems() {
+    var container = document.getElementById('items-container');
+
+    if (packageItems.length === 0) {
+      container.innerHTML =
+        '<div class="empty-state">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>' +
+        '</svg><p>No items added yet</p><span>Use the form above to add products</span></div>';
+      return;
+    }
+
+    var rows = packageItems.map(function(item) {
+      return '<div class="item-swipe-wrapper" data-id="' + item.id + '">' +
+        '<div class="item-row">' +
+          '<span class="item-bullet"></span>' +
+          '<span class="item-name">' + escHtml(item.product_name || '') + '</span>' +
+          '<span class="swipe-hint">&#8592; swipe</span>' +
+        '</div>' +
+        '<div class="item-delete-action" data-id="' + item.id + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+          '<polyline points="3 6 5 6 21 6"/>' +
+          '<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>' +
+          '</svg>' +
+          'Delete' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    container.innerHTML = rows;
+    attachItemSwipe();
+  }
+
+  /* ── Item swipe gestures ── */
+  function closeAllItemSwipes() {
+    document.querySelectorAll('.item-swipe-wrapper.revealed').forEach(function(w) {
+      w.classList.remove('revealed');
+    });
+  }
+
+  function attachItemSwipe() {
+    document.querySelectorAll('.item-swipe-wrapper').forEach(function(wrapper) {
+      var startX, startY, dragged;
+
+      function onStart(x, y) { startX = x; startY = y; dragged = false; }
+      function onEnd(x, y) {
+        var dx = x - startX, dy = y - startY;
+        if (Math.abs(dx) > 8) dragged = true;
+        if (dragged && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+          if (dx < 0) { closeAllItemSwipes(); wrapper.classList.add('revealed'); }
+          else { wrapper.classList.remove('revealed'); }
+        }
+      }
+
+      wrapper.addEventListener('touchstart', function(e) { onStart(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+      wrapper.addEventListener('touchend', function(e) { onEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY); }, { passive: true });
+
+      wrapper.addEventListener('mousedown', function(e) { if (e.button !== 0) return; onStart(e.clientX, e.clientY); wrapper._md = true; });
+      window.addEventListener('mousemove', function(e) { if (!wrapper._md) return; if (Math.abs(e.clientX - startX) > 8) dragged = true; });
+      window.addEventListener('mouseup', function(e) { if (!wrapper._md) return; wrapper._md = false; onEnd(e.clientX, e.clientY); });
+
+      // Delete action click
+      var delBtn = wrapper.querySelector('.item-delete-action');
+      if (delBtn) {
+        delBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          removeItem(parseInt(delBtn.dataset.id));
+        });
+      }
+
+      // Click outside to close
+      wrapper.addEventListener('click', function() {
+        if (dragged) { dragged = false; return; }
+        if (wrapper.classList.contains('revealed')) closeAllItemSwipes();
+      });
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.item-swipe-wrapper')) closeAllItemSwipes();
+    });
+  }
+
+  /* ── Dropdown ── */
+  function getAvailableProducts() {
+    var addedNames = packageItems.map(function(i) { return i.product_name; });
+    return allProducts.filter(function(p) { return addedNames.indexOf(p.name) === -1; });
+  }
+
+  function rebuildDropdownList() { filterOptions(); }
+
+  function filterOptions() {
+    var query = (document.getElementById('search-input').value || '').toLowerCase();
+    var filtered = getAvailableProducts().filter(function(p) {
+      return p.name.toLowerCase().indexOf(query) !== -1;
+    });
+
+    var list = document.getElementById('dropdown-list');
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="dropdown-empty">No products found</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(function(p) {
+      var isActive = selectedProduct && selectedProduct.id === p.id ? ' active' : '';
+      return '<div class="dropdown-option' + isActive + '" onclick="selectProduct(' + p.id + ')">' +
+        '<span class="option-name">' + escHtml(p.name) + '</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  function selectProduct(id) {
+    selectedProduct = allProducts.find(function(p) { return p.id === id; });
+    if (!selectedProduct) return;
+    var t = document.getElementById('trigger-text');
+    t.textContent = selectedProduct.name;
+    t.classList.add('selected');
+    closeDropdown();
+  }
+
+  function toggleDropdown() {
+    var panel = document.getElementById('dropdown-panel');
+    var trigger = document.getElementById('dropdown-trigger');
+    if (panel.classList.contains('open')) {
+      closeDropdown();
+    } else {
+      panel.classList.add('open');
+      trigger.classList.add('open');
+      rebuildDropdownList();
+      document.getElementById('search-input').focus();
+    }
+  }
+
+  function closeDropdown() {
+    document.getElementById('dropdown-panel').classList.remove('open');
+    document.getElementById('dropdown-trigger').classList.remove('open');
+    document.getElementById('search-input').value = '';
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#dropdown-wrap')) closeDropdown();
+  });
+
+  /* ── Add / Remove ── */
+  async function addItem() {
+    if (!selectedProduct) { showToast('Please select a product.'); return; }
+    var result = await db.from('package_type_products').insert({
+      package_type_name: pkg.name,
+      product_name: selectedProduct.name,
+    });
+    if (result.error) { showToast('Error: ' + result.error.message); return; }
+    selectedProduct = null;
+    var t = document.getElementById('trigger-text');
+    t.textContent = 'Select a product…';
+    t.classList.remove('selected');
+    showToast('Item added.');
+    await loadItems();
+  }
+
+  async function removeItem(id) {
+    closeAllItemSwipes();
+    var result = await db.from('package_type_products').delete().eq('id', id);
+    if (result.error) { showToast('Error: ' + result.error.message); return; }
+    showToast('Item removed.');
+    await loadItems();
+  }
+
+  function goBackToPackages() {
+    if (typeof window.loadTabContent === 'function') {
+      window.loadTabContent('admin/pospackages.html');
+    }
+  }
+
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 2800);
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Expose onclick-called functions
+  window.toggleDropdown = toggleDropdown;
+  window.filterOptions = filterOptions;
+  window.selectProduct = selectProduct;
+  window.addItem = addItem;
+  window.removeItem = removeItem;
+  window.goBackToPackages = goBackToPackages;
+
+  window.editCurrentPackage = function() {
+    if (typeof window.openEditFromManage === 'function') {
+      window.openEditFromManage(pkg.id);
+    }
+  };
+
+})();
+</script>
+</body>
+</html>

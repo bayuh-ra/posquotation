@@ -182,7 +182,12 @@
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <!-- Employee Selection Modal -->
     <div id="employeeModal" class="modal-overlay">
-        <div class="modal-content">
+        <div class="modal-content" style="position:relative;">
+            <button id="closeEmployeeBtn" style="position:absolute;top:16px;right:16px;background:#f3f4f6;border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
             <h2 class="text-3xl font-bold text-blue-900 text-center mb-2">Select Employee</h2>
             <p class="text-gray-600 text-center mb-6">Who will create this quotation?</p>
             <div id="employeeContainer" class="employee-grid">
@@ -190,11 +195,6 @@
                     <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                     <p class="text-gray-600 mt-4">Loading employees...</p>
                 </div>
-            </div>
-            <div class="mt-6 text-center">
-                <button id="closeEmployeeBtn" class="px-6 py-2 text-gray-600 hover:text-gray-800 font-semibold transition">
-                    Cancel
-                </button>
             </div>
         </div>
     </div>
@@ -249,191 +249,143 @@
 
     <!-- Header -->
     <header class="bg-white shadow-md">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <img src="LOGO1.png" alt="LAP I.T. Solutions" class="h-16 w-16 object-contain">
+        <div class="container mx-auto px-4 md:px-6 py-3 md:py-4">
+            <!-- Mobile header -->
+            <div class="flex items-center justify-between md:hidden">
+                <button id="welcomeHeaderBtn" class="flex items-center gap-3 cursor-pointer text-left" style="background:none;border:none;padding:0;">
+                    <img src="LOGO1.png" alt="LAP I.T. Solutions" class="h-10 w-10 object-contain flex-shrink-0">
+                    <div>
+                        <p class="text-xs text-gray-400">Welcome back</p>
+                        <p id="employee-name-mobile" class="text-base font-bold text-blue-900 leading-tight">Select Employee</p>
+                    </div>
+                </button>
+                <div class="text-right">
+                    <p id="header-date-mobile" class="text-xs text-gray-500"></p>
+                    <p id="header-time-mobile" class="text-xs font-semibold text-gray-700"></p>
+                </div>
+            </div>
+            <!-- Desktop header -->
+            <div class="hidden md:flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <img src="LOGO1.png" alt="LAP I.T. Solutions" class="h-16 w-16 object-contain flex-shrink-0">
                     <div>
                         <h1 class="text-2xl font-bold text-blue-900">LAP I.T. Solutions</h1>
                         <p class="text-sm text-gray-600">Quotation Management System</p>
                     </div>
                 </div>
-                <div id="user-info" class="text-right">
-                    <p class="text-sm text-gray-600">Current User:</p>
-                    <p id="employee-name" class="font-semibold text-blue-900 text-lg">Not Selected</p>
-                    <button id="changeEmployeeBtn" class="mt-1 text-xs text-blue-600 hover:text-blue-800 underline hidden">
-                        Change Employee
-                    </button>
+                <div class="text-center">
+                    <p id="header-date" class="text-sm font-semibold text-gray-700"></p>
+                    <p id="header-time" class="text-xl font-bold text-blue-900"></p>
                 </div>
+                <button id="welcomeHeaderBtn-desktop" class="cursor-pointer text-right" style="background:none;border:none;padding:0;">
+                    <p id="employee-name" class="font-semibold text-blue-900 text-lg hover:text-blue-600 transition">Select Employee</p>
+                </button>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="container mx-auto px-6 py-12">
-        <!-- Welcome Section -->
-        <div class="text-center mb-12 fade-in">
-            <h2 class="text-4xl font-bold text-blue-900 mb-4" id="welcomeTitle">Welcome to Your Dashboard</h2>
-            <p class="text-lg text-gray-700" id="welcomeSubtitle">Choose an option below to get started</p>
-            <div id="selectEmployeePrompt" class="mt-6 hidden">
-                <div class="inline-block bg-yellow-50 border-2 border-yellow-400 rounded-lg px-6 py-4">
-                    <svg class="inline w-6 h-6 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                    <span class="text-yellow-800 font-semibold">Please select an employee to continue</span>
-                    <button id="selectEmployeePromptBtn" class="ml-4 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg font-semibold transition">
-                        Select Employee
-                    </button>
+    <main class="container mx-auto px-4 py-6 pb-24">
+        <div id="selectEmployeePrompt" class="hidden"></div>
+
+        <!-- Quick Stats -->
+        <div class="max-w-6xl mx-auto mb-6 fade-in" style="animation-delay: 0.2s">
+            <div class="bg-white rounded-xl shadow-lg p-4">
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-600" id="total-quotations">-</div>
+                        <div class="text-xs text-gray-600 mt-1">Total Quotations</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-indigo-600" id="total-products">-</div>
+                        <div class="text-xs text-gray-600 mt-1">Products</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-600" id="total-packages">-</div>
+                        <div class="text-xs text-gray-600 mt-1">Package Types</div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Action Cards -->
-        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="grid grid-cols-3 gap-3 md:gap-8 max-w-6xl mx-auto">
             <!-- Create Quotation Card -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover fade-in" style="animation-delay: 0.3s">
-                <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-6">
-                    <div class="flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4">
-                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div id="quotationCard" class="bg-white rounded-xl shadow-lg overflow-hidden card-hover fade-in cursor-pointer flex flex-col" style="animation-delay: 0.3s">
+                <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-3 md:p-6 flex flex-col items-center justify-center text-center md:block flex-1 md:flex-none">
+                    <div class="flex items-center justify-center w-10 h-10 md:w-16 md:h-16 bg-white rounded-full flex-shrink-0 mb-2 md:mb-4">
+                        <svg class="w-5 h-5 md:w-8 md:h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">Create Quotation</h3>
-                    <p class="text-blue-100">Generate new quotations for clients</p>
+                    <div>
+                        <h3 class="text-xs md:text-2xl font-bold text-white md:mb-2">Create Quotation</h3>
+                        <p class="text-blue-100 text-sm hidden md:block">Generate new quotations for clients</p>
+                    </div>
                 </div>
-                <div class="p-6">
-                    <ul class="space-y-2 mb-6 text-gray-600">
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            Auto-generated quotation numbers
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            Package type templates
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            Print-ready format
-                        </li>
-                    </ul>
-                    <button id="quotationBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+                <div class="hidden md:block md:p-6">
+                    <button id="quotationBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 md:py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 text-sm md:text-base">
                         Start New Quotation →
                     </button>
                 </div>
             </div>
 
             <!-- Quotations List Card -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover fade-in" style="animation-delay: 0.35s">
-                <div class="bg-gradient-to-br from-green-600 to-teal-800 p-6">
-                    <div class="flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div id="quotationsListCard" class="bg-white rounded-xl shadow-lg overflow-hidden card-hover fade-in cursor-pointer flex flex-col" style="animation-delay: 0.35s">
+                <div class="bg-gradient-to-br from-green-600 to-teal-800 p-3 md:p-6 flex flex-col items-center justify-center text-center md:block flex-1 md:flex-none">
+                    <div class="flex items-center justify-center w-10 h-10 md:w-16 md:h-16 bg-white rounded-full flex-shrink-0 mb-2 md:mb-4">
+                        <svg class="w-5 h-5 md:w-8 md:h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">Quotations List</h3>
-                    <p class="text-green-100">View and manage all quotations</p>
+                    <div>
+                        <h3 class="text-xs md:text-2xl font-bold text-white md:mb-2">Quotations List</h3>
+                        <p class="text-green-100 text-sm hidden md:block">View and manage all quotations</p>
+                    </div>
                 </div>
-                <div class="p-6">
-                    <ul class="space-y-2 mb-6 text-gray-600">
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            Search & filter quotations
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            View, edit, and delete
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            Track quotation status
-                        </li>
-                    </ul>
-                    <button id="quotationsListBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+                <div class="hidden md:block md:p-6">
+                    <button id="quotationsListBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 md:py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 text-sm md:text-base">
                         View All Quotations →
                     </button>
                 </div>
             </div>
 
             <!-- Data Management Card -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover fade-in" style="animation-delay: 0.4s">
-                <div class="bg-gradient-to-br from-indigo-600 to-purple-800 p-6">
-                    <div class="flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4">
-                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div id="adminCard" class="bg-white rounded-xl shadow-lg overflow-hidden card-hover fade-in cursor-pointer flex flex-col" style="animation-delay: 0.4s">
+                <div class="bg-gradient-to-br from-indigo-600 to-purple-800 p-3 md:p-6 flex flex-col items-center justify-center text-center md:block flex-1 md:flex-none">
+                    <div class="flex items-center justify-center w-10 h-10 md:w-16 md:h-16 bg-white rounded-full flex-shrink-0 mb-2 md:mb-4">
+                        <svg class="w-5 h-5 md:w-8 md:h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">Data Management</h3>
-                    <p class="text-indigo-100">Manage products, packages, and settings</p>
+                    <div>
+                        <h3 class="text-xs md:text-2xl font-bold text-white md:mb-2">Data Management</h3>
+                        <p class="text-indigo-100 text-sm hidden md:block">Manage products, packages, and settings</p>
+                    </div>
                 </div>
-                <div class="p-6">
-                    <ul class="space-y-2 mb-6 text-gray-600">
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            Add/Edit products & categories
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            Manage package types
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            Configure units & settings
-                        </li>
-                    </ul>
-                    <button id="adminBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+                <div class="hidden md:block md:p-6">
+                    <button id="adminBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 md:py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 text-sm md:text-base">
                         Manage Data →
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Stats -->
-        <div class="mt-16 max-w-4xl mx-auto fade-in" style="animation-delay: 0.5s">
-            <div class="bg-white rounded-xl shadow-lg p-8">
-                <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">Quick Stats</h3>
-                <div class="grid grid-cols-3 gap-6">
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-blue-600" id="total-quotations">-</div>
-                        <div class="text-sm text-gray-600 mt-1">Total Quotations</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-indigo-600" id="total-products">-</div>
-                        <div class="text-sm text-gray-600 mt-1">Products</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-purple-600" id="total-packages">-</div>
-                        <div class="text-sm text-gray-600 mt-1">Package Types</div>
-                    </div>
+        <!-- Recent Quotations -->
+        <div class="max-w-6xl mx-auto mt-6 fade-in" style="animation-delay: 0.5s">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-700">Recent Quotations</h3>
+                    <button onclick="goToQuotationsList()" class="text-xs text-blue-600 hover:text-blue-800 font-semibold">View all →</button>
+                </div>
+                <div id="recent-quotations-list">
+                    <div class="text-center py-6 text-gray-400 text-sm">Loading...</div>
                 </div>
             </div>
         </div>
+
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white mt-16 py-6 shadow-lg">
-        <div class="container mx-auto px-6 text-center text-gray-600">
-            <p>&copy; 2025 LAP I.T. Solutions. All rights reserved.</p>
-            <p class="text-sm mt-1">Door B-3 Marcela Building 11-A, J.Palma Gil Street, Davao City</p>
-        </div>
-    </footer>
 
     <script>
         (function() {
@@ -460,11 +412,7 @@
             const passwordError = document.getElementById('passwordError');
             const passwordErrorText = document.getElementById('passwordErrorText');
             const employeeName = document.getElementById('employee-name');
-            const changeEmployeeBtn = document.getElementById('changeEmployeeBtn');
             const selectEmployeePrompt = document.getElementById('selectEmployeePrompt');
-            const selectEmployeePromptBtn = document.getElementById('selectEmployeePromptBtn');
-            const welcomeTitle = document.getElementById('welcomeTitle');
-            const welcomeSubtitle = document.getElementById('welcomeSubtitle');
             
             // Buttons
             const quotationBtn = document.getElementById('quotationBtn');
@@ -489,11 +437,6 @@
             // ==========================================
             // MODAL FUNCTIONS
             // ==========================================
-            function openEmployeeModal() {
-                employeeModal.classList.add('active');
-                loadEmployees();
-            }
-            
             function closeEmployeeModal() {
                 employeeModal.classList.remove('active');
             }
@@ -659,20 +602,19 @@
             // ==========================================
             function updateEmployeeDisplay() {
                 const savedEmployeeName = localStorage.getItem('selectedEmployeeName');
-                
+                const mobileNameEl = document.getElementById('employee-name-mobile');
                 if (savedEmployeeName) {
-                    employeeName.textContent = savedEmployeeName;
-                    changeEmployeeBtn.classList.remove('hidden');
-                    selectEmployeePrompt.classList.add('hidden');
-                    welcomeTitle.textContent = `Welcome, ${savedEmployeeName}!`;
-                    welcomeSubtitle.textContent = 'Choose an option below to get started';
+                    employeeName.textContent = `Welcome, ${savedEmployeeName}!`;
+                    if (mobileNameEl) mobileNameEl.textContent = savedEmployeeName + '!';
                 } else {
-                    employeeName.textContent = 'Not Selected';
-                    changeEmployeeBtn.classList.add('hidden');
-                    selectEmployeePrompt.classList.remove('hidden');
-                    welcomeTitle.textContent = 'Welcome to Your Dashboard';
-                    welcomeSubtitle.textContent = 'Please select an employee to begin';
+                    employeeName.textContent = 'Select Employee';
+                    if (mobileNameEl) mobileNameEl.textContent = 'Select Employee';
                 }
+            }
+
+            function openEmployeeModal() {
+                employeeModal.classList.add('active');
+                loadEmployees();
             }
             
             // ==========================================
@@ -685,7 +627,7 @@
                         client.from('products').select('id', { count: 'exact', head: true }),
                         client.from('package_type').select('id', { count: 'exact', head: true })
                     ]);
-                    
+
                     document.getElementById('total-quotations').textContent = quotations.count || 0;
                     document.getElementById('total-products').textContent = products.count || 0;
                     document.getElementById('total-packages').textContent = packages.count || 0;
@@ -695,16 +637,33 @@
             }
             
             // ==========================================
+            // CLOCK
+            function updateClock() {
+                const now = new Date();
+                const dateOpts = { month: 'short', day: 'numeric', year: 'numeric' };
+                const dateStr = now.toLocaleDateString('en-US', dateOpts);
+                const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('header-date').textContent = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+                document.getElementById('header-time').textContent = timeStr;
+                document.getElementById('header-date-mobile').textContent = dateStr;
+                document.getElementById('header-time-mobile').textContent = timeStr;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+
             // EVENT LISTENERS
             // ==========================================
             quotationBtn.addEventListener('click', goToQuotation);
             quotationsListBtn.addEventListener('click', goToQuotationsList);
             adminBtn.addEventListener('click', goToAdmin);
+            document.getElementById('quotationCard').addEventListener('click', goToQuotation);
+            document.getElementById('quotationsListCard').addEventListener('click', goToQuotationsList);
+            document.getElementById('adminCard').addEventListener('click', goToAdmin);
             closeEmployeeBtn.addEventListener('click', closeEmployeeModal);
             closePasswordBtn.addEventListener('click', closePasswordModal);
             submitPasswordBtn.addEventListener('click', submitPassword);
-            changeEmployeeBtn.addEventListener('click', openEmployeeModal);
-            selectEmployeePromptBtn.addEventListener('click', openEmployeeModal);
+            document.getElementById('welcomeHeaderBtn').addEventListener('click', openEmployeeModal);
+            document.getElementById('welcomeHeaderBtn-desktop').addEventListener('click', openEmployeeModal);
             
             employeePassword.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -716,19 +675,44 @@
             // ==========================================
             // INITIALIZE
             // ==========================================
-            // Check if we're returning from another page (like quotation.html)
-            // If there's a referrer from the same domain, preserve the employee selection
-            const isReturning = document.referrer && document.referrer.includes(window.location.hostname);
-            
-            if (!isReturning) {
-                // Only clear employee selection on fresh visits (not when returning from other pages)
-                localStorage.removeItem('selectedEmployeeId');
-                localStorage.removeItem('selectedEmployeeName');
-                localStorage.removeItem('selectedEmployeeCode');
-            }
-            
             updateEmployeeDisplay();
             loadStats();
+            loadRecentQuotations();
+
+            async function loadRecentQuotations() {
+                const container = document.getElementById('recent-quotations-list');
+                try {
+                    const { data, error } = await client
+                        .from('quotations')
+                        .select('id, quotation_no, client_name, quotation_date, created_at, total, package_type')
+                        .order('created_at', { ascending: false })
+                        .limit(5);
+
+                    if (error || !data || data.length === 0) {
+                        container.innerHTML = '<div class="text-center py-6 text-gray-400 text-sm">No quotations yet.</div>';
+                        return;
+                    }
+
+                    container.innerHTML = data.map((q, i) => {
+                        const date = new Date(q.quotation_date || q.created_at);
+                        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const amount = q.total ? '₱' + Number(q.total).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '—';
+                        const border = i < data.length - 1 ? ' border-b border-gray-50' : '';
+                        return `<div class="flex items-center justify-between px-4 py-3${border} hover:bg-gray-50 cursor-pointer" onclick="window.location.href='quotationlist.html'">
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-gray-800 truncate">${q.client_name || '—'}</p>
+                                <p class="text-xs text-gray-400">${q.quotation_no || 'No #'} · ${q.package_type || '—'}</p>
+                            </div>
+                            <div class="text-right flex-shrink-0 ml-3">
+                                <p class="text-sm font-bold text-blue-700">${amount}</p>
+                                <p class="text-xs text-gray-400">${dateStr}</p>
+                            </div>
+                        </div>`;
+                    }).join('');
+                } catch (e) {
+                    container.innerHTML = '<div class="text-center py-6 text-gray-400 text-sm">Could not load recent quotations.</div>';
+                }
+            }
             
             // Show employee selection modal if no employee is selected
             const savedEmployeeName = localStorage.getItem('selectedEmployeeName');

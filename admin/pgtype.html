@@ -1,12 +1,314 @@
 <link rel="stylesheet" href="admin/shared.css">
 
-<h2>Manage Package Types</h2>
+<style>
+.pgtype-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
 
-<div style="margin-bottom: 20px;">
-    <button class="btn btn-primary" onclick="openAddPackageTypeModal()">+ Add New Package Type</button>
+.pgtype-header-left h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 4px 0;
+}
+
+.pgtype-header-left p {
+    font-size: 14px;
+    color: #718096;
+    margin: 0;
+}
+
+.pgtype-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.view-toggle {
+    display: flex;
+    background: #e2e8f0;
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+}
+
+.view-btn {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: transparent;
+    color: #718096;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.btn-add-package {
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.btn-add-package:hover {
+    background: #5a6fd8;
+}
+
+/* Card Grid */
+.package-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.package-cards-grid.list-view {
+    grid-template-columns: 1fr;
+}
+
+.package-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.package-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.package-icon {
+    width: 40px;
+    height: 40px;
+    background: #667eea;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.package-card-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a202c;
+    flex: 1;
+    line-height: 1.3;
+}
+
+.package-card-edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #a0aec0;
+    padding: 4px;
+    border-radius: 6px;
+    transition: color 0.2s;
+    flex-shrink: 0;
+    line-height: 0;
+}
+
+.package-card-edit-btn:hover {
+    color: #667eea;
+}
+
+.package-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.package-items-count {
+    font-size: 14px;
+    color: #718096;
+}
+
+.package-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e53e3e;
+}
+
+.btn-manage-items {
+    width: 100%;
+    background: #f3f0ff;
+    color: #667eea;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-manage-items:hover {
+    background: #e9e4ff;
+}
+
+/* Modal price input */
+.price-input-wrapper {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.price-input-wrapper:focus-within {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102,126,234,0.15);
+}
+
+.price-input-prefix {
+    padding: 10px 12px;
+    color: #4a5568;
+    background: #f7fafc;
+    border-right: 1px solid #e2e8f0;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.price-input-wrapper input {
+    border: none !important;
+    border-radius: 0 !important;
+    flex: 1;
+    padding: 10px 12px !important;
+    box-shadow: none !important;
+}
+
+.price-input-wrapper input:focus {
+    outline: none;
+    box-shadow: none !important;
+}
+
+.form-hint {
+    font-size: 12px;
+    color: #718096;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Modal footer */
+.modal-footer-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.btn-delete-modal {
+    background: white;
+    color: #e53e3e;
+    border: 2px solid #e53e3e;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.btn-delete-modal:hover {
+    background: #fff5f5;
+}
+
+.btn-cancel-modal {
+    background: white;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-cancel-modal:hover {
+    background: #f7fafc;
+}
+
+.btn-save-modal {
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: auto;
+    transition: background 0.2s;
+}
+
+.btn-save-modal:hover {
+    background: #5a6fd8;
+}
+</style>
+
+<!-- Page Header -->
+<div class="pgtype-header">
+    <div class="pgtype-header-left">
+        <h3>Package Types</h3>
+        <p id="pkg-count-label">Loading...</p>
+    </div>
+    <div class="pgtype-header-right">
+        <div class="view-toggle">
+            <button class="view-btn active" id="grid-view-btn" onclick="setPackageView('grid')" title="Grid view">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <rect x="1" y="1" width="6" height="6" rx="1"/>
+                    <rect x="9" y="1" width="6" height="6" rx="1"/>
+                    <rect x="1" y="9" width="6" height="6" rx="1"/>
+                    <rect x="9" y="9" width="6" height="6" rx="1"/>
+                </svg>
+            </button>
+            <button class="view-btn" id="list-view-btn" onclick="setPackageView('list')" title="List view">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <rect x="1" y="2" width="14" height="2" rx="1"/>
+                    <rect x="1" y="7" width="14" height="2" rx="1"/>
+                    <rect x="1" y="12" width="14" height="2" rx="1"/>
+                </svg>
+            </button>
+        </div>
+        <button class="btn-add-package" onclick="openAddPackageTypeModal()">
+            + Add Package Type
+        </button>
+    </div>
 </div>
+
 <div id="package-types-message"></div>
-<div class="table-container" id="package-types-list">
+<div id="package-types-list">
     <div class="loading">Loading...</div>
 </div>
 
@@ -14,25 +316,29 @@
 <div id="addPackageTypeModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>Add New Package Type</h3>
+            <h3>Add Package Type</h3>
             <button class="close-btn" onclick="closeAddPackageTypeModal()">&times;</button>
         </div>
         <div id="add-package-type-message"></div>
         <div class="form-group">
-            <label>Package Name *</label>
+            <label>Package Name <span style="color:#e53e3e">*</span></label>
             <input type="text" id="add-package-name" placeholder="e.g., Standard POS Retail Package">
         </div>
         <div class="form-group">
-            <label>Package Price (₱) *</label>
-            <input type="number" id="add-package-price" placeholder="e.g., 97000.00" step="0.01" min="0">
+            <label>Package Price (₱)</label>
+            <div class="price-input-wrapper">
+                <span class="price-input-prefix">₱</span>
+                <input type="number" id="add-package-price" placeholder="45000" step="0.01" min="0">
+            </div>
+            <small class="form-hint">Set a selling price for this package (optional)</small>
         </div>
         <div class="form-group">
-            <label>Description/Inclusions</label>
-            <textarea id="add-package-description" placeholder="Package inclusions and details"></textarea>
+            <label>Description</label>
+            <textarea id="add-package-description" placeholder="Optional description..."></textarea>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn btn-primary" onclick="addPackageType()" style="flex: 1;">Add Package Type</button>
-            <button class="btn btn-secondary" onclick="closeAddPackageTypeModal()" style="flex: 1;">Cancel</button>
+        <div class="modal-footer-actions">
+            <button class="btn-cancel-modal" onclick="closeAddPackageTypeModal()">Cancel</button>
+            <button class="btn-save-modal" onclick="addPackageType()">Add Package Type</button>
         </div>
     </div>
 </div>
@@ -47,163 +353,214 @@
         <div id="edit-package-message"></div>
         <input type="hidden" id="edit-package-old-name">
         <div class="form-group">
-            <label>Package Name *</label>
+            <label>Package Name <span style="color:#e53e3e">*</span></label>
             <input type="text" id="edit-package-name">
         </div>
         <div class="form-group">
-            <label>Package Price (₱) *</label>
-            <input type="number" id="edit-package-price" placeholder="e.g., 97000.00" step="0.01" min="0">
+            <label>Package Price (₱)</label>
+            <div class="price-input-wrapper">
+                <span class="price-input-prefix">₱</span>
+                <input type="number" id="edit-package-price" placeholder="45000" step="0.01" min="0">
+            </div>
+            <small class="form-hint">Set a selling price for this package (optional)</small>
         </div>
         <div class="form-group">
-            <label>Description/Inclusions</label>
-            <textarea id="edit-package-description"></textarea>
+            <label>Description</label>
+            <textarea id="edit-package-description" placeholder="Optional description..."></textarea>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn btn-primary" onclick="updatePackageType()">Update</button>
-            <button class="btn btn-secondary" onclick="closeEditPackageModal()">Cancel</button>
-        </div>
-    </div>
-</div>
-
-<!-- Package Type Detail Modal -->
-<div id="detailPackageModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Package Type Details</h3>
-            <button class="close-btn" onclick="closeDetailPackageModal()">&times;</button>
-        </div>
-        <div style="padding: 10px 0;">
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">NAME</label>
-                <div id="detail-package-name" style="font-size: 18px; font-weight: bold; color: #2d3748; margin-top: 5px;"></div>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">PACKAGE PRICE</label>
-                <div id="detail-package-price" style="font-size: 18px; font-weight: bold; color: #16a34a; margin-top: 5px;"></div>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: 600; color: #4a5568; font-size: 12px;">DESCRIPTION</label>
-                <div id="detail-package-description" style="font-size: 14px; color: #2d3748; margin-top: 5px; line-height: 1.6;"></div>
-            </div>
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
-            <button class="btn btn-warning" onclick="editPackageFromDetail()" style="flex: 1;">Edit</button>
-            <button class="btn btn-danger" onclick="deletePackageFromDetail()" style="flex: 1;">Delete</button>
+        <div class="modal-footer-actions">
+            <button class="btn-delete-modal" onclick="deletePackageFromEdit()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                </svg>
+                Delete
+            </button>
+            <button class="btn-cancel-modal" onclick="closeEditPackageModal()">Cancel</button>
+            <button class="btn-save-modal" onclick="updatePackageType()">Save Changes</button>
         </div>
     </div>
 </div>
 
 <script>
 (function() {
-    // Access the globally available supabaseClient
     const supabase = window.supabaseClient || window.lapSupabaseClient;
+    let _currentView = 'grid';
+    let _pkgData = [];
+    let _itemCounts = {};
+
+    window.setPackageView = function(view) {
+        _currentView = view;
+        document.getElementById('grid-view-btn').classList.toggle('active', view === 'grid');
+        document.getElementById('list-view-btn').classList.toggle('active', view === 'list');
+        renderPackages();
+    };
 
     window.loadPackageTypes = async function() {
         const container = document.getElementById('package-types-list');
-        const { data, error } = await supabase
-            .from('package_type')
-            .select('*')
-            .order('name');
-        
-        if (error) {
-            container.innerHTML = '<p class="error">Error loading package types: ' + error.message + '</p>';
+
+        const [pkgResult, countResult] = await Promise.all([
+            supabase.from('package_type').select('*').order('name'),
+            supabase.from('package_type_products').select('package_type_name')
+        ]);
+
+        if (pkgResult.error) {
+            container.innerHTML = '<p class="error">Error loading package types: ' + pkgResult.error.message + '</p>';
             return;
         }
-        
-        let html = '<table><tr><th>Name</th><th>Package Price</th><th>Description</th></tr>';
-        data.forEach((pkg, index) => {
-            const rowId = `package-row-${index}`;
-            const formattedPrice = pkg.package_price 
-                ? '₱' + parseFloat(pkg.package_price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                : '₱0.00';
-            
-            html += `<tr id="${rowId}" style="cursor: pointer;" 
-                data-name="${encodeURIComponent(pkg.name)}" 
-                data-price="${pkg.package_price || 0}"
-                data-description="${encodeURIComponent(pkg.description || '')}">
-                <td>${pkg.name}</td>
-                <td style="font-weight: bold; color: #16a34a;">${formattedPrice}</td>
-                <td>${pkg.description || ''}</td>
-            </tr>`;
+
+        _pkgData = pkgResult.data || [];
+
+        // Build item count map
+        _itemCounts = {};
+        if (countResult.data) {
+            countResult.data.forEach(row => {
+                _itemCounts[row.package_type_name] = (_itemCounts[row.package_type_name] || 0) + 1;
+            });
+        }
+
+        const count = _pkgData.length;
+        document.getElementById('pkg-count-label').textContent =
+            count + ' package type' + (count !== 1 ? 's' : '');
+
+        renderPackages();
+    };
+
+    function renderPackages() {
+        const container = document.getElementById('package-types-list');
+
+        if (!_pkgData.length) {
+            container.innerHTML = '<p style="color:#718096;text-align:center;padding:40px 0;">No package types yet. Click "+ Add Package Type" to create one.</p>';
+            return;
+        }
+
+        const gridClass = 'package-cards-grid' + (_currentView === 'list' ? ' list-view' : '');
+        let html = `<div class="${gridClass}">`;
+
+        _pkgData.forEach((pkg, i) => {
+            const formattedPrice = pkg.package_price != null
+                ? '&#8369;' + parseFloat(pkg.package_price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                : '&#8212;';
+            const count = _itemCounts[pkg.name] || 0;
+            const itemLabel = count + ' item' + (count !== 1 ? 's' : '');
+
+            html += `
+            <div class="package-card">
+                <div class="package-card-header">
+                    <div class="package-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                            <polyline points="2 17 12 22 22 17"/>
+                            <polyline points="2 12 12 17 22 12"/>
+                        </svg>
+                    </div>
+                    <span class="package-card-name">${escHtml(pkg.name)}</span>
+                    <button class="package-card-edit-btn" data-index="${i}" title="Edit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="package-card-meta">
+                    <span class="package-items-count">${itemLabel}</span>
+                    <span class="package-price">${formattedPrice}</span>
+                </div>
+                <button class="btn-manage-items" data-index="${i}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    </svg>
+                    Manage Items &rsaquo;
+                </button>
+            </div>`;
         });
-        html += '</table>';
+
+        html += '</div>';
         container.innerHTML = html;
-        
-        // Add click listeners
-        data.forEach((pkg, index) => {
-            const row = document.getElementById(`package-row-${index}`);
-            if (row) {
-                row.addEventListener('click', function() {
-                    showPackageDetail(
-                        decodeURIComponent(this.dataset.name),
-                        parseFloat(this.dataset.price) || 0,
-                        decodeURIComponent(this.dataset.description)
-                    );
-                });
-            }
+
+        // Attach event listeners
+        container.querySelectorAll('.package-card-edit-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const pkg = _pkgData[parseInt(this.dataset.index)];
+                openEditPackageModal(pkg);
+            });
         });
+
+        container.querySelectorAll('.btn-manage-items').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const pkg = _pkgData[parseInt(this.dataset.index)];
+                managePackageItems(pkg.name);
+            });
+        });
+    }
+
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function openEditPackageModal(pkg) {
+        document.getElementById('edit-package-old-name').value = pkg.name;
+        document.getElementById('edit-package-name').value = pkg.name;
+        document.getElementById('edit-package-price').value = pkg.package_price != null ? pkg.package_price : '';
+        document.getElementById('edit-package-description').value = pkg.description || '';
+        document.getElementById('edit-package-message').innerHTML = '';
+        document.getElementById('editPackageModal').classList.add('active');
+    }
+
+    // Keep global for backward compat
+    window.editPackageType = function(name, price, description) {
+        openEditPackageModal({ name, package_price: price, description });
     };
 
-    window.showPackageDetail = function(name, price, description) {
-        const formattedPrice = '₱' + parseFloat(price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        
-        document.getElementById('detail-package-name').textContent = name;
-        document.getElementById('detail-package-price').textContent = formattedPrice;
-        document.getElementById('detail-package-description').textContent = description || 'No description';
-        
-        const modal = document.getElementById('detailPackageModal');
-        modal.dataset.name = name;
-        modal.dataset.price = price;
-        modal.dataset.description = description;
-        modal.classList.add('active');
-    };
-
-    window.closeDetailPackageModal = function() {
-        document.getElementById('detailPackageModal').classList.remove('active');
-    };
-
-    window.editPackageFromDetail = function() {
-        const modal = document.getElementById('detailPackageModal');
-        editPackageType(modal.dataset.name, modal.dataset.price, modal.dataset.description);
-        closeDetailPackageModal();
-    };
-
-    window.deletePackageFromDetail = function() {
-        const modal = document.getElementById('detailPackageModal');
-        deletePackageType(modal.dataset.name);
-        closeDetailPackageModal();
+    window.managePackageItems = function(packageName) {
+        // Switch to package products sub-tab
+        const subTabs = document.querySelectorAll('.sub-tab');
+        subTabs.forEach(t => t.classList.remove('active'));
+        const pgproductsTab = Array.from(subTabs).find(t => {
+            const onclick = t.getAttribute('onclick') || '';
+            return onclick.includes('pgproducts');
+        });
+        if (pgproductsTab) pgproductsTab.classList.add('active');
+        window._selectedPackageForManage = packageName;
+        // Load pgproducts content directly
+        const container = document.getElementById('pos-sub-content');
+        if (container) {
+            fetch('admin/pgproducts.html')
+                .then(r => r.text())
+                .then(html => {
+                    container.innerHTML = html;
+                    container.querySelectorAll('script').forEach(old => {
+                        try { new Function(old.innerHTML)(); } catch(e) { console.error(e); }
+                    });
+                });
+        }
     };
 
     window.addPackageType = async function() {
         const name = document.getElementById('add-package-name').value.trim();
         const priceInput = document.getElementById('add-package-price').value.trim();
         const description = document.getElementById('add-package-description').value.trim();
-        
+
         if (!name) {
             showMessage('add-package-type-message', 'Please enter a package name', true);
             return;
         }
-        
-        if (!priceInput || parseFloat(priceInput) < 0) {
-            showMessage('add-package-type-message', 'Please enter a valid package price', true);
-            return;
-        }
-        
-        const packagePrice = parseFloat(priceInput);
-        
+
+        const packagePrice = priceInput ? parseFloat(priceInput) : null;
+
         const { error } = await supabase
             .from('package_type')
-            .insert([{ 
-                name, 
-                package_price: packagePrice,
-                description 
-            }]);
-        
+            .insert([{ name, package_price: packagePrice, description }]);
+
         if (error) {
             showMessage('add-package-type-message', 'Error: ' + error.message, true);
             return;
         }
-        
+
         showMessage('package-types-message', 'Package type added successfully!');
         document.getElementById('add-package-name').value = '';
         document.getElementById('add-package-price').value = '';
@@ -221,16 +578,9 @@
         document.getElementById('add-package-type-message').innerHTML = '';
     };
 
-    window.editPackageType = function(name, price, description) {
-        document.getElementById('edit-package-old-name').value = name;
-        document.getElementById('edit-package-name').value = name;
-        document.getElementById('edit-package-price').value = parseFloat(price) || 0;
-        document.getElementById('edit-package-description').value = description;
-        document.getElementById('editPackageModal').classList.add('active');
-    };
-
     window.closeEditPackageModal = function() {
         document.getElementById('editPackageModal').classList.remove('active');
+        document.getElementById('edit-package-message').innerHTML = '';
     };
 
     window.updatePackageType = async function() {
@@ -238,56 +588,65 @@
         const newName = document.getElementById('edit-package-name').value.trim();
         const priceInput = document.getElementById('edit-package-price').value.trim();
         const description = document.getElementById('edit-package-description').value.trim();
-        
+
         if (!newName) {
             showMessage('edit-package-message', 'Please enter a package name', true);
             return;
         }
-        
-        if (!priceInput || parseFloat(priceInput) < 0) {
-            showMessage('edit-package-message', 'Please enter a valid package price', true);
-            return;
-        }
-        
-        const packagePrice = parseFloat(priceInput);
-        
+
+        const packagePrice = priceInput ? parseFloat(priceInput) : null;
+
         const { error } = await supabase
             .from('package_type')
-            .update({
-                name: newName,
-                package_price: packagePrice,
-                description
-            })
+            .update({ name: newName, package_price: packagePrice, description })
             .eq('name', oldName);
-        
+
         if (error) {
             showMessage('edit-package-message', 'Error: ' + error.message, true);
             return;
         }
-        
+
         showMessage('package-types-message', 'Package type updated successfully!');
+        closeEditPackageModal();
+        loadPackageTypes();
+    };
+
+    window.deletePackageFromEdit = async function() {
+        const name = document.getElementById('edit-package-old-name').value;
+        if (!confirm(`Delete package type "${name}"?`)) return;
+
+        const { error } = await supabase
+            .from('package_type')
+            .delete()
+            .eq('name', name);
+
+        if (error) {
+            showMessage('edit-package-message', 'Error: ' + error.message, true);
+            return;
+        }
+
+        showMessage('package-types-message', 'Package type deleted successfully!');
         closeEditPackageModal();
         loadPackageTypes();
     };
 
     window.deletePackageType = async function(name) {
         if (!confirm(`Delete package type "${name}"?`)) return;
-        
+
         const { error } = await supabase
             .from('package_type')
             .delete()
             .eq('name', name);
-        
+
         if (error) {
             alert('Error: ' + error.message);
             return;
         }
-        
+
         showMessage('package-types-message', 'Package type deleted successfully!');
         loadPackageTypes();
     };
 
-    // Load data when this tab loads
     loadPackageTypes();
 })();
 </script>
