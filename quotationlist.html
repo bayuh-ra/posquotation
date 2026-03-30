@@ -561,10 +561,16 @@
             `).join('');
         }
 
-        function viewQuotation(id) {
+        async function viewQuotation(id) {
             const quotation = quotations.find(q => q.id === id);
             if (!quotation) { alert('Quotation not found'); return; }
-            localStorage.setItem('viewQuotationData', JSON.stringify(quotation));
+            // Pre-fetch items so quotation.html can render with zero extra network calls
+            const { data: items } = await supabaseClient
+                .from('quotation_items')
+                .select('*, product:products(id, name, description, unit, base_price)')
+                .eq('quotation_id', id)
+                .order('row_order', { ascending: true });
+            localStorage.setItem('viewQuotationData', JSON.stringify({ ...quotation, prefetched_items: items || [] }));
             localStorage.setItem('viewMode', 'true');
             window.location.href = 'quotation.html';
         }

@@ -225,6 +225,16 @@ function populatePackageTypes() {
     console.log('populatePackageTypes() - packageTypes length:', packageTypes ? packageTypes.length : 0);
     if (packageTypes && packageTypes.length > 0) console.table(packageTypes);
 
+    // Also populate setup panel dropdown (split-panel create mode)
+    const setupPackageSelect = document.getElementById('setup-package-type');
+    if (setupPackageSelect) {
+        setupPackageSelect.innerHTML = '<option value="" disabled selected>Select package type</option>';
+        const setupCustomize = document.createElement('option');
+        setupCustomize.value = 'CUSTOMIZE';
+        setupCustomize.textContent = 'Customize (Build your own)';
+        setupPackageSelect.appendChild(setupCustomize);
+    }
+
     if (packageTypes && packageTypes.length > 0) {
         packageTypes.forEach(type => {
             const option = document.createElement('option');
@@ -235,6 +245,13 @@ function populatePackageTypes() {
             if (type.description) option.dataset.inclusions = type.description;
             if (type.inclusions) option.dataset.inclusions = type.inclusions;
             packageTypeSelect.appendChild(option);
+            // Mirror to setup panel
+            if (setupPackageSelect) {
+                const opt2 = document.createElement('option');
+                opt2.value = val;
+                opt2.textContent = option.textContent;
+                setupPackageSelect.appendChild(opt2);
+            }
         });
     } else {
         const opt = document.createElement('option');
