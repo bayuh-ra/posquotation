@@ -5,25 +5,14 @@ let products = [];
 let categories = [];
 let units = [];
 let packageTypes = [];
-let __dataLoadPromise = null;
 
-function formatPHP(amount) {
-    const n = Number(amount) || 0;
-    return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function parsePHP(value) {
-    if (value == null) return 0;
-    return parseFloat(String(value).replace(/[₱,]/g, '').trim()) || 0;
-}
-
-// âœ… CHECK VIEW MODE IMMEDIATELY - Before any other code runs
+// ✅ CHECK VIEW MODE IMMEDIATELY - Before any other code runs
 const viewMode = localStorage.getItem('viewMode');
 const viewQuotationData = localStorage.getItem('viewQuotationData');
 const isViewMode = (viewMode === 'true' && viewQuotationData);
 
 if (isViewMode) {
-    console.log('ðŸ”µ VIEW MODE DETECTED - Quotation initialization will be skipped');
+    console.log('🔵 VIEW MODE DETECTED - Quotation initialization will be skipped');
 }
 
 // Function to replace dropdown with wrapped text after selection
@@ -91,14 +80,8 @@ function handleDropdownSelection(selectElement) {
                             line-height: 1.4;
                             text-align: left;
                         `;
-                        // Replace leading dash or bullet with checkmark, or prepend checkmark if not present
-                        let cleanLine = line.trim();
-                        if (/^[-•]/.test(cleanLine)) {
-                            cleanLine = cleanLine.replace(/^[-•]\s*/, '&#10003; ');
-                        } else if (!/^(&#10003;|✓)/.test(cleanLine)) {
-                            cleanLine = '&#10003; ' + cleanLine;
-                        }
-                        listItem.innerHTML = cleanLine;
+                        // Add checkmark before each item
+                        listItem.innerHTML = '✓ ' + line.trim();
                         listContainer.appendChild(listItem);
                     });
 
@@ -224,74 +207,6 @@ async function loadData() {
     }
 }
 
-function ensureDataLoaded() {
-    if (!__dataLoadPromise) __dataLoadPromise = loadData();
-    return __dataLoadPromise;
-}
-
-function setInputValueIfPresent(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.value = value ?? '';
-}
-
-function getResolvedPackageTypeValue(packageTypeText) {
-    const packageTypeSelect = document.getElementById('packageType');
-    if (!packageTypeSelect || !packageTypeText) return null;
-
-    for (let i = 0; i < packageTypeSelect.options.length; i++) {
-        const opt = packageTypeSelect.options[i];
-        if (opt.text === packageTypeText || opt.value === packageTypeText) return opt.value;
-    }
-    return null;
-}
-
-function applyPackageTypeToUI(packageTypeText) {
-    const resolvedValue = getResolvedPackageTypeValue(packageTypeText);
-
-    const packageTypeSelect = document.getElementById('packageType');
-    if (packageTypeSelect && resolvedValue) packageTypeSelect.value = resolvedValue;
-
-    const setupSelect = document.getElementById('setup-package-type');
-    if (setupSelect && resolvedValue) setupSelect.value = resolvedValue;
-
-    const pkgText = document.getElementById('pkg-dd-text');
-    if (pkgText && packageTypeText) pkgText.textContent = packageTypeText;
-}
-
-async function enrichQuotationItems(items) {
-    if (!Array.isArray(items) || items.length === 0) return [];
-
-    const ids = Array.from(new Set(items.map(i => i?.product_id).filter(Boolean))).map(Number);
-    const productMap = new Map();
-
-    // Seed from already loaded products
-    if (Array.isArray(products)) {
-        products.forEach(p => {
-            if (p && p.id != null) productMap.set(Number(p.id), p);
-        });
-    }
-
-    const missingIds = ids.filter(id => !productMap.has(Number(id)));
-    if (missingIds.length > 0) {
-        try {
-            const { data, error } = await supabaseClient
-                .from('products')
-                .select('id,name,unit,description,base_price')
-                .in('id', missingIds);
-            if (error) throw error;
-            (data || []).forEach(p => productMap.set(Number(p.id), p));
-        } catch (e) {
-            console.error('Failed to enrich items with products:', e);
-        }
-    }
-
-    return items.map(item => {
-        const pid = item?.product_id ? Number(item.product_id) : null;
-        const product = pid != null ? productMap.get(pid) : null;
-        return { ...item, product };
-    });
-}
-
 // Populate package type dropdown
 function populatePackageTypes() {
     const packageTypeSelect = document.getElementById('packageType');
@@ -407,7 +322,7 @@ async function loadProductsForPackageType(packageTypeName) {
             return;
         }
 
-        // âœ… NEW: Get the package total price from packageTypes
+        // ✅ NEW: Get the package total price from packageTypes
         const selectedPackage = packageTypes.find(p => p.name === packageTypeName);
         const packageTotalPrice = selectedPackage ? (selectedPackage.package_price || 0) : 0;
 
@@ -469,7 +384,7 @@ async function loadProductsForPackageType(packageTypeName) {
                     if (descLines.length > 0) {
                         descriptionHTML += '<div style="font-size: 9px; color: #666;">';
                         descLines.forEach(line => {
-                            descriptionHTML += `<div style="margin-bottom: 2px;">&#10003; ${line.trim()}</div>`;
+                            descriptionHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
                         });
                         descriptionHTML += '</div>';
                     }
@@ -485,10 +400,10 @@ async function loadProductsForPackageType(packageTypeName) {
             packageRow.dataset.productId = firstItem.product ? firstItem.product.id : '';
             packageRow.dataset.productName = firstItem.product_name;
 
-            // âœ… UPDATE PRICE: Show package total price in first row
+            // ✅ UPDATE PRICE: Show package total price in first row
             const priceInput = packageRow.querySelector('.price-input');
             if (priceInput) {
-                priceInput.value = packageTotalPrice; // â† Use package price from database
+                priceInput.value = packageTotalPrice; // ← Use package price from database
                 console.log('Set package total price to:', packageTotalPrice);
             }
 
@@ -516,20 +431,20 @@ async function loadProductsForPackageType(packageTypeName) {
                 if (descLines.length > 0) {
                     descriptionHTML += '<div style="font-size: 9px; color: #666; padding: 2px 5px;">';
                     descLines.forEach(line => {
-                        descriptionHTML += `<div style="margin-bottom: 2px;">&#10003; ${line.trim()}</div>`;
+                        descriptionHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
                     });
                     descriptionHTML += '</div>';
                 }
             }
 
-            // âœ… SET PRICE TO 0 FOR ALL OTHER PRODUCTS
+            // ✅ SET PRICE TO 0 FOR ALL OTHER PRODUCTS
             newRow.innerHTML = `
                 <td class="item-number-cell" style="text-align: center; font-weight: bold; font-size: 12px;"></td>
                 <td><input type="number" value="1" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
                 <td><input type="text" value="${item.product && item.product.unit ? item.product.unit : ''}" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
                 <td>${descriptionHTML}</td>
                 <td><input type="number" value="0" step="0.01" class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-                <td class="total-cell" style="text-align: right; font-weight: bold;"></td>
+                <td class="total-cell" style="text-align: right; font-weight: bold;">₱0.00</td>
                 <td class="no-print"><button onclick="deleteRow(this)" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button></td>
             `;
 
@@ -655,14 +570,11 @@ async function initializeQuotation() {
 
     // Check if we're in edit mode
     const editQuotationDataStr = localStorage.getItem('editQuotationData');
-    console.log('🔍 Edit mode check - editQuotationDataStr:', editQuotationDataStr);
     if (editQuotationDataStr) {
         try {
             const editData = JSON.parse(editQuotationDataStr);
-            console.log('🔍 Parsed edit data:', editData);
             if (editData.isEdit) {
-                console.log('🔍 Edit mode detected, loading quotation data...');
-                await ensureDataLoaded();
+                console.log('Edit mode detected, loading quotation data...');
                 await loadQuotationForEdit(editData);
                 return;
             }
@@ -712,9 +624,9 @@ function calculateTotals() {
 
             // ✅ UPDATED: Show empty cell when zero (not ₱0.00)
             if (total > 0) {
-                totalCell.textContent = formatPHP(total);
+                totalCell.textContent = `₱${total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             } else {
-                totalCell.innerHTML = ''; // â† Empty cell
+                totalCell.innerHTML = ''; // ← Empty cell
             }
             subtotal += total;
         }
@@ -734,15 +646,15 @@ function calculateTotals() {
     // Update subtotal input
     const subtotalInput = document.getElementById('subtotal-input');
     if (subtotalInput) {
-        subtotalInput.value = formatPHP(subtotal);
+        subtotalInput.value = '₱' + subtotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     // Get on-site delivery and discount values
     const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
     const discountInput = document.getElementById('discount-input');
 
-    const onsiteDelivery = onsiteDeliveryInput ? parsePHP(onsiteDeliveryInput.value) : 0;
-    const discount = discountInput ? parsePHP(discountInput.value) : 0;
+    const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
+    const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
 
     // Calculate final total: subtotal + on-site delivery - discount
     const totalPackagePrice = subtotal + onsiteDelivery - discount;
@@ -750,7 +662,7 @@ function calculateTotals() {
     // Update total package price input
     const totalPackagePriceInput = document.getElementById('total-package-price-input');
     if (totalPackagePriceInput) {
-        totalPackagePriceInput.value = formatPHP(totalPackagePrice);
+        totalPackagePriceInput.value = '₱' + totalPackagePrice.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     // Update total items count
@@ -765,15 +677,18 @@ function calculateTotalFromInputs() {
     const totalPackagePriceInput = document.getElementById('total-package-price-input');
 
     // ✅ UPDATED: Remove peso signs and commas before parsing
-    const subtotal = subtotalInput ? parsePHP(subtotalInput.value) : 0;
-    const onsiteDelivery = onsiteDeliveryInput ? parsePHP(onsiteDeliveryInput.value) : 0;
-    const discount = discountInput ? parsePHP(discountInput.value) : 0;
+    const subtotal = subtotalInput ? parseFloat(subtotalInput.value.replace(/[₱,]/g, '')) || 0 : 0;
+    const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value.replace(/[₱,]/g, '')) || 0 : 0;
+    const discount = discountInput ? parseFloat(discountInput.value.replace(/[₱,]/g, '')) || 0 : 0;
 
     // Calculate total: subtotal + on-site delivery - discount
     const totalPackagePrice = subtotal + onsiteDelivery - discount;
 
     if (totalPackagePriceInput) {
-        totalPackagePriceInput.value = formatPHP(totalPackagePrice);
+        totalPackagePriceInput.value = '₱' + totalPackagePrice.toLocaleString('en-PH', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
     }
 }
 
@@ -848,250 +763,210 @@ async function getQuotationById(quotationId) {
 // Replace your existing saveQuotation() function in scripts/quotation.js with this
 
 async function saveQuotation() {
-    async function saveQuotation() {
-        try {
-            // Check if we're in edit mode
-            const editingQuotationId = localStorage.getItem('editingQuotationId');
-            const isEditMode = !!editingQuotationId;
+    try {
+        // Check if we're in edit mode
+        const editingQuotationId = localStorage.getItem('editingQuotationId');
+        const isEditMode = !!editingQuotationId;
 
-            // Get employee name
-            const employeeName = localStorage.getItem('selectedEmployeeName');
-            const quotationNo = isEditMode ?
-                (await getQuotationById(editingQuotationId))?.quotation_no :
-                localStorage.getItem('currentQuotationNumber');
+        // Get employee name
+        const employeeName = localStorage.getItem('selectedEmployeeName');
+        const quotationNo = isEditMode ?
+            (await getQuotationById(editingQuotationId))?.quotation_no :
+            localStorage.getItem('currentQuotationNumber');
 
-            if (!employeeName) {
-                showAlert('Error', 'No employee selected. Please go back to home and select an employee.', 'error');
-                return;
-            }
+        if (!employeeName) {
+            showAlert('Error', 'No employee selected. Please go back to home and select an employee.', 'error');
+            return;
+        }
 
-            if (!quotationNo) {
-                showAlert('Error', 'Error: No quotation number found. Please refresh the page.', 'error');
-                return;
-            }
+        if (!quotationNo) {
+            showAlert('Error', 'Error: No quotation number found. Please refresh the page.', 'error');
+            return;
+        }
 
-            // Get client information
-            const clientName = document.querySelector('.client-info input[placeholder="Enter recipient name"]').value;
-            const officeAddress = document.querySelector('.client-info input[placeholder="Enter office address"]').value;
-            const contactPerson = document.querySelector('.client-info input[placeholder="Enter contact person"]').value;
-            const contactNumber = document.querySelector('.client-info input[placeholder="Enter contact number"]').value;
+        // Get client information
+        const clientName = document.querySelector('.client-info input[placeholder="Enter recipient name"]').value;
+        const officeAddress = document.querySelector('.client-info input[placeholder="Enter office address"]').value;
+        const contactPerson = document.querySelector('.client-info input[placeholder="Enter contact person"]').value;
+        const contactNumber = document.querySelector('.client-info input[placeholder="Enter contact number"]').value;
 
-            if (!clientName || !officeAddress || !contactPerson || !contactNumber) {
-                showAlert('Missing Info', 'Please fill in all client information fields.', 'warning');
-                return;
-            }
+        if (!clientName || !officeAddress || !contactPerson || !contactNumber) {
+            showAlert('Missing Info', 'Please fill in all client information fields.', 'warning');
+            return;
+        }
 
-            // Get package type
-            const packageTypeSelect = document.getElementById('packageType');
-            const packageType = packageTypeSelect.options[packageTypeSelect.selectedIndex]?.text || '';
+        // Get package type
+        const packageTypeSelect = document.getElementById('packageType');
+        const packageType = packageTypeSelect.options[packageTypeSelect.selectedIndex]?.text || '';
 
-            // Get quotation date
-            const quotationDate = document.getElementById('quote-date').textContent;
+        // Get quotation date
+        const quotationDate = document.getElementById('quote-date').textContent;
 
-            // Get total amounts
-            const subtotalInput = document.getElementById('subtotal-input');
-            const subtotal = subtotalInput ? parseFloat(subtotalInput.value) || 0 : 0;
+        // Get total amounts
+        const subtotalInput = document.getElementById('subtotal-input');
+        const subtotal = subtotalInput ? parseFloat(subtotalInput.value) || 0 : 0;
 
-            const totalPackagePriceInput = document.getElementById('total-package-price-input');
-            const totalPackagePrice = totalPackagePriceInput ? parseFloat(totalPackagePriceInput.value) || 0 : 0;
+        const totalPackagePriceInput = document.getElementById('total-package-price-input');
+        const totalPackagePrice = totalPackagePriceInput ? parseFloat(totalPackagePriceInput.value) || 0 : 0;
 
-            // Get onsite delivery and discount
-            const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
-            const discountInput = document.getElementById('discount-input');
-            const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
-            const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
+        // Get onsite delivery and discount
+        const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
+        const discountInput = document.getElementById('discount-input');
+        const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
+        const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
 
-            console.log('Saving quotation with employee_name:', employeeName);
-            console.log('Package type:', packageType);
-            console.log('Edit mode:', isEditMode);
+        console.log('Saving quotation with employee_name:', employeeName);
+        console.log('Package type:', packageType);
 
-            // STEP 1: Save the main quotation
-            const quotationPayload = {
-                quotation_no: quotationNo,
-                quotation_date: quotationDate,
-                client_name: clientName,
-                office_address: officeAddress,
-                contact_person: contactPerson,
-                contact_number: contactNumber,
-                package_type: packageType,
-                total: totalPackagePrice,
-                discount: discount,
-                employee_name: employeeName,
-                status: 'pending'
-            };
+        // STEP 1: Save the main quotation
+        const quotationPayload = {
+            quotation_no: quotationNo,
+            quotation_date: quotationDate,
+            client_name: clientName,
+            office_address: officeAddress,
+            contact_person: contactPerson,
+            contact_number: contactNumber,
+            package_type: packageType,
+            total: totalPackagePrice,
+            discount: discount,
+            employee_name: employeeName,
+            status: 'pending'
+        };
 
-            console.log('Quotation payload:', quotationPayload);
+        console.log('Quotation payload:', quotationPayload);
 
-            let quotation;
-            if (isEditMode) {
-                // Update existing quotation
-                const { data: updatedQuotation, error: updateError } = await supabaseClient
-                    .from('quotations')
-                    .update(quotationPayload)
-                    .eq('id', editingQuotationId)
-                    .select()
+        const quotation = await createQuotation(quotationPayload);
+
+        if (!quotation || !quotation.id) {
+            showAlert('Error', 'Error: Failed to save quotation. No response from server.', 'error');
+            return;
+        }
+
+        console.log('Quotation saved successfully:', quotation);
+
+        // STEP 2: Collect all quotation items with product_id lookup
+        const items = [];
+        let rowOrder = 0;
+
+        // Get package type row (first row)
+        const packageRow = document.getElementById('package-type-row');
+        if (packageRow) {
+            const packageQty = parseFloat(packageRow.querySelector('.qty-input')?.value) || 0;
+            const packagePrice = parseFloat(packageRow.querySelector('.price-input')?.value) || 0;
+            const packageTotal = parseFloat(packageRow.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
+
+            // Get the selected product name from description dropdown
+            const packageDesc = document.getElementById('descriptionDropdown');
+            const packageProductName = packageDesc?.options[packageDesc.selectedIndex]?.value || '';
+
+            // Look up product_id from product name
+            let packageProductId = null;
+            if (packageProductName) {
+                const { data: productData, error: productError } = await supabaseClient
+                    .from('products')
+                    .select('id')
+                    .eq('name', packageProductName)
                     .single();
 
-                if (updateError) {
-                    console.error('Error updating quotation:', updateError);
-                    showAlert('Error', 'Failed to update quotation: ' + updateError.message, 'error');
-                    return;
+                if (!productError && productData) {
+                    packageProductId = productData.id;
                 }
-
-                quotation = updatedQuotation;
-                console.log('Quotation updated successfully:', quotation);
-
-                // Delete existing items before creating new ones
-                await supabaseClient
-                    .from('quotation_items')
-                    .delete()
-                    .eq('quotation_id', editingQuotationId);
-
-            } else {
-                // Create new quotation
-                quotation = await createQuotation(quotationPayload);
-
-                if (!quotation || !quotation.id) {
-                    showAlert('Error', 'Error: Failed to save quotation. No response from server.', 'error');
-                    return;
-                }
-
-                console.log('Quotation saved successfully:', quotation);
             }
 
-            // STEP 2: Collect all quotation items with product_id lookup
-            const items = [];
-            let rowOrder = 0;
+            items.push({
+                quotation_id: quotation.id,
+                product_id: packageProductId,
+                row_type: 'package',
+                quantity: packageQty,
+                price: packagePrice,
+                total: packageTotal,
+                row_order: rowOrder++
+            });
+        }
 
-            // Get package type row (first row)
-            const packageRow = document.getElementById('package-type-row');
-            if (packageRow) {
-                const packageQty = parseFloat(packageRow.querySelector('.qty-input')?.value) || 0;
-                const packagePrice = parseFloat(packageRow.querySelector('.price-input')?.value) || 0;
-                const packageTotal = parsePHP(packageRow.querySelector('.total-cell')?.textContent);
+        // Get all product rows
+        const productRows = document.querySelectorAll('.product-row');
+        for (const row of productRows) {
+            const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
 
-                // Get the selected product name from description dropdown
-                const packageDesc = document.getElementById('descriptionDropdown');
-                const packageProductName = packageDesc?.options[packageDesc.selectedIndex]?.value || '';
+            // Only save rows that have a quantity > 0
+            if (qty > 0) {
+                const dropdown = row.querySelector('.product-dropdown');
+                const productName = dropdown?.options[dropdown.selectedIndex]?.value || '';
+                const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
+                const total = parseFloat(row.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
 
                 // Look up product_id from product name
-                let packageProductId = null;
-                if (packageProductName) {
+                let productId = null;
+                if (productName) {
                     const { data: productData, error: productError } = await supabaseClient
                         .from('products')
                         .select('id')
-                        .eq('name', packageProductName)
+                        .eq('name', productName)
                         .single();
 
                     if (!productError && productData) {
-                        packageProductId = productData.id;
+                        productId = productData.id;
                     }
                 }
 
                 items.push({
                     quotation_id: quotation.id,
-                    product_id: packageProductId,
-                    row_type: 'package',
-                    quantity: packageQty,
-                    price: packagePrice,
-                    total: packageTotal,
+                    product_id: productId,
+                    row_type: 'product',
+                    quantity: qty,
+                    price: price,
+                    total: total,
                     row_order: rowOrder++
                 });
             }
-
-            // Get all product rows
-            const productRows = document.querySelectorAll('.product-row');
-            for (const row of productRows) {
-                const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
-
-                // Only save rows that have a quantity > 0
-                if (qty > 0) {
-                    const dropdown = row.querySelector('.product-dropdown');
-                    const productName = dropdown?.options[dropdown.selectedIndex]?.value || '';
-                    const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
-                    const total = parsePHP(row.querySelector('.total-cell')?.textContent);
-
-                    // Look up product_id from product name
-                    let productId = null;
-                    if (productName) {
-                        const { data: productData, error: productError } = await supabaseClient
-                            .from('products')
-                            .select('id')
-                            .eq('name', productName)
-                            .single();
-
-                        if (!productError && productData) {
-                            productId = productData.id;
-                        }
-                    }
-
-                    items.push({
-                        quotation_id: quotation.id,
-                        product_id: productId,
-                        row_type: 'product',
-                        quantity: qty,
-                        price: price,
-                        total: total,
-                        row_order: rowOrder++
-                    });
-                }
-            }
-
-            // Get delivery row (delivery is not a product, so product_id will be NULL)
-            const deliveryRow = document.getElementById('delivery-row');
-            if (deliveryRow) {
-                const deliveryPrice = parseFloat(deliveryRow.querySelector('.delivery-price-input')?.value) || 0;
-                const deliveryTotal = deliveryRow.querySelector('.delivery-total-cell')?.textContent || 'FREE';
-                const deliveryTotalNum = deliveryTotal === 'FREE' ? 0 : parsePHP(deliveryTotal);
-
-                items.push({
-                    quotation_id: quotation.id,
-                    product_id: null, // Delivery is not a product
-                    row_type: 'delivery',
-                    quantity: 1,
-                    price: deliveryPrice,
-                    total: deliveryTotalNum,
-                    row_order: rowOrder++
-                });
-            }
-
-            console.log('Items to save:', items);
-
-            // STEP 3: Save all items to database
-            if (items.length > 0) {
-                const { data: savedItems, error: itemsError } = await supabaseClient
-                    .from('quotation_items')
-                    .insert(items)
-                    .select();
-
-                if (itemsError) {
-                    console.error('Error saving quotation items:', itemsError);
-                    showAlert('Partial Save', 'Quotation saved, but failed to save items: ' + itemsError.message, 'warning');
-                    return;
-                }
-
-                console.log('Items saved successfully:', savedItems);
-            }
-
-            // Success!
-            const action = isEditMode ? 'updated' : 'saved';
-            showAlert('Success', `Quotation ${action} successfully!\n\nQuotation No: ${quotation.quotation_no || quotationNo}\nPackage Type: ${packageType}\nItems Saved: ${items.length}`, 'success', function () {
-                if (isEditMode) {
-                    // Navigate back to quotation list after updating
-                    window.location.href = 'quotationlist.html';
-                }
-            });
-
-            // Clear the stored quotation number and edit mode
-            localStorage.removeItem('currentQuotationNumber');
-            if (isEditMode) {
-                localStorage.removeItem('editingQuotationId');
-            }
-
-        } catch (error) {
-            console.error('Error saving quotation:', error);
-            showAlert('Error', 'Error saving quotation: ' + (error.message || 'Unknown error'), 'error');
         }
+
+        // Get delivery row (delivery is not a product, so product_id will be NULL)
+        const deliveryRow = document.getElementById('delivery-row');
+        if (deliveryRow) {
+            const deliveryPrice = parseFloat(deliveryRow.querySelector('.delivery-price-input')?.value) || 0;
+            const deliveryTotal = deliveryRow.querySelector('.delivery-total-cell')?.textContent || 'FREE';
+            const deliveryTotalNum = deliveryTotal === 'FREE' ? 0 : parseFloat(deliveryTotal.replace(/[₱,]/g, '')) || 0;
+
+            items.push({
+                quotation_id: quotation.id,
+                product_id: null, // Delivery is not a product
+                row_type: 'delivery',
+                quantity: 1,
+                price: deliveryPrice,
+                total: deliveryTotalNum,
+                row_order: rowOrder++
+            });
+        }
+
+        console.log('Items to save:', items);
+
+        // STEP 3: Save all items to database
+        if (items.length > 0) {
+            const { data: savedItems, error: itemsError } = await supabaseClient
+                .from('quotation_items')
+                .insert(items)
+                .select();
+
+            if (itemsError) {
+                console.error('Error saving quotation items:', itemsError);
+                showAlert('Partial Save', 'Quotation saved, but failed to save items: ' + itemsError.message, 'warning');
+                return;
+            }
+
+            console.log('Items saved successfully:', savedItems);
+        }
+
+        // Success!
+        showAlert('Success', `Quotation saved successfully!\n\nQuotation No: ${quotation.quotation_no || quotationNo}\nPackage Type: ${packageType}\nItems Saved: ${items.length}`, 'success');
+
+        // Clear the stored quotation number
+        localStorage.removeItem('currentQuotationNumber');
+
+    } catch (error) {
+        console.error('Error saving quotation:', error);
+        showAlert('Error', 'Error saving quotation: ' + (error.message || 'Unknown error'), 'error');
     }
 }
 
@@ -1163,50 +1038,14 @@ async function saveAndPrintPDF() {
 
         console.log('Quotation payload:', quotationPayload);
 
-        // Check if we're updating an existing quotation (edit mode)
-        const editingQuotationId = localStorage.getItem('editingQuotationId');
-        const isEditMode = !!editingQuotationId;
+        const quotation = await createQuotation(quotationPayload);
 
-        let quotation;
-        if (isEditMode) {
-            // Update existing quotation
-            const { data: updatedQuotation, error: updateError } = await supabaseClient
-                .from('quotations')
-                .update(quotationPayload)
-                .eq('id', editingQuotationId)
-                .select()
-                .single();
-
-            if (updateError) {
-                console.error('Error updating quotation in saveAndPrintPDF:', updateError);
-                showAlert('Error', 'Failed to update quotation: ' + updateError.message, 'error');
-                return;
-            }
-
-            quotation = updatedQuotation;
-            console.log('Quotation updated successfully:', quotation);
-
-            // Delete existing items before inserting new ones
-            const { error: deleteItemsError } = await supabaseClient
-                .from('quotation_items')
-                .delete()
-                .eq('quotation_id', editingQuotationId);
-
-            if (deleteItemsError) {
-                console.error('Error deleting existing quotation items:', deleteItemsError);
-                showAlert('Warning', 'Failed to delete existing quotation items: ' + deleteItemsError.message, 'warning');
-            }
-        } else {
-            // Create new quotation
-            quotation = await createQuotation(quotationPayload);
-
-            if (!quotation || !quotation.id) {
-                showAlert('Error', 'Error: Failed to save quotation. No response from server.', 'error');
-                return;
-            }
-
-            console.log('Quotation saved successfully:', quotation);
+        if (!quotation || !quotation.id) {
+            showAlert('Error', 'Error: Failed to save quotation. No response from server.', 'error');
+            return;
         }
+
+        console.log('Quotation saved successfully:', quotation);
 
         // STEP 2: Collect all quotation items with product_id lookup
         const items = [];
@@ -1217,7 +1056,7 @@ async function saveAndPrintPDF() {
         if (packageRow) {
             const packageQty = parseFloat(packageRow.querySelector('.qty-input')?.value) || 0;
             const packagePrice = parseFloat(packageRow.querySelector('.price-input')?.value) || 0;
-            const packageTotal = parsePHP(packageRow.querySelector('.total-cell')?.textContent);
+            const packageTotal = parseFloat(packageRow.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
 
             // Get the selected product name from description dropdown
             const packageDesc = document.getElementById('descriptionDropdown');
@@ -1258,7 +1097,7 @@ async function saveAndPrintPDF() {
                 const dropdown = row.querySelector('.product-dropdown');
                 const productName = dropdown?.options[dropdown.selectedIndex]?.value || '';
                 const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
-                const total = parsePHP(row.querySelector('.total-cell')?.textContent);
+                const total = parseFloat(row.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
 
                 // Look up product_id from product name
                 let productId = null;
@@ -1291,7 +1130,7 @@ async function saveAndPrintPDF() {
         if (deliveryRow) {
             const deliveryPrice = parseFloat(deliveryRow.querySelector('.delivery-price-input')?.value) || 0;
             const deliveryTotal = deliveryRow.querySelector('.delivery-total-cell')?.textContent || 'FREE';
-            const deliveryTotalNum = deliveryTotal === 'FREE' ? 0 : parsePHP(deliveryTotal);
+            const deliveryTotalNum = deliveryTotal === 'FREE' ? 0 : parseFloat(deliveryTotal.replace(/[₱,]/g, '')) || 0;
 
             items.push({
                 quotation_id: quotation.id,
@@ -1324,9 +1163,6 @@ async function saveAndPrintPDF() {
 
         // Clear the stored quotation number
         localStorage.removeItem('currentQuotationNumber');
-        if (isEditMode) {
-            localStorage.removeItem('editingQuotationId');
-        }
 
         // Now trigger the print dialog
         console.log('Quotation saved successfully. Opening print dialog...');
@@ -1345,9 +1181,9 @@ async function saveAndPrintPDF() {
 document.addEventListener('DOMContentLoaded', function () {
     console.log('Page loaded, initializing...');
 
-    // âœ… CHECK: Don't initialize if in view mode
+    // ✅ CHECK: Don't initialize if in view mode
     if (isViewMode) {
-        console.log('ðŸ”µ View mode active - skipping new quotation initialization');
+        console.log('🔵 View mode active - skipping new quotation initialization');
         return;
     }
 
@@ -1360,10 +1196,8 @@ document.addEventListener('DOMContentLoaded', function () {
         quotationNo
     });
 
-    (async () => {
-        await ensureDataLoaded();
-        await initializeQuotation();
-    })();
+    loadData();
+    initializeQuotation();
 
     // Add event listeners to all existing rows
     document.querySelectorAll('.product-row, #package-type-row').forEach(row => {
@@ -1450,14 +1284,14 @@ function calculateDeliveryTotal() {
     const totalCell = deliveryRow.querySelector('.delivery-total-cell');
 
     if (priceInput && totalCell) {
-        const price = parsePHP(priceInput.value);
+        const price = parseFloat(priceInput.value) || 0;
         const total = price; // qty is always 1
 
         if (total === 0) {
             totalCell.textContent = 'FREE';
             totalCell.style.color = '#28a745';
         } else {
-            totalCell.textContent = formatPHP(total);
+            totalCell.textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             totalCell.style.color = '#000';
         }
     }
@@ -1522,14 +1356,14 @@ function calculateRowTotal(row) {
 
     if (qtyInput && priceInput && totalCell) {
         const qty = parseFloat(qtyInput.value) || 0;
-        const price = parsePHP(priceInput.value);
+        const price = parseFloat(priceInput.value) || 0;
         const total = qty * price;
 
-        // âœ… UPDATED: Use innerHTML to make cell truly empty (no text node)
+        // ✅ UPDATED: Use innerHTML to make cell truly empty (no text node)
         if (total > 0) {
-            totalCell.textContent = formatPHP(total);
+            totalCell.textContent = '₱' + total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         } else {
-            totalCell.innerHTML = ''; // â† Completely empty HTML
+            totalCell.innerHTML = ''; // ← Completely empty HTML
         }
     }
 }
@@ -1544,14 +1378,14 @@ function updateItemNumbers() {
     const allRows = tbody.querySelectorAll('tr');
 
     allRows.forEach(row => {
-        // Skip delivery row for numbering
+        // Skip delivery row
         if (row.id === 'delivery-row') {
             const itemCell = row.querySelector('td:first-child');
             if (itemCell) itemCell.textContent = '';
             return;
         }
 
-        // Handle package row and product rows
+        // Get quantity
         const qtyInput = row.querySelector('.qty-input');
         const qty = qtyInput ? parseFloat(qtyInput.value) || 0 : 0;
 
@@ -1606,67 +1440,45 @@ async function loadQuotationForEdit(editData) {
         if (clientInputs[2]) clientInputs[2].value = quotation.contact_person || '';
         if (clientInputs[3]) clientInputs[3].value = quotation.contact_number || '';
 
-        // Populate left setup panel (new UI)
-        setInputValueIfPresent('setup-client-name', quotation.client_name || '');
-        setInputValueIfPresent('setup-office-address', quotation.office_address || '');
-        setInputValueIfPresent('setup-contact-person', quotation.contact_person || '');
-        setInputValueIfPresent('setup-contact-no', quotation.contact_number || '');
-
-        // Populate package type (both preview select + setup select)
-        if (quotation.package_type) {
-            applyPackageTypeToUI(quotation.package_type);
+        // Populate package type
+        const packageTypeSelect = document.getElementById('packageType');
+        if (packageTypeSelect && quotation.package_type) {
+            // Find and select the matching option
+            for (let i = 0; i < packageTypeSelect.options.length; i++) {
+                if (packageTypeSelect.options[i].text === quotation.package_type) {
+                    packageTypeSelect.selectedIndex = i;
+                    packageTypeSelect.dispatchEvent(new Event('change'));
+                    break;
+                }
+            }
         }
 
-        // Populate items immediately (items come from quotation_items; enrich via product_id)
-        const enrichedItems = await enrichQuotationItems(items);
-        console.log('🔍 About to populate edit items (enriched)...');
-        populateEditItems(enrichedItems);
+        // Wait for package type to load, then populate items
+        setTimeout(() => {
+            populateEditItems(items);
+        }, 1000);
 
         // Update totals
         if (quotation.total) {
             const totalPackagePriceInput = document.getElementById('total-package-price-input');
             if (totalPackagePriceInput) {
-                totalPackagePriceInput.value = formatPHP(quotation.total);
+                totalPackagePriceInput.value = '₱' + quotation.total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
         }
 
-        if (quotation.onsite_delivery !== undefined && quotation.onsite_delivery !== null) {
+        if (quotation.onsite_delivery) {
             const onsiteDeliveryInput = document.getElementById('onsite-delivery-input');
             if (onsiteDeliveryInput) {
-                onsiteDeliveryInput.value = formatPHP(quotation.onsite_delivery);
+                onsiteDeliveryInput.value = quotation.onsite_delivery;
             }
         }
 
-        if (quotation.discount !== undefined && quotation.discount !== null) {
+        if (quotation.discount) {
             const discountInput = document.getElementById('discount-input');
             if (discountInput) {
-                discountInput.value = formatPHP(quotation.discount);
+                discountInput.value = quotation.discount;
             }
         }
-
-        // Restore page 2 HTML (terms/notes/payment lines) if present
-        try {
-            const page2 = document.getElementById('page2-content');
-            if (page2 && quotation.page2_html) {
-                page2.innerHTML = quotation.page2_html;
-                // Re-bind payment amount inputs formatting and events
-                page2.querySelectorAll('.payment-amount-input').forEach(input => {
-                    let value = String(input.value || '').replace(/,/g, '');
-                    if (value && !isNaN(value)) input.value = parseFloat(value).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                    input.addEventListener('focus', function () { this.value = String(this.value || '').replace(/,/g, ''); });
-                    input.addEventListener('blur', function () {
-                        let v = String(this.value || '').replace(/,/g, '');
-                        if (v && !isNaN(v)) this.value = parseFloat(v).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                    });
-                });
-            }
-        } catch (e) { console.error('Error restoring page2_html in edit load:', e); }
-
-        // Recompute derived totals to match hydrated row values
-        calculateDeliveryTotal();
-        calculateTotals();
-        updateItemNumbers();
-        updateTotalItemsCount();
 
         // Clear the edit data from localStorage
         localStorage.removeItem('editQuotationData');
@@ -1681,12 +1493,8 @@ async function loadQuotationForEdit(editData) {
 
 // Populate items from the loaded quotation
 function populateEditItems(items) {
-    console.log('🔍 populateEditItems called with items:', items);
     const tbody = document.getElementById('quotation-tbody');
-    if (!tbody) {
-        console.error('🔍 quotation-tbody not found!');
-        return;
-    }
+    if (!tbody) return;
 
     // Clear existing rows except package and delivery rows
     const existingProductRows = tbody.querySelectorAll('.product-row');
@@ -1694,92 +1502,58 @@ function populateEditItems(items) {
 
     let previousRow = document.getElementById('package-type-row');
 
-    const packageItem = (items || []).find(i => i?.row_type === 'package') || null;
-    const deliveryItem = (items || []).find(i => i?.row_type === 'delivery') || null;
-    const productItems = (items || []).filter(i => i?.row_type === 'product');
+    items.forEach((item, index) => {
+        if (item.row_type === 'product') {
+            const productRow = document.createElement('tr');
+            productRow.className = 'product-row';
+            productRow.dataset.productId = item.product_id || '';
+            productRow.dataset.productName = item.product_name || '';
 
-    if (packageItem) {
-        const packageRow = document.getElementById('package-type-row');
-        if (packageRow) {
-            const qtyInput = packageRow.querySelector('.qty-input');
-            if (qtyInput) qtyInput.value = packageItem.quantity ?? 1;
-
-            const priceInput = packageRow.querySelector('.price-input');
-            if (priceInput) priceInput.value = packageItem.price ?? 0;
-
-            const unitDisplay = packageRow.querySelector('.unit-display');
-            if (unitDisplay) unitDisplay.value = packageItem.product?.unit || '';
-
-            packageRow.dataset.productId = packageItem.product_id || '';
-            packageRow.dataset.productName = packageItem.product?.name || '';
-
-            const descriptionDiv = document.getElementById('description-display');
-            if (descriptionDiv) {
-                const title = packageItem.product?.name || 'Package';
-                let descriptionHTML = `<div style="font-weight: bold; font-size: 10px; margin-bottom: 4px;">${title}</div>`;
-                const descLines = String(packageItem.product?.description || '').split('\n').filter(line => line.trim());
+            // Build description HTML
+            let descriptionHTML = `<div style="font-weight: bold; font-size: 10px; padding: 5px;">${item.product_name}</div>`;
+            if (item.description) {
+                const descLines = item.description.split('\n').filter(line => line.trim());
                 if (descLines.length > 0) {
-                    descriptionHTML += '<div style="font-size: 9px; color: #666;">';
-                    descLines.forEach(line => { descriptionHTML += `<div style="margin-bottom: 2px;">&#10003; ${line.trim()}</div>`; });
+                    descriptionHTML += '<div style="font-size: 9px; color: #666; padding: 2px 5px;">';
+                    descLines.forEach(line => {
+                        descriptionHTML += `<div style="margin-bottom: 2px;">✓ ${line.trim()}</div>`;
+                    });
                     descriptionHTML += '</div>';
                 }
-                descriptionDiv.innerHTML = descriptionHTML;
-                descriptionDiv.style.color = '#000';
-                descriptionDiv.style.fontStyle = 'normal';
             }
 
-            calculateRowTotal(packageRow);
+            productRow.innerHTML = `
+                <td class="item-number-cell" style="text-align: center; font-weight: bold; font-size: 12px;"></td>
+                <td><input type="number" value="${item.quantity || 1}" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+                <td><input type="text" value="${item.unit || ''}" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
+                <td>${descriptionHTML}</td>
+                <td><input type="number" value="${item.price || 0}" step="0.01" class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
+                <td class="total-cell" style="text-align: right; font-weight: bold;">₱${(item.total || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td class="no-print"><button onclick="deleteRow(this)" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button></td>
+            `;
+
+            // Insert the row
+            if (previousRow && previousRow.nextSibling) {
+                previousRow.parentNode.insertBefore(productRow, previousRow.nextSibling);
+            } else {
+                tbody.appendChild(productRow);
+            }
+            previousRow = productRow;
+
+            // Add event listeners
+            setupRowEventListeners(productRow);
+            calculateRowTotal(productRow);
+        } else if (item.row_type === 'delivery') {
+            // Update delivery row
+            const deliveryRow = document.getElementById('delivery-row');
+            if (deliveryRow) {
+                const deliveryPriceInput = deliveryRow.querySelector('.delivery-price-input');
+                if (deliveryPriceInput) {
+                    deliveryPriceInput.value = item.price || 0;
+                }
+            }
         }
-    }
-
-    productItems.forEach(item => {
-        const productRow = document.createElement('tr');
-        productRow.className = 'product-row';
-        productRow.dataset.productId = item.product_id || '';
-        productRow.dataset.productName = item.product?.name || '';
-
-        const title = item.product?.name || item.product_name || 'Product';
-        const unit = item.product?.unit || item.unit || '';
-        const desc = item.product?.description || item.description || '';
-
-        let descriptionHTML = `<div style="font-weight: bold; font-size: 10px; padding: 5px;">${title}</div>`;
-        const descLines = String(desc).split('\n').filter(line => line.trim());
-        if (descLines.length > 0) {
-            descriptionHTML += '<div style="font-size: 9px; color: #666; padding: 2px 5px;">';
-            descLines.forEach(line => {
-                descriptionHTML += `<div style="margin-bottom: 2px;">&#10003; ${line.trim()}</div>`;
-            });
-            descriptionHTML += '</div>';
-        }
-
-        productRow.innerHTML = `
-            <td class="item-number-cell" style="text-align: center; font-weight: bold; font-size: 12px;"></td>
-            <td><input type="number" value="${item.quantity ?? 1}" min="0" class="qty-input" style="width: 50px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-            <td><input type="text" value="${unit}" class="unit-display" readonly style="font-size: 10px; padding: 2px 4px; border: 1px solid #e0e0e0; border-radius: 3px; background: #f5f5f5; width: 100%; text-align: center;"></td>
-            <td>${descriptionHTML}</td>
-            <td><input type="number" value="${item.price ?? 0}" step="0.01" class="price-input" style="width: 80px; font-size: 10px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; text-align: right;"></td>
-            <td class="total-cell" style="text-align: right; font-weight: bold;"></td>
-            <td class="no-print"><button onclick="deleteRow(this)" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px;">Delete</button></td>
-        `;
-
-        if (previousRow && previousRow.nextSibling) {
-            previousRow.parentNode.insertBefore(productRow, previousRow.nextSibling);
-        } else {
-            tbody.appendChild(productRow);
-        }
-        previousRow = productRow;
-
-        setupRowEventListeners(productRow);
-        calculateRowTotal(productRow);
     });
-
-    if (deliveryItem) {
-        const deliveryRow = document.getElementById('delivery-row');
-        if (deliveryRow) {
-            const deliveryPriceInput = deliveryRow.querySelector('.delivery-price-input');
-            if (deliveryPriceInput) deliveryPriceInput.value = deliveryItem.price ?? 0;
-        }
-    }
 
     // Update totals and item numbers
     calculateTotals();

@@ -3768,7 +3768,7 @@
                         const updateBtn = document.createElement('button');
                         updateBtn.textContent = 'Update Quotation';
                         updateBtn.style.cssText = 'background:#28a745;color:white;padding:10px 20px;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:bold;flex:1;min-width:120px;max-width:220px;transition:all 0.3s;';
-                        updateBtn.onclick = function () { updateQuotation(capturedIdForEdit); };
+                        updateBtn.onclick = function () { navigateToCreateForEdit(capturedIdForEdit); };
                         const pdfBtn = document.createElement('button');
                         pdfBtn.textContent = 'Save as PDF';
                         pdfBtn.style.cssText = 'background:#0a57b0;color:white;padding:10px 20px;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:bold;flex:1;min-width:120px;max-width:220px;transition:all 0.3s;';
@@ -3812,9 +3812,8 @@
             editFab.onmouseleave = function () { this.style.transform = 'scale(1)'; this.style.boxShadow = '0 4px 16px rgba(40,167,69,0.4)'; };
             editFab.onclick = function (e) {
                 e.preventDefault();
-                localStorage.setItem('viewMode', 'true');
-                localStorage.setItem('editMode', 'true');
-                window.location.reload();
+                console.log('🔍 Green FAB clicked, capturedQuotationId:', capturedQuotationId);
+                navigateToCreateForEdit(capturedQuotationId);
             };
 
             // FAB: Delete (red, left of PDF)
@@ -3942,6 +3941,9 @@
                     page2Html = clone.innerHTML;
                 }
 
+                console.log('Debug: page2Html length', page2Html ? page2Html.length : 0);
+                if (page2Html) console.log('Debug: page2Html preview', page2Html.substring(0,200));
+
                 const quotationPayload = {
                     quotation_no: quotationNo, quotation_date: quotationDate, client_name: clientName,
                     office_address: officeAddress, contact_person: contactPerson, contact_number: contactNumber,
@@ -3949,8 +3951,26 @@
                     onsite_delivery: onsiteDelivery, page2_html: page2Html, employee_name: employeeName, status: 'pending'
                 };
 
-                const quotation = await createQuotation(quotationPayload);
-                if (!quotation || !quotation.id) { showAlert('Save Failed', 'Failed to save quotation. No response from server.', 'error'); return; }
+                // If editing, update existing quotation; otherwise create new
+                const editingQuotationId = localStorage.getItem('editingQuotationId');
+                let quotation;
+                if (editingQuotationId) {
+                    // Update quotation via Supabase directly
+                    const { data: updatedQuotation, error: updateError } = await supabaseClient
+                        .from('quotations')
+                        .update(quotationPayload)
+                        .eq('id', editingQuotationId)
+                        .select()
+                        .single();
+                    if (updateError) { console.error('Error updating quotation:', updateError); showAlert('Save Failed', 'Failed to update quotation: ' + (updateError.message || updateError), 'error'); return; }
+                    quotation = updatedQuotation;
+                    // remove existing items so we can reinsert
+                    const { error: deleteErr } = await supabaseClient.from('quotation_items').delete().eq('quotation_id', editingQuotationId);
+                    if (deleteErr) console.warn('Failed to delete existing quotation items:', deleteErr);
+                } else {
+                    quotation = await createQuotation(quotationPayload);
+                    if (!quotation || !quotation.id) { showAlert('Save Failed', 'Failed to save quotation. No response from server.', 'error'); return; }
+                }
 
                 const items = [];
                 let rowOrder = 0;
@@ -3971,10 +3991,32 @@
                     const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
                     if (qty > 0) {
                         let finalProductId = row.dataset.productId ? parseInt(row.dataset.productId) : null;
-                        if (!finalProductId && row.dataset.productName) {
-                            const { data: productData } = await supabaseClient.from('products').select('id').eq('name', row.dataset.productName).single();
+                        let productName = row.dataset.productName || '';
+
+                        // If there's a dropdown, prefer its selected value and data attributes
+                        const dropdown = row.querySelector('.product-dropdown');
+                        if (dropdown) {
+                            const selectedOpt = dropdown.options[dropdown.selectedIndex];
+                            if (selectedOpt) {
+                                productName = selectedOpt.value || productName;
+                                const optPid = selectedOpt.dataset && (selectedOpt.dataset.productId || selectedOpt.dataset.id || selectedOpt.dataset.pid);
+                                if (optPid) finalProductId = parseInt(optPid);
+                            }
+                        } else {
+                            // If the dropdown was replaced by a display div, take its text
+                            const displayDiv = row.querySelector('.selected-dropdown-text');
+                            if (displayDiv) {
+                                const txt = (displayDiv.textContent || '').trim();
+                                if (txt) productName = txt;
+                            }
+                        }
+
+                        // If still no product id, try to look up by name
+                        if (!finalProductId && productName) {
+                            const { data: productData } = await supabaseClient.from('products').select('id').eq('name', productName).single();
                             if (productData) finalProductId = productData.id;
                         }
+
                         const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
                         const total = parseFloat(row.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
                         items.push({ quotation_id: quotation.id, product_id: finalProductId, row_type: 'product', quantity: qty, price, total, row_order: rowOrder++ });
@@ -3995,6 +4037,7 @@
                 }
 
                 localStorage.removeItem('currentQuotationNumber');
+                if (editingQuotationId) localStorage.removeItem('editingQuotationId');
                 markZeroValuesForPrint();
                 const isMobileView = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
                 window.__redirectToListAfterPrint = !isMobileView;
@@ -4011,6 +4054,71 @@
                 });
             } catch (error) {
                 showAlert('Error', 'Error saving quotation: ' + (error.message || 'Unknown error'), 'error');
+            }
+        }
+
+        async function navigateToCreateForEdit(quotationId) {
+            console.log('🔍 navigateToCreateForEdit called with ID:', quotationId);
+            try {
+                // Fetch the complete quotation data from database
+                const { data: quotation, error } = await supabaseClient
+                    .from('quotations')
+                    .select('*')
+                    .eq('id', quotationId)
+                    .single();
+
+                console.log('🔍 Quotation data fetched:', quotation);
+                console.log('🔍 Quotation fetch error:', error);
+
+                if (error) {
+                    showAlert('Error', 'Failed to load quotation data: ' + error.message, 'error');
+                    return;
+                }
+
+                // Fetch quotation items
+                console.log('🔍 Starting to fetch items for quotation ID:', quotationId);
+                const { data: items, error: itemsError } = await supabaseClient
+                    .from('quotation_items')
+                    .select('*')
+                    .eq('quotation_id', quotationId)
+                    .order('row_order', { ascending: true });
+
+                console.log('🔍 Items fetch result:', items);
+                console.log('🔍 Items fetch error:', itemsError);
+
+                if (itemsError) {
+                    console.error('🔍 Items fetch failed:', itemsError);
+                    showAlert('Error', 'Failed to load quotation items: ' + itemsError.message, 'error');
+                    return;
+                }
+
+                if (!quotation) {
+                    showAlert('Error', 'Quotation data not found for editing.', 'error');
+                    return;
+                }
+                if (!items || items.length === 0) {
+                    console.error('🔍 Items data is empty or null.');
+                    showAlert('Error', 'Quotation items not found for editing.', 'error');
+                    return;
+                }
+
+                // Store the quotation data for pre-filling the create form
+                console.log('🔍 Storing edit data:', { quotation, items });
+                localStorage.setItem('editQuotationData', JSON.stringify({
+                    quotation: quotation,
+                    items: items,
+                    isEdit: true
+                }));
+
+                console.log('🔍 About to navigate to quotation.html');
+                // Clear view mode before navigating to edit
+                localStorage.removeItem('viewMode');
+                localStorage.removeItem('viewQuotationData');
+                // Navigate to the create quotation page
+                window.location.href = 'quotation.html';
+
+            } catch (error) {
+                showAlert('Error', 'Failed to prepare quotation for editing: ' + (error.message || 'Unknown error'), 'error');
             }
         }
 
@@ -4076,10 +4184,32 @@
                     const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
                     if (qty > 0) {
                         let finalProductId = row.dataset.productId ? parseInt(row.dataset.productId) : null;
-                        if (!finalProductId && row.dataset.productName) {
-                            const { data: productData } = await supabaseClient.from('products').select('id').eq('name', row.dataset.productName).single();
+                        let productName = row.dataset.productName || '';
+
+                        // If there's a dropdown, prefer its selected value and data attributes
+                        const dropdown = row.querySelector('.product-dropdown');
+                        if (dropdown) {
+                            const selectedOpt = dropdown.options[dropdown.selectedIndex];
+                            if (selectedOpt) {
+                                productName = selectedOpt.value || productName;
+                                const optPid = selectedOpt.dataset && (selectedOpt.dataset.productId || selectedOpt.dataset.id || selectedOpt.dataset.pid);
+                                if (optPid) finalProductId = parseInt(optPid);
+                            }
+                        } else {
+                            // If the dropdown was replaced by a display div, take its text
+                            const displayDiv = row.querySelector('.selected-dropdown-text');
+                            if (displayDiv) {
+                                const txt = (displayDiv.textContent || '').trim();
+                                if (txt) productName = txt;
+                            }
+                        }
+
+                        // If still no product id, try to look up by name
+                        if (!finalProductId && productName) {
+                            const { data: productData } = await supabaseClient.from('products').select('id').eq('name', productName).single();
                             if (productData) finalProductId = productData.id;
                         }
+
                         const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
                         const total = parseFloat(row.querySelector('.total-cell')?.textContent.replace(/[₱,]/g, '')) || 0;
                         items.push({ quotation_id: quotationId, product_id: finalProductId, row_type: 'product', quantity: qty, price, total, row_order: rowOrder++ });
