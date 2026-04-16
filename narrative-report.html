@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Narrative Report</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 11pt;
+      background: #fff;
+      color: #000;
+    }
+
+    .page {
+      width: 850px;
+      margin: 20px auto;
+      padding: 30px 40px;
+    }
+
+    h1.report-title {
+      text-align: center;
+      font-size: 13pt;
+      font-weight: bold;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+
+    table.report-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    table.report-table th,
+    table.report-table td {
+      border: 1px solid #000;
+      padding: 6px 8px;
+      vertical-align: top;
+    }
+
+    /* Header info row */
+    .info-row td {
+      border: 1px solid #000;
+      padding: 4px 8px;
+    }
+
+    /* Column widths */
+    col.col-date   { width: 14%; }
+    col.col-hours  { width: 9%; }
+    col.col-tasks  { width: 40%; }
+    col.col-learn  { width: 37%; }
+
+    .col-header {
+      text-align: center;
+      font-weight: bold;
+      background: #fff;
+      font-size: 11pt;
+    }
+
+    .instructions-cell ul {
+      padding-left: 18px;
+    }
+
+    .instructions-cell li {
+      margin-bottom: 2px;
+    }
+
+    .day-cell {
+      vertical-align: top;
+      font-size: 11pt;
+    }
+
+    .day-cell .date-text {
+      white-space: nowrap;
+    }
+
+    .empty-row td {
+      height: 120px;
+    }
+
+    ul {
+      padding-left: 18px;
+    }
+
+    ul li {
+      margin-bottom: 3px;
+    }
+
+    @media print {
+      body { margin: 0; }
+      .page { margin: 0; padding: 15mm 20mm; width: 100%; }
+      table.report-table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <h1 class="report-title">NARRATIVE REPORT</h1>
+
+  <table class="report-table">
+    <colgroup>
+      <col class="col-date" />
+      <col class="col-hours" />
+      <col class="col-tasks" />
+      <col class="col-learn" />
+    </colgroup>
+
+    <!-- Student / Company info -->
+    <tr>
+      <td colspan="2" style="border-right:1px solid #000;">
+        <strong>Student:</strong> Hannah Bea R. Alcaide<br/>
+        <strong>Contact:</strong> 09156875354
+      </td>
+      <td colspan="2" style="text-align:right;">
+        <strong>Company:</strong> Lap I.T. Solutions Inc.<br/>
+        <strong>Contact:</strong> +63 9171147882
+      </td>
+    </tr>
+
+    <!-- Column headers -->
+    <tr>
+      <th class="col-header">Date</th>
+      <th class="col-header">NO. OF<br/>HOURS</th>
+      <th class="col-header">ACTIVITIES / TASK</th>
+      <th class="col-header">LEARNINGS</th>
+    </tr>
+
+    <!-- Instructions row -->
+    <tr>
+      <td class="day-cell"><strong>Date</strong></td>
+      <td class="day-cell"><strong>Hours</strong></td>
+      <td class="instructions-cell">
+        <ul>
+          <li><strong>What did you do that day?</strong></li>
+          <li><strong>Indicate quality of experience</strong></li>
+          <li><strong>Discuss the steps of the flow</strong></li>
+        </ul>
+      </td>
+      <td class="instructions-cell">
+        <ul>
+          <li>
+            <strong>What did you learn?</strong>
+            <ul style="list-style-type:disc; padding-left:16px; margin-top:3px;">
+              <li>
+                Describe if the task was already taught in school or something new.
+                Relate to the closest subject or course that helped perform the task.
+                Cite specific lessons taught in the classroom that <u>is useful in this task.</u>
+              </li>
+              <li>
+                If not related in the school, discuss the importance of the learning
+                that it should be taught in the school.
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </td>
+    </tr>
+
+    <!-- ======================== DAY 1 ======================== -->
+    <tr>
+      <td class="day-cell"><span class="date-text">December 15, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td>
+        <strong>What did you do that day?</strong>
+        <ul>
+          <li>
+            On my first day, I was immediately immersed in the project by organizing the frontend
+            files and establishing the initial project structure for the POS Quotation system.
+            This foundational work set the stage for all future development.
+          </li>
+          <li>
+            I also configured a GitHub Actions workflow to automate the deployment to GitHub Pages,
+            ensuring that the team could continuously publish updates without manual effort.
+          </li>
+          <li>
+            Beyond the structural setup, I made several UI improvements: I updated the Generate
+            Quotation button and modal styles for a cleaner look, refined the employee modal to
+            display names in a more informative "Name - ID" format, improved modal and button CSS
+            for better responsiveness on mobile.
+          </li>
+        </ul>
+      </td>
+      <td>
+        <strong>What did you learn?</strong>
+        <ul>
+          <li>
+            On the first day, I learned about the company orientation — what LAP I.T. Solutions does,
+            who the people on the team are, what the house rules were, what time to arrive, and how to
+            conduct myself in the workplace. I was also given a brief overview of the project I would
+            be assisting with: a web-based POS Quotation System that the company uses to generate
+            formal quotations for their clients. I didn't touch any code yet. Most of the day was
+            spent listening, taking notes, and familiarizing myself with the office environment.
+          </li>
+        </ul>
+        <br/>
+        <strong>Describe if the task was already taught in school or something new.</strong>
+        <ul>
+          <li>
+            The orientation itself was not technically taught in school, but my Professional
+            Development and Work Ethics class in senior high touched on workplace conduct, professional
+            behavior, and understanding company culture — all of which were directly applicable on
+            this first day.
+          </li>
+        </ul>
+      </td>
+    </tr>
+
+    <!-- ======================== DAY 2 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">December 16, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 3 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">December 17, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 4 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">December 18, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 5 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">December 19, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 6 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">December 22, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 7 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">December 23, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 8 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">December 24, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 9 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">December 26, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 10 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">December 29, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 11 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">December 30, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 12 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">December 31, 2025</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 13 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 2, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 14 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 5, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 15 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 6, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 16 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 7, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 17 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 8, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 18 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 9, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 19 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 12, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 20 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 13, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 21 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 14, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 22 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 15, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 23 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 16, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 24 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 19, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 25 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 20, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 26 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 21, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 27 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 22, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 28 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 23, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 29 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 26, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 30 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 27, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 31 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 28, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 32 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 29, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 33 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">January 30, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 34 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 2, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 35 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 3, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 36 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 4, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 37 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 5, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 38 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 6, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 39 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 9, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 40 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 10, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 41 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 11, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 42 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 12, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 43 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 13, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 44 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 16, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 45 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 17, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 46 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 18, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 47 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 19, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 48 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 20, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 49 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 23, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 50 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 24, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 51 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 25, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 52 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 26, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 53 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">February 27, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 54 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 2, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 55 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 3, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 56 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 4, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 57 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 5, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 58 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 6, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 59 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 9, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 60 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 10, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 61 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 11, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 62 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 12, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 63 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 13, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 64 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 16, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 65 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 17, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 66 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 18, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 67 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 19, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <!-- ======================== DAY 68 ======================== -->
+    <tr class="empty-row">
+      <td class="day-cell"><span class="date-text">March 20, 2026</span></td>
+      <td class="day-cell" style="text-align:center;">8</td>
+      <td></td>
+      <td></td>
+    </tr>
+
+  </table>
+</div>
+</body>
+</html>
