@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="backend/config.js"></script>
     <script src="backend/supabase.js"></script>
+    <script src="../scripts/quotation-templates.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="Logo.png">
@@ -3612,9 +3613,9 @@
             } catch (e) { console.error('Error restoring page2_html:', e); }
 
             const clientInputs = document.querySelectorAll('.client-info input');
-            if (clientInputs[0]) clientInputs[0].value = quotation.client_name || '';
-            if (clientInputs[1]) clientInputs[1].value = quotation.office_address || '';
-            if (clientInputs[2]) clientInputs[2].value = quotation.contact_person || '';
+            if (clientInputs[0]) clientInputs[0].value = (quotation.client_name || '').toUpperCase();
+            if (clientInputs[1]) clientInputs[1].value = (quotation.office_address || '').toUpperCase();
+            if (clientInputs[2]) clientInputs[2].value = (quotation.contact_person || '').toUpperCase();
             if (clientInputs[3]) clientInputs[3].value = quotation.contact_number || '';
 
             const quoteNumber = document.getElementById('quote-number');
@@ -3679,6 +3680,11 @@
 
             // Reveal page now that data is fully populated
             document.documentElement.style.visibility = '';
+
+            // Inject AMC / SLA / EULA template pages now that client info is loaded
+            if (typeof window.qptplInjectViewPages === 'function') {
+                window.qptplInjectViewPages(quotation.template_dates || null);
+            }
 
             makePageReadOnly();
         }
@@ -3910,13 +3916,15 @@
         async function saveAndPrintQuotation() {
             try {
                 const employeeName = localStorage.getItem('selectedEmployeeName');
-                const quotationNo = localStorage.getItem('currentQuotationNumber');
+                const editingQuotationId = localStorage.getItem('editingQuotationId');
+                const quotationNo = localStorage.getItem('currentQuotationNumber')
+                    || (editingQuotationId ? (document.getElementById('quote-number')?.textContent?.trim() || null) : null);
                 if (!employeeName) { showAlert('Missing Employee', 'No employee selected. Please go back to home and select an employee.', 'error'); return; }
                 if (!quotationNo) { showAlert('Missing Quotation Number', 'No quotation number generated. Please refresh the page.', 'error'); return; }
 
-                const clientName = document.querySelector('.client-info input[placeholder="Enter recipient name"]').value;
-                const officeAddress = document.querySelector('.client-info input[placeholder="Enter office address"]').value;
-                const contactPerson = document.querySelector('.client-info input[placeholder="Enter contact person"]').value;
+                const clientName = (document.querySelector('.client-info input[placeholder="Enter recipient name"]').value || '').toUpperCase();
+                const officeAddress = (document.querySelector('.client-info input[placeholder="Enter office address"]').value || '').toUpperCase();
+                const contactPerson = (document.querySelector('.client-info input[placeholder="Enter contact person"]').value || '').toUpperCase();
                 const contactNumber = document.querySelector('.client-info input[placeholder="Enter contact number"]').value;
                 if (!clientName || !officeAddress || !contactPerson || !contactNumber) { showAlert('Incomplete Information', 'Please fill in all client information fields before saving.', 'warning'); return; }
 
@@ -3944,26 +3952,28 @@
                 console.log('Debug: page2Html length', page2Html ? page2Html.length : 0);
                 if (page2Html) console.log('Debug: page2Html preview', page2Html.substring(0,200));
 
+                const templateDates = (typeof window.qptplCollectDates === 'function')
+                    ? window.qptplCollectDates() : null;
+
                 const quotationPayload = {
                     quotation_no: quotationNo, quotation_date: quotationDate, client_name: clientName,
                     office_address: officeAddress, contact_person: contactPerson, contact_number: contactNumber,
                     package_type: packageType, total: totalPackagePrice, discount: discount,
-                    onsite_delivery: onsiteDelivery, page2_html: page2Html, employee_name: employeeName, status: 'pending'
+                    onsite_delivery: onsiteDelivery, page2_html: page2Html, employee_name: employeeName,
+                    template_dates: templateDates, status: 'pending'
                 };
 
                 // If editing, update existing quotation; otherwise create new
-                const editingQuotationId = localStorage.getItem('editingQuotationId');
                 let quotation;
                 if (editingQuotationId) {
                     // Update quotation via Supabase directly
-                    const { data: updatedQuotation, error: updateError } = await supabaseClient
+                    const { data: updatedQuotationArr, error: updateError } = await supabaseClient
                         .from('quotations')
                         .update(quotationPayload)
                         .eq('id', editingQuotationId)
-                        .select()
-                        .single();
+                        .select('*');
                     if (updateError) { console.error('Error updating quotation:', updateError); showAlert('Save Failed', 'Failed to update quotation: ' + (updateError.message || updateError), 'error'); return; }
-                    quotation = updatedQuotation;
+                    quotation = Array.isArray(updatedQuotationArr) ? updatedQuotationArr[0] : updatedQuotationArr;
                     // remove existing items so we can reinsert
                     const { error: deleteErr } = await supabaseClient.from('quotation_items').delete().eq('quotation_id', editingQuotationId);
                     if (deleteErr) console.warn('Failed to delete existing quotation items:', deleteErr);

@@ -655,17 +655,38 @@ async function initializeQuotation() {
 
     // Check if we're in edit mode
     const editQuotationDataStr = localStorage.getItem('editQuotationData');
-    console.log('🔍 Edit mode check - editQuotationDataStr:', editQuotationDataStr);
     if (editQuotationDataStr) {
         try {
             const editData = JSON.parse(editQuotationDataStr);
-            console.log('🔍 Parsed edit data:', editData);
             if (editData.isEdit) {
-                console.log('🔍 Edit mode detected, loading quotation data...');
                 await ensureDataLoaded();
                 await loadQuotationForEdit(editData);
                 return;
-            }
+
+            setTimeout(() => {
+                    const quotationData = editData; // Use the data from localStorage
+                    if (quotationData.template_dates) {
+                        try {
+                            const tDates = JSON.parse(quotationData.template_dates);
+                            const allTemplateDateInputs = document.querySelectorAll('.qptpl-template-page input[type="date"]');
+                            const dateValues = [tDates.amc_start, tDates.amc_end, tDates.sla_date, tDates.eula_date];
+
+                            allTemplateDateInputs.forEach((input, index) => {
+                                if (dateValues[index]) {
+                                    input.value = dateValues[index];
+                                    if (window.qptplFormatDate) window.qptplFormatDate(input);
+                                }
+                            });
+                        } catch (e) {
+                            console.error("Error parsing template dates:", e);
+                        }
+                    }
+                }, 500);
+
+            return;
+        }
+
+
         } catch (error) {
             console.error('Error parsing edit quotation data:', error);
             // Clear invalid data
@@ -840,15 +861,7 @@ async function getQuotationById(quotationId) {
     }
 }
 
-// Save quotation to Supabase
-// Updated saveQuotation function - saves quotation AND its items
-// Replace your existing saveQuotation() function with this
-
-// Updated saveQuotation function - uses product_id instead of storing names/descriptions
-// Replace your existing saveQuotation() function in scripts/quotation.js with this
-
 async function saveQuotation() {
-    async function saveQuotation() {
         try {
             // Check if we're in edit mode
             const editingQuotationId = localStorage.getItem('editingQuotationId');
@@ -901,6 +914,13 @@ async function saveQuotation() {
             const onsiteDelivery = onsiteDeliveryInput ? parseFloat(onsiteDeliveryInput.value) || 0 : 0;
             const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
 
+            const templateDatesObj = {
+                amc_start: document.querySelector('input[type="date"][onchange*="qptplFormatDate"]')?.value || '',
+                amc_end: document.querySelectorAll('input[type="date"][onchange*="qptplFormatDate"]')[1]?.value || '',
+                sla_date: document.querySelector('.qptpl-template-page:nth-of-type(2) input[type="date"]')?.value || '',
+                eula_date: document.querySelector('.qptpl-template-page:nth-of-type(3) input[type="date"]')?.value || ''
+            };
+
             console.log('Saving quotation with employee_name:', employeeName);
             console.log('Package type:', packageType);
             console.log('Edit mode:', isEditMode);
@@ -917,7 +937,8 @@ async function saveQuotation() {
                 total: totalPackagePrice,
                 discount: discount,
                 employee_name: employeeName,
-                status: 'pending'
+                status: 'pending',
+                template_dates: JSON.stringify(templateDatesObj)
             };
 
             console.log('Quotation payload:', quotationPayload);
@@ -925,12 +946,11 @@ async function saveQuotation() {
             let quotation;
             if (isEditMode) {
                 // Update existing quotation
-                const { data: updatedQuotation, error: updateError } = await supabaseClient
+                const { data: updatedQuotationArr, error: updateError } = await supabaseClient
                     .from('quotations')
                     .update(quotationPayload)
                     .eq('id', editingQuotationId)
-                    .select()
-                    .single();
+                    .select('*');
 
                 if (updateError) {
                     console.error('Error updating quotation:', updateError);
@@ -938,7 +958,13 @@ async function saveQuotation() {
                     return;
                 }
 
-                quotation = updatedQuotation;
+                if (!updateQuotationArr || updateQuotationArr.length === 0) {
+                    console.error('Update failed: ID not found in database');
+                    showAlert('Error', 'Update failed: The quotation you are editing could not be found. It may have been deleted.', 'error');
+                    return;
+                }
+
+                quotation = updatedQuotationArr[0];
                 console.log('Quotation updated successfully:', quotation);
 
                 // Delete existing items before creating new ones
@@ -1093,7 +1119,6 @@ async function saveQuotation() {
             showAlert('Error', 'Error saving quotation: ' + (error.message || 'Unknown error'), 'error');
         }
     }
-}
 
 // Combined function: Save quotation AND print as PDF
 async function saveAndPrintPDF() {
@@ -1170,12 +1195,11 @@ async function saveAndPrintPDF() {
         let quotation;
         if (isEditMode) {
             // Update existing quotation
-            const { data: updatedQuotation, error: updateError } = await supabaseClient
+            const { data: updatedQuotationArr, error: updateError } = await supabaseClient
                 .from('quotations')
                 .update(quotationPayload)
                 .eq('id', editingQuotationId)
-                .select()
-                .single();
+                .select('*');
 
             if (updateError) {
                 console.error('Error updating quotation in saveAndPrintPDF:', updateError);
@@ -1183,7 +1207,7 @@ async function saveAndPrintPDF() {
                 return;
             }
 
-            quotation = updatedQuotation;
+            quotation = Array.isArray(updatedQuotationArr) ? updatedQuotationArr[0] : updatedQuotationArr;
             console.log('Quotation updated successfully:', quotation);
 
             // Delete existing items before inserting new ones
@@ -1586,7 +1610,6 @@ async function loadQuotationForEdit(editData) {
 
         // Store the original quotation ID for updating
         localStorage.setItem('editingQuotationId', quotation.id);
-
         // Update quotation number and date
         const quoteNumber = document.getElementById('quote-number');
         const quoteDate = document.getElementById('quote-date');
@@ -1601,15 +1624,15 @@ async function loadQuotationForEdit(editData) {
 
         // Populate client information
         const clientInputs = document.querySelectorAll('.client-info input');
-        if (clientInputs[0]) clientInputs[0].value = quotation.client_name || '';
-        if (clientInputs[1]) clientInputs[1].value = quotation.office_address || '';
-        if (clientInputs[2]) clientInputs[2].value = quotation.contact_person || '';
+        if (clientInputs[0]) clientInputs[0].value = (quotation.client_name || '').toUpperCase();
+        if (clientInputs[1]) clientInputs[1].value = (quotation.office_address || '').toUpperCase();
+        if (clientInputs[2]) clientInputs[2].value = (quotation.contact_person || '').toUpperCase();
         if (clientInputs[3]) clientInputs[3].value = quotation.contact_number || '';
 
         // Populate left setup panel (new UI)
-        setInputValueIfPresent('setup-client-name', quotation.client_name || '');
-        setInputValueIfPresent('setup-office-address', quotation.office_address || '');
-        setInputValueIfPresent('setup-contact-person', quotation.contact_person || '');
+        setInputValueIfPresent('setup-client-name', (quotation.client_name || '').toUpperCase());
+        setInputValueIfPresent('setup-office-address', (quotation.office_address || '').toUpperCase());
+        setInputValueIfPresent('setup-contact-person', (quotation.contact_person || '').toUpperCase());
         setInputValueIfPresent('setup-contact-no', quotation.contact_number || '');
 
         // Populate package type (both preview select + setup select)
@@ -1672,6 +1695,29 @@ async function loadQuotationForEdit(editData) {
         localStorage.removeItem('editQuotationData');
 
         console.log('Quotation loaded successfully for editing');
+
+        if (quotation.template_dates){
+            setTimeout(() => {
+                try{
+                    const tDates = typeof quotaion.templates_dates === 'string'
+                        ? JSON.parse(quotation.template_dates)
+                        : quotation.template_dates;
+
+                    const allTemplateDateInputs = [tDates.amc_start, tDates.amc_end,tDates.sla_date,tDates.eula_date];
+
+                    allTemplateDateInputs.forEach((dateStr, index) => {
+                        if (dateValues[index]) {
+                            if (window.qptplFormatDate){
+                                window.qptplFormatDate(input);
+                            }   
+                        }    
+                    });
+                    console.log('Template dates re-populated');
+                } catch (e) {
+                    console.error('Error parsing template dates:', e);
+                }
+            }, 600);
+        }
 
     } catch (error) {
         console.error('Error loading quotation for edit:', error);
