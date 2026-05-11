@@ -685,6 +685,7 @@
                     const { data, error } = await client
                         .from('quotations')
                         .select('id, quotation_no, client_name, quotation_date, created_at, total, package_type')
+                        .order('quotation_date', { ascending: false })
                         .order('created_at', { ascending: false })
                         .limit(5);
 

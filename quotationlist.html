@@ -460,6 +460,7 @@
                 const { data, error } = await supabaseClient
                     .from('quotations')
                     .select('*')
+                    .order('quotation_date', { ascending: false })
                     .order('created_at', { ascending: false });
                 if (error) { showError('Failed to load quotations'); return; }
                 quotations = data || [];
