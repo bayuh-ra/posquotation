@@ -320,13 +320,6 @@
     function buildSLA(c) {
         return `<div class="qptpl-page">
 <h1>Service Level Agreement (SLA)</h1>
-<p>This Agreement is made on <strong class="qptpl-auto qptpl-date">${c.date}</strong> between <strong>LAP I.T. Solutions Inc.</strong> ("Service Provider") and:</p>
-<div class="qptpl-info-block">
-  <p><strong class="qptpl-auto qptpl-name">${c.name}</strong></p>
-  <div class="qptpl-info-row"><span class="qptpl-label">Office Address:</span><span class="qptpl-value qptpl-address">${c.address}</span></div>
-  <div class="qptpl-info-row"><span class="qptpl-label">Contact Person:</span><span class="qptpl-value qptpl-contact">${c.contact}</span></div>
-  <div class="qptpl-info-row"><span class="qptpl-label">Contact Number:</span><span class="qptpl-value qptpl-phone">${c.phone}</span></div>
-</div>
 <hr class="qptpl-divider">
 <h2>1. Purpose of the Agreement</h2>
 <p>This SLA defines the scope of support, service commitments, responsibilities, and performance standards provided by LAP I.T. Solutions Inc. to the Client for the POS System and related hardware/software components.</p>
@@ -415,13 +408,6 @@
         return `<div class="qptpl-page">
 <h1>End User License Agreement (EULA)</h1>
 <p>This End User License Agreement is entered into on <strong class="qptpl-auto qptpl-date">${c.date}</strong> between <strong>LAP I.T. Solutions Inc.</strong> and:</p>
-<div class="qptpl-info-block">
-  <p><strong class="qptpl-auto qptpl-name">${c.name}</strong></p>
-  <div class="qptpl-info-row"><span class="qptpl-label">Office Address:</span><span class="qptpl-value qptpl-address">${c.address}</span></div>
-  <div class="qptpl-info-row"><span class="qptpl-label">Contact Person:</span><span class="qptpl-value qptpl-contact">${c.contact}</span></div>
-  <div class="qptpl-info-row"><span class="qptpl-label">Contact Number:</span><span class="qptpl-value qptpl-phone">${c.phone}</span></div>
-</div>
-<hr class="qptpl-divider">
 <h2>1. Grant of License</h2>
 <p>LAP I.T. Solutions grants the Client a non-exclusive, non-transferable license to use the POS software solely for the Client's internal business operations.</p>
 <h2>2. Ownership</h2>
@@ -452,18 +438,6 @@
 <p>This license may be revoked by LAP I.T. Solutions if the Client violates any terms of this EULA, tampers with or cracks the software, has outstanding unpaid balances, or uses the software for unauthorized or illegal purposes. Upon termination, the Client must immediately cease use and destroy all copies.</p>
 <h2>9. Acceptance</h2>
 <p>By signing below, the Client acknowledges that they have read, understood, and agreed to all terms of this End User License Agreement. Use of the software constitutes acceptance of this EULA.</p>
-<div class="qptpl-sign-row">
-  <div class="qptpl-sign-block">
-    <p><strong>CLIENT</strong></p>
-    <p>Name: <span class="qptpl-auto qptpl-name">${c.name}</span></p>
-    <div style="margin-top:18px;"><div class="qptpl-sign-line"></div><div class="qptpl-sign-label">Signature</div><p style="margin-top:6px;">Date: ${DBLANK()}</p></div>
-  </div>
-  <div class="qptpl-sign-block">
-    <p><strong>LAP I.T. SOLUTIONS INC.</strong></p>
-    <p>Authorized Representative: ${BLANK}</p>
-    <div style="margin-top:18px;"><div class="qptpl-sign-line"></div><div class="qptpl-sign-label">Signature</div><p style="margin-top:6px;">Date: ${DBLANK()}</p></div>
-  </div>
-</div>
 </div>`;
     }
 
