@@ -320,7 +320,6 @@
     function buildSLA(c) {
         return `<div class="qptpl-page">
 <h1>Service Level Agreement (SLA)</h1>
-<hr class="qptpl-divider">
 <h2>1. Purpose of the Agreement</h2>
 <p>This SLA defines the scope of support, service commitments, responsibilities, and performance standards provided by LAP I.T. Solutions Inc. to the Client for the POS System and related hardware/software components.</p>
 <h2>2. Coverage Period</h2>
