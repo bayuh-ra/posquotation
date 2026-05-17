@@ -195,22 +195,26 @@
    */
   .qptpl-template-page{
     width:auto!important;
-    min-height:13.2in!important;
+    min-height:unset!important;
     height:auto!important;
     margin:0!important;
-    padding:0.3in 0.4in 0.8in!important;
+    padding:0.3in 0.4in 0.3in!important;
     box-shadow:none!important;
     border-radius:0!important;
-    position:relative!important;
+    position:static!important;
     overflow:visible!important;
     display:block!important;
     page-break-inside:auto!important;
     break-inside:auto!important;
     page-break-before:always!important;
     break-before:page!important;
-    page-break-after:auto!important;
-    break-after:auto!important;
+    page-break-after:avoid!important;
+    break-after:avoid!important;
     box-sizing:border-box!important;
+  }
+  .qptpl-template-page:last-child{
+    page-break-after:avoid!important;
+    break-after:avoid!important;
   }
   .qptpl-template-page .page-inner{
     display:block!important;
@@ -218,6 +222,14 @@
     flex:none!important;
     page-break-inside:auto!important;
     break-inside:auto!important;
+  }
+  .qptpl-template-page .page-footer{
+    page-break-before:avoid!important;
+    break-before:avoid!important;
+    page-break-inside:avoid!important;
+    break-inside:avoid!important;
+    page-break-after:avoid!important;
+    break-after:avoid!important;
   }
   /* Keep headings with content */
   .qptpl-page h2{page-break-after:avoid!important;break-after:avoid!important}
@@ -230,22 +242,11 @@
   .qptpl-page table{page-break-inside:avoid!important;break-inside:avoid!important}
   .tpl-section{page-break-inside:auto;break-inside:auto;}
   .tpl-section h2{page-break-after:avoid!important;break-after:avoid!important;}
-  .qptpl-template-page .page-footer{
-    position:absolute!important;
-    bottom:0.3in!important;
-    right:0.4in!important;
-    left:auto!important;
-    display:flex!important;
-    align-items:center!important;
-    padding:0!important;
-    margin-top:0!important;
-    border-top:none!important;
-  }
   .qptpl-template-page .page-number{
     position:static!important;
     flex-shrink:0!important;
   }
-  #qptpl-page-eula{min-height:13.2in!important;display:flex!important;flex-direction:column!important;}
+  #qptpl-page-eula{min-height:unset!important;display:flex!important;flex-direction:column!important;}
   #qptpl-page-eula .page-inner{flex:1!important;display:flex!important;flex-direction:column!important;}
   .qptpl-date-picker:not([value])::-webkit-datetime-edit,
   .qptpl-date-picker[value=""]::-webkit-datetime-edit{color:transparent!important;visibility:hidden!important;}
@@ -253,7 +254,6 @@
   .qptpl-date-picker[value=""]{border-bottom:1px solid #000!important;min-width:140px!important;color:transparent!important;}
   .qptpl-date-picker[data-formatted]{display:none!important;width:0!important;height:0!important;overflow:hidden!important;}
   .qptpl-dp-display{display:inline!important;color:#000!important;font-weight:600!important;font-size:11px!important;border-bottom:none!important;}
-  .qptpl-template-page:last-child{page-break-after:avoid!important;break-after:avoid!important;}
 }
         `;
         document.head.appendChild(s);
