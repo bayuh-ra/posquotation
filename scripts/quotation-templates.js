@@ -251,6 +251,9 @@
   .qptpl-date-picker[value=""]::-webkit-datetime-edit{color:transparent!important;visibility:hidden!important;}
   .qptpl-date-picker:not([value]),
   .qptpl-date-picker[value=""]{border-bottom:1px solid #000!important;min-width:140px!important;color:transparent!important;}
+  .qptpl-date-picker[data-formatted]{display:none!important;width:0!important;height:0!important;overflow:hidden!important;}
+  .qptpl-dp-display{display:inline!important;color:#000!important;font-weight:600!important;font-size:11px!important;border-bottom:none!important;}
+  .qptpl-template-page:last-child{page-break-after:avoid!important;break-after:avoid!important;}
 }
         `;
         document.head.appendChild(s);
@@ -429,7 +432,7 @@
         return `
 <div class="page page-break qptpl-template-page" id="qptpl-page-${key}"
      style="width:8.27in;min-height:unset;margin:20px auto;background:white;
-            padding:0.3in 0.4in 0.4in;box-shadow:0 0 10px rgba(0,0,0,0.1);
+            padding:0.3in 0.4in 0.3in;box-shadow:0 0 10px rgba(0,0,0,0.1);
             position:relative;box-sizing:border-box;overflow:visible;display:block;">
   <div class="page-inner">${innerHTML}</div>
   <div class="page-footer" style="position:absolute;bottom:0.3in;right:0.4in;display:flex;align-items:center;">
