@@ -385,6 +385,7 @@
         .total-cell {
             font-size: 13px !important;
             font-weight: bold !important;
+            white-space: nowrap !important;
             text-align: right !important;
             white-space: nowrap;
         }
@@ -413,7 +414,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 11in;
+            min-height: 13in;
         }
 
         #page2-content {
@@ -1500,7 +1501,7 @@
             #onsite-delivery-input,
             #discount-input,
             #total-package-price-input {
-                width: 100px !important;
+                width: 130px !important;
                 font-size: 12px !important;
             }
 
@@ -1722,7 +1723,7 @@
         /* --- Print styles (must be in <style>) --- */
         @media print {
             @page {
-                size: A4;
+                size: legal portrait;
                 margin: 0.4in 0.35in;
             }
 
@@ -1778,11 +1779,11 @@
                 zoom: 1 !important;
                 width: 8.27in !important;
                 height: auto !important;
-                min-height: 11.2in !important;
+                min-height: 13.2in !important;
                 max-height: none !important;
                 box-shadow: none !important;
                 margin: 0 !important;
-                padding: 0.3in 0.4in 0.6in !important;
+                padding: 0.3in 0.4in 0.8in !important;
                 page-break-after: always !important;
                 page-break-inside: avoid !important;
                 position: relative !important;
@@ -1824,7 +1825,7 @@
 
             /* Enlarge page 2 for print but keep within one sheet */
             .page.page-break .page-inner {
-                min-height: 10.6in !important;
+                min-height: 12.5in !important;
             }
 
             #page2-content,
@@ -2094,6 +2095,7 @@
             .total-cell {
                 font-size: 11px !important;
                 font-weight: bold !important;
+                white-space: nowrap !important;
             }
 
             .delivery-total-cell {
@@ -2104,26 +2106,24 @@
             .page-footer {
                 position: absolute !important;
                 bottom: 0.35in !important;
-                left: 0 !important;
-                right: 0 !important;
+                right: 0.35in !important;
+                left: auto !important;
                 page-break-inside: avoid !important;
                 display: flex !important;
-                justify-content: center !important;
                 align-items: center !important;
-                padding: 0 0.3in !important;
+                padding: 0 !important;
                 margin-top: 0 !important;
             }
 
             .page-number {
-                position: absolute !important;
-                left: 0.3in !important;
                 display: inline-flex !important;
-                width: 24px !important;
-                height: 24px !important;
+                flex-shrink: 0 !important;
+                width: 26px !important;
+                height: 26px !important;
                 background-color: #1a5276 !important;
                 color: white !important;
                 font-weight: bold !important;
-                font-size: 10px !important;
+                font-size: 11px !important;
                 border-radius: 50% !important;
                 align-items: center !important;
                 justify-content: center !important;
@@ -2142,7 +2142,7 @@
             }
 
             .terms-section h3 {
-                font-size: 9px !important;
+                font-size: 14px !important;
                 margin-top: 0 !important;
                 margin-bottom: 4px !important;
             }
@@ -2150,11 +2150,11 @@
             .terms-section p {
                 margin-top: 2px !important;
                 margin-bottom: 2px !important;
-                font-size: 8.5px !important;
+                font-size: 12px !important;
             }
 
             .terms-list {
-                font-size: 8.5px !important;
+                font-size: 12px !important;
                 line-height: 1.25 !important;
                 margin-top: 0 !important;
                 margin-bottom: 4px !important;
@@ -2166,7 +2166,7 @@
             }
 
             .terms-section ul {
-                font-size: 8.5px !important;
+                font-size: 12px !important;
                 line-height: 1.25 !important;
                 margin-top: 2px !important;
                 margin-bottom: 2px !important;
@@ -2178,7 +2178,7 @@
             }
 
             .payment-term-line {
-                font-size: 8.5px !important;
+                font-size: 12px !important;
                 margin-bottom: 1px !important;
                 line-height: 1.25 !important;
             }
@@ -2444,7 +2444,7 @@
     <div id="pdf-content">
         <!-- PAGE 1 -->
         <div class="page"
-            style="width:8.27in; min-height:11.69in; margin:20px auto; background:white; padding:0.3in 0.4in 0.4in; box-shadow:0 0 10px rgba(0,0,0,0.1); position:relative; box-sizing:border-box; overflow:visible; display:flex; flex-direction:column;">
+            style="width:8.27in; min-height:13.2in; margin:20px auto; background:white; padding:0.3in 0.4in 0.4in; box-shadow:0 0 10px rgba(0,0,0,0.1); position:relative; box-sizing:border-box; overflow:visible; display:flex; flex-direction:column;">
             <div class="page-inner">
 
                 <!-- Header -->
@@ -2458,6 +2458,7 @@
                             <div>Door B-3 Marcela Building 11-A, J.Palma Gil Street, Davao City, Philippines, 8000</div>
                             <div>Landline: (082) 296-0363 Mobile: 0917-1147882</div>
                             <div>Email: lapitsolutions09@gmail.com</div>
+                            <div>Facebook: <a href="https://www.facebook.com/lapsolutions/" target="_blank" style="color:#1a5276; text-decoration:none;">https://www.facebook.com/lapsolutions/</a></div>
                         </div>
                     </div>
                 </div>
@@ -2504,8 +2505,8 @@
                         <col style="width:60px">
                         <col><!-- description: fills remaining -->
                         <col style="width:70px">
-                        <!-- Total: widened so decimals (e.g. .00) don't get clipped in desktop/web view -->
-                        <col style="width:140px"><!-- Total -->
+                        <!-- Total: wide enough for millions e.g. ₱18,000,000.00 -->
+                        <col style="width:160px"><!-- Total -->
                     </colgroup>
                     <thead>
                         <tr style="background:#e8f4f8; border:2px solid #1a5276;">
@@ -2545,7 +2546,7 @@
                                 style="background:#d6e6f0; color:#000; padding:4px 3px; text-align:center; font-size:9px; font-weight:700; border:1px solid #ccc; width:70px;">
                                 Price (Php)</th>
                             <th
-                                style="background:#d6e6f0; color:#000; padding:4px 3px; text-align:right; font-size:11px; font-weight:700; border:1px solid #ccc; width:90px;">
+                                style="background:#d6e6f0; color:#000; padding:4px 3px; text-align:right; font-size:11px; font-weight:700; border:1px solid #ccc; width:160px; white-space:nowrap;">
                                 Total (Php)</th>
                             <th class="no-print"
                                 style="background:#d6e6f0; color:#000; padding:4px 3px; text-align:center; font-size:9px; font-weight:700; border:1px solid #ccc; width:60px;">
@@ -2636,7 +2637,7 @@
                             <td colspan="5"
                                 style="border:1px solid #ccc; padding:10px; text-align:right; font-weight:bold;">
                                 Subtotal</td>
-                            <td style="border:1px solid #ccc; padding:10px; text-align:right;">
+                            <td style="border:1px solid #ccc; padding:10px; text-align:right; white-space:nowrap;">
                                 <input type="text" id="subtotal-input" value="₱0.00"
                                     style="width:100%; font-size:12px; padding:5px; border:1px solid #ccc; border-radius:3px; text-align:right; font-weight:bold;"
                                     onchange="calculateTotalFromInputs()">
@@ -2647,7 +2648,7 @@
                             <td colspan="5"
                                 style="border:1px solid #ccc; padding:10px; text-align:right; font-weight:bold;">On-site
                                 delivery setup &amp; training (optional)</td>
-                            <td style="border:1px solid #ccc; padding:10px; text-align:right;">
+                            <td style="border:1px solid #ccc; padding:10px; text-align:right; white-space:nowrap;">
                                 <input type="text" id="onsite-delivery-input" value=""
                                     style="width:100%; font-size:12px; padding:5px; border:1px solid #ccc; border-radius:3px; text-align:right; font-weight:bold;"
                                     onchange="calculateTotalFromInputs()">
@@ -2658,7 +2659,7 @@
                             <td colspan="5"
                                 style="border:1px solid #ccc; padding:10px; text-align:right; font-weight:bold;">
                                 Discount</td>
-                            <td style="border:1px solid #ccc; padding:10px; text-align:right;">
+                            <td style="border:1px solid #ccc; padding:10px; text-align:right; white-space:nowrap;">
                                 <input type="text" id="discount-input" value=""
                                     style="width:100%; font-size:12px; padding:5px; border:1px solid #ccc; border-radius:3px; text-align:right; font-weight:bold;"
                                     onchange="calculateTotalFromInputs()">
@@ -2669,7 +2670,7 @@
                             <td colspan="5"
                                 style="border:1px solid #ccc; padding:10px; text-align:right; font-weight:bold; font-size:13px;">
                                 Total Package Price</td>
-                            <td style="border:1px solid #ccc; padding:10px; text-align:right;">
+                            <td style="border:1px solid #ccc; padding:10px; text-align:right; white-space:nowrap;">
                                 <input type="text" id="total-package-price-input" value="₱0.00"
                                     style="width:100%; font-size:13px; padding:5px; border:1px solid #ccc; border-radius:3px; text-align:right; font-weight:bold;"
                                     onchange="validateTotalPackagePrice()">
@@ -2683,20 +2684,16 @@
 
             <!-- Page 1 Footer -->
             <div class="page-footer"
-                style="position:absolute; bottom:0.2in; left:0; right:0; display:flex; justify-content:center; align-items:center; padding:0 0.5in;">
+                style="position:absolute; bottom:0.3in; right:0.4in; display:flex; align-items:center;">
                 <div class="page-number"
-                    style="position:absolute; left:0.5in; width:30px; height:30px; background-color:#1a5276; color:white; font-weight:bold; font-size:12px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    style="width:26px; height:26px; background-color:#1a5276; color:white; font-weight:bold; font-size:11px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
                     1</div>
-                <div class="footer-link" style="font-size:10px; color:#1a5276; text-align:center;">
-                    <a href="https://www.facebook.com/lapsolutions/" target="_blank"
-                        style="color:#1a5276; text-decoration:none;">https://www.facebook.com/lapsolutions/</a>
-                </div>
             </div>
         </div>
 
         <!-- PAGE 2 -->
         <div class="page page-break"
-            style="width:8.27in; min-height:11.69in; margin:20px auto; background:white; padding:0.3in 0.4in 0.4in; box-shadow:0 0 10px rgba(0,0,0,0.1); position:relative; box-sizing:border-box; overflow:visible; display:flex; flex-direction:column;">
+            style="width:8.27in; min-height:13.2in; margin:20px auto; background:white; padding:0.3in 0.4in 0.4in; box-shadow:0 0 10px rgba(0,0,0,0.1); position:relative; box-sizing:border-box; overflow:visible; display:flex; flex-direction:column;">
             <div class="page-inner">
                 <div id="page2-content">
                     <!-- Terms and Conditions -->
@@ -2852,7 +2849,7 @@
                                 style="margin-bottom:8px; outline:none; border:1px solid transparent; padding:2px; border-radius:3px;"
                                 onfocus="this.style.border='1px solid #4CAF50'"
                                 onblur="this.style.border='1px solid transparent'">After one (1) year, client is
-                                encourage to pay ₱1,000/month for continued technical support</li>
+                                encouraged to avail the AMC amounting to ₱1,500/month for continued technical support</li>
                             <li contenteditable="true"
                                 style="margin-bottom:8px; outline:none; border:1px solid transparent; padding:2px; border-radius:3px;"
                                 onfocus="this.style.border='1px solid #4CAF50'"
@@ -2865,33 +2862,6 @@
                             onfocus="this.style.border='1px solid #4CAF50'"
                             onblur="this.style.border='1px solid transparent'">Our warranty is absolutely limited to the
                             specified parts and services mentioned above.</p>
-                        <p contenteditable="true"
-                            style="margin-top:15px; font-size:11px; color:#000; font-weight:500; outline:none; border:1px solid transparent; padding:2px; border-radius:3px;"
-                            onfocus="this.style.border='1px solid #4CAF50'"
-                            onblur="this.style.border='1px solid transparent'">This document serves as a contract
-                            agreement as well as acknowledgement receipt. If all is in order, kindly sign Below.</p>
-                    </div>
-                </div>
-
-                <!-- Signature -->
-                <div class="signature-section"
-                    style="display:flex; justify-content:space-between; margin-top:25px; gap:40px;">
-                    <div style="display:flex; align-items:flex-end;">
-                        <p contenteditable="true"
-                            style="font-weight:bold; font-size:11px; color:#000; margin:0; margin-right:15px; outline:none; border:1px solid transparent; padding:2px; border-radius:3px;"
-                            onfocus="this.style.border='1px solid #4CAF50'"
-                            onblur="this.style.border='1px solid transparent'">
-                            CONFORME:
-                        </p>
-                        <div>
-                            <div style="width:200px; border-bottom:1px solid #000; margin-bottom:3px;"></div>
-                            <div contenteditable="true"
-                                style="font-size:10px; color:#000; text-align:center; outline:none; border:1px solid transparent; padding:2px; border-radius:3px;"
-                                onfocus="this.style.border='1px solid #4CAF50'"
-                                onblur="this.style.border='1px solid transparent'">
-                                Signature over Printed Name
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -2899,14 +2869,10 @@
 
             <!-- Page 2 Footer -->
             <div class="page-footer"
-                style="position:absolute; bottom:0.2in; left:0; right:0; display:flex; justify-content:center; align-items:center; padding:0 0.5in;">
+                style="position:absolute; bottom:0.3in; right:0.4in; display:flex; align-items:center;">
                 <div class="page-number"
-                    style="position:absolute; left:0.5in; width:30px; height:30px; background-color:#1a5276; color:white; font-weight:bold; font-size:12px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    style="width:26px; height:26px; background-color:#1a5276; color:white; font-weight:bold; font-size:11px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
                     2</div>
-                <div class="footer-link" style="font-size:10px; color:#1a5276; text-align:center;">
-                    <a href="https://www.facebook.com/lapsolutions/" target="_blank"
-                        style="color:#1a5276; text-decoration:none;">https://www.facebook.com/lapsolutions/</a>
-                </div>
             </div>
         </div>
     </div>

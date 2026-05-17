@@ -195,47 +195,29 @@
    */
   .qptpl-template-page{
     width:auto!important;
-    min-height:unset!important;
+    min-height:13.2in!important;
     height:auto!important;
     margin:0!important;
-    padding:0!important;
+    padding:0.3in 0.4in 0.8in!important;
     box-shadow:none!important;
     border-radius:0!important;
-    position:static!important;
+    position:relative!important;
     overflow:visible!important;
     display:block!important;
     page-break-inside:auto!important;
     break-inside:auto!important;
     page-break-before:always!important;
     break-before:page!important;
-    page-break-after:always!important;
-    break-after:page!important;
+    page-break-after:auto!important;
+    break-after:auto!important;
     box-sizing:border-box!important;
   }
   .qptpl-template-page .page-inner{
     display:block!important;
-    padding:0 0 0.5in!important;
+    padding:0!important;
     flex:none!important;
     page-break-inside:auto!important;
     break-inside:auto!important;
-  }
-  /* Footer: static flow at end of content */
-  .qptpl-template-page .page-footer{
-    position:static!important;
-    display:flex!important;
-    justify-content:center!important;
-    align-items:center!important;
-    padding:8px 0 0!important;
-    border-top:1px solid #e0e0e0!important;
-    margin-top:12px!important;
-    bottom:auto!important;
-    left:auto!important;
-    right:auto!important;
-  }
-  .qptpl-template-page .page-footer .page-number{
-    position:static!important;
-    margin-right:12px!important;
-    flex-shrink:0!important;
   }
   /* Keep headings with content */
   .qptpl-page h2{page-break-after:avoid!important;break-after:avoid!important}
@@ -246,6 +228,29 @@
   .qptpl-info-block{page-break-inside:avoid!important;break-inside:avoid!important}
   .qptpl-sign-row{page-break-inside:avoid!important;break-inside:avoid!important}
   .qptpl-page table{page-break-inside:avoid!important;break-inside:avoid!important}
+  .tpl-section{page-break-inside:auto;break-inside:auto;}
+  .tpl-section h2{page-break-after:avoid!important;break-after:avoid!important;}
+  .qptpl-template-page .page-footer{
+    position:absolute!important;
+    bottom:0.3in!important;
+    right:0.4in!important;
+    left:auto!important;
+    display:flex!important;
+    align-items:center!important;
+    padding:0!important;
+    margin-top:0!important;
+    border-top:none!important;
+  }
+  .qptpl-template-page .page-number{
+    position:static!important;
+    flex-shrink:0!important;
+  }
+  #qptpl-page-eula{min-height:13.2in!important;display:flex!important;flex-direction:column!important;}
+  #qptpl-page-eula .page-inner{flex:1!important;display:flex!important;flex-direction:column!important;}
+  .qptpl-date-picker:not([value])::-webkit-datetime-edit,
+  .qptpl-date-picker[value=""]::-webkit-datetime-edit{color:transparent!important;visibility:hidden!important;}
+  .qptpl-date-picker:not([value]),
+  .qptpl-date-picker[value=""]{border-bottom:1px solid #000!important;min-width:140px!important;color:transparent!important;}
 }
         `;
         document.head.appendChild(s);
@@ -254,19 +259,14 @@
     // ── Template Builders ─────────────────────────────────────────────────────
     function buildAMC(c) {
         return `<div class="qptpl-page">
-<h1>Annual Maintenance Contract (AMC)</h1>
-<p>This Agreement is made on <strong class="qptpl-auto qptpl-date">${c.date}</strong> between:</p>
-<div class="qptpl-info-block">
-  <p><strong>LAP I.T. SOLUTIONS INC.</strong><br>Door B-3 Marcela Building, 11-A J. Palma Gil Street, Davao City, Philippines<br>Contact: (082) 296-0363 / 0917-1147882<br>Email: lapitsolutions09@gmail.com</p>
-</div>
-<p><strong>And</strong></p>
+<h1>ANNUAL MAINTENANCE CONTRACT (AMC)</h1>
+<p>This Agreement is made on <strong class="qptpl-auto qptpl-date">${c.date}</strong> between <strong>LAP I.T SOLUTIONS INC.</strong> and:</p>
 <div class="qptpl-info-block">
   <p><strong class="qptpl-auto qptpl-name">${c.name}</strong></p>
   <div class="qptpl-info-row"><span class="qptpl-label">Office Address:</span><span class="qptpl-value qptpl-address">${c.address}</span></div>
   <div class="qptpl-info-row"><span class="qptpl-label">Contact Person:</span><span class="qptpl-value qptpl-contact">${c.contact}</span></div>
   <div class="qptpl-info-row"><span class="qptpl-label">Contact Number:</span><span class="qptpl-value qptpl-phone">${c.phone}</span></div>
 </div>
-<hr class="qptpl-divider">
 <h2>1. Purpose</h2>
 <p>This Annual Maintenance Contract (AMC) outlines the terms under which LAP I.T. SOLUTIONS INC. will provide ongoing technical support, software updates, and maintenance services for the Client's installed POS system and related hardware/software components.</p>
 <h2>2. Coverage Period</h2>
@@ -281,7 +281,12 @@
   <li>Hardware maintenance</li>
   <li>Scheduled monthly on-site visit (for Davao City clients only)</li>
 </ul>
-<p><strong>Exclusions:</strong> Major system enhancements or customizations; hardware replacement outside warranty; on-site visits outside Davao City (unless separately arranged).</p>
+<p><strong>Exclusions:</strong></p>
+<ul>
+  <li>Major system enhancements or customizations</li>
+  <li>Hardware replacement outside warranty</li>
+  <li>On-site visits outside Davao City (unless separately arranged)</li>
+</ul>
 <h2>4. Service Response Time</h2>
 <ul>
   <li>Remote Support: Within 24 hours of request</li>
@@ -289,7 +294,11 @@
   <li>On-Site (Outside Davao): Within 3–10 business days; travel and accommodation costs to be shouldered by Client</li>
 </ul>
 <h2>5. AMC Fee</h2>
-<ul><li>Annual Fee: ₱18,000</li><li>Payment Terms: ₱1,500 every 5th of the month</li><li>Renewal: Automatic renewal upon expiry (unless cancelled 30 days prior)</li></ul>
+<ul>
+  <li>Annual Fee: ₱18,000</li>
+  <li>Payment Terms: ₱1,500 every 5th of the month</li>
+  <li>Renewal: Automatic renewal upon expiry (unless cancelled 30 days prior)</li>
+</ul>
 <h2>6. Client Responsibilities</h2>
 <ul>
   <li>Maintain stable internet connection for remote support</li>
@@ -297,31 +306,18 @@
   <li>Provide the necessary computer parts that need to be replaced</li>
   <li>Notify LAP I.T. SOLUTIONS INC. of any system issues promptly</li>
 </ul>
+<div style="page-break-inside:avoid;break-inside:avoid;">
 <h2>7. Termination</h2>
 <p>Either party may terminate this contract with 30 days written notice. Client must settle any remaining balance.</p>
-<h2>8. Acceptance</h2>
-<p>By signing below, both parties agree to the terms and conditions of this AMC.</p>
-<p><strong>Signed by:</strong></p>
-<div class="qptpl-sign-row">
-  <div class="qptpl-sign-block">
-    <p style="margin-bottom:26px;"><strong>LAP I.T. SOLUTIONS INC.</strong> – Authorized Representative</p>
-    <div class="qptpl-sign-line"></div><div class="qptpl-sign-label">Signature over Printed Name</div>
-    <p style="margin-top:8px;">Date: ${DBLANK()}</p>
-  </div>
-  <div class="qptpl-sign-block">
-    <p style="margin-bottom:26px;"><strong class="qptpl-auto qptpl-name">${c.name}</strong> – Authorized Representative</p>
-    <div class="qptpl-sign-line"></div><div class="qptpl-sign-label">Signature over Printed Name</div>
-    <p style="margin-top:8px;">Date: ${DBLANK()}</p>
-  </div>
 </div>
 </div>`;
     }
 
     function buildSLA(c) {
         return `<div class="qptpl-page">
-<h1>Service Level Agreement (SLA)</h1>
+<h1>SERVICE LEVEL AGREEMENT (SLA)</h1>
 <h2>1. Purpose of the Agreement</h2>
-<p>This SLA defines the scope of support, service commitments, responsibilities, and performance standards provided by LAP I.T. Solutions Inc. to the Client for the POS System and related hardware/software components.</p>
+<p>This Service Level Agreement (SLA) defines the scope of support, service commitments, responsibilities, and performance standards provided by LAP I.T. Solutions Inc. ("Service Provider") to the Client for the use, maintenance, and support of the Point-of-Sale (POS) System and related hardware/software components.</p>
 <h2>2. Coverage Period</h2>
 <ul>
   <li>Standard Support Duration: 12 months from the date of installation or turnover</li>
@@ -329,34 +325,25 @@
   <li>Renewal: Renewable annually upon agreement and payment of support renewal fees</li>
 </ul>
 <h2>3. Scope of Services</h2>
-<p><strong>3.1 Software Support</strong> — Bug fixes, system usage guidance, license activation assistance, remote configuration support, and minor adjustments. <em>Not included: customization, new features, third-party integrations, data reconstruction due to client negligence.</em></p>
-<p><strong>3.2 Hardware Support</strong> — Diagnostics and warranty processing for POS hardware purchased from LAP I.T. Solutions. <em>Exclusions: physical damage, liquid damage, power-related damage, tampering or unauthorized repairs.</em></p>
+<p><strong>3.1 Software Support</strong> — LAP I.T. Solutions will provide bug fixes and troubleshooting, system usage guidance, license activation assistance, remote configuration support, and minor adjustments. <em>Not included: customization requests, new feature development, third-party integrations, data reconstruction due to client negligence.</em></p>
+<p><strong>3.2 Hardware Support</strong> — Diagnostics for POS hardware purchased from LAP I.T. Solutions, warranty processing (if applicable), and hardware replacement based on manufacturer warranty. <em>Exclusions: physical damage, liquid damage, power-related damage, tampering or unauthorized repairs.</em></p>
 <p><strong>3.3 Support Channels &amp; Availability</strong></p>
 <table style="table-layout:fixed;width:100%;">
-  <colgroup>
-    <col style="width:28%;">
-    <col style="width:30%;">
-    <col style="width:42%;">
-  </colgroup>
+  <colgroup><col style="width:28%;"><col style="width:30%;"><col style="width:42%;"></colgroup>
   <thead><tr><th>Support Type</th><th>Availability</th><th>Notes</th></tr></thead>
   <tbody>
-    <tr><td>Remote Support</td><td>Mon–Sat, 9:00 AM – 6:00 PM</td><td>Via phone, Messenger, email, or remote tools</td></tr>
+    <tr><td>Remote Support</td><td>Monday–Saturday, 9:00 AM – 6:00 PM</td><td>Via phone, Messenger, email, or remote tools</td></tr>
     <tr><td>On-site (Davao City)</td><td>Within 1–3 business days</td><td>Scheduling required</td></tr>
     <tr><td>On-site (Outside Davao City)</td><td>Within 3–10 business days</td><td>Client shoulders transportation &amp; accommodation</td></tr>
   </tbody>
 </table>
 <h2>4. Response &amp; Resolution Times</h2>
 <table style="table-layout:fixed;width:100%;">
-  <colgroup>
-    <col style="width:14%;">
-    <col style="width:42%;">
-    <col style="width:22%;">
-    <col style="width:22%;">
-  </colgroup>
+  <colgroup><col style="width:14%;"><col style="width:42%;"><col style="width:22%;"><col style="width:22%;"></colgroup>
   <thead><tr><th>Issue Level</th><th>Description</th><th>Response Time</th><th>Target Resolution</th></tr></thead>
   <tbody>
     <tr><td><strong>Critical</strong></td><td>System down, cannot operate</td><td>Within 4 hours</td><td>Same day if possible</td></tr>
-    <tr><td><strong>Major</strong></td><td>Major functions affected but system is still usable</td><td>Within 12 hours</td><td>1–2 days</td></tr>
+    <tr><td><strong>Major</strong></td><td>Major functions affected but system usable</td><td>Within 12 hours</td><td>1–2 days</td></tr>
     <tr><td><strong>Minor</strong></td><td>Non-critical issues, UI concerns, minor bugs</td><td>Within 24 hours</td><td>2–5 days</td></tr>
   </tbody>
 </table>
@@ -371,10 +358,10 @@
 </ul>
 <h2>6. Conditions That Void SLA Support</h2>
 <ul>
-  <li>System tampered with or modified without authorization</li>
-  <li>Use of unlicensed or pirated software</li>
-  <li>Unpaid balances related to the POS package or support renewal</li>
-  <li>Hardware damage caused by negligence, misuse, or environmental factors</li>
+  <li>The system is tampered with or modified without authorization</li>
+  <li>The client uses unlicensed or pirated software</li>
+  <li>There are unpaid balances related to the POS package or support renewal</li>
+  <li>Hardware damage is caused by negligence, misuse, or environmental factors</li>
 </ul>
 <h2>7. Escalation Process</h2>
 <ul>
@@ -383,60 +370,57 @@
   <li>Level 3: Operations Manager – LAP I.T. Solutions</li>
   <li>Level 4: Managing Director (for unresolved or critical escalations)</li>
 </ul>
+<div style="page-break-inside:avoid;break-inside:avoid;">
 <h2>8. Service Limitations</h2>
-<p>The SLA does not guarantee zero downtime, instant resolution, support outside business hours (unless on a premium plan), or support for third-party hardware/software not provided by LAP I.T. Solutions.</p>
+<p>The SLA does not guarantee zero downtime, instant resolution of all issues, support outside business hours (unless covered by a premium plan), or support for third-party hardware or software not provided by LAP I.T. Solutions.</p>
 <h2>9. Termination of SLA</h2>
-<p>Either party may terminate with written notice if terms are violated, payments are not settled, or system misuse is detected. No refunds will be issued for unused months of support.</p>
-<h2>10. Acceptance &amp; Agreement</h2>
-<div class="qptpl-sign-row">
-  <div class="qptpl-sign-block">
-    <p><strong>CLIENT</strong></p>
-    <p>Name: <span class="qptpl-auto qptpl-name">${c.name}</span></p>
-    <div style="margin-top:18px;"><div class="qptpl-sign-line"></div><div class="qptpl-sign-label">Signature</div><p style="margin-top:6px;">Date: ${DBLANK()}</p></div>
-  </div>
-  <div class="qptpl-sign-block">
-    <p><strong>LAP I.T. SOLUTIONS INC.</strong></p>
-    <p>Authorized Representative: ${BLANK}</p>
-    <div style="margin-top:18px;"><div class="qptpl-sign-line"></div><div class="qptpl-sign-label">Signature</div><p style="margin-top:6px;">Date: ${DBLANK()}</p></div>
-  </div>
+<p>Either party may terminate the SLA with written notice if terms are violated, payments are not settled, or system misuse or tampering is detected. No refunds will be issued for unused months of support.</p>
 </div>
 </div>`;
     }
 
     function buildEULA(c) {
-        return `<div class="qptpl-page">
-<h1>End User License Agreement (EULA)</h1>
-<p>This End User License Agreement is entered into on <strong class="qptpl-auto qptpl-date">${c.date}</strong> between <strong>LAP I.T. Solutions Inc.</strong> and:</p>
+        return `<div class="qptpl-page" style="display:flex;flex-direction:column;flex:1;">
+<h1>END USER LICENSE AGREEMENT (EULA)</h1>
 <h2>1. Grant of License</h2>
-<p>LAP I.T. Solutions grants the Client a non-exclusive, non-transferable license to use the POS software solely for the Client's internal business operations.</p>
+<p>LAP I.T. Solutions grants the Client a non-exclusive, non-transferable license to use the POS software.</p>
 <h2>2. Ownership</h2>
-<p>All software, source code, and intellectual property remain owned by LAP I.T. Solutions. This agreement does not transfer any ownership rights to the Client.</p>
+<p>All software, source code, and intellectual property remain owned by LAP I.T. Solutions.</p>
 <h2>3. Restrictions</h2>
-<p>Client may not:</p>
-<ul>
-  <li>Modify, reverse engineer, decompile, or disassemble the software</li>
-  <li>Copy or distribute the software to third parties</li>
-  <li>Sublicense or resell access to the software</li>
-  <li>Use the software for any unlawful purpose</li>
-</ul>
+<p>Client may not modify, reverse engineer, copy, or distribute the software.</p>
 <h2>4. Data Responsibility</h2>
-<p>Client is responsible for the accuracy and security of all data entered into the system. Client must maintain their own data backups unless a backup service is explicitly included in the package agreement.</p>
+<p>Client is responsible for data accuracy and backups unless backup service is included.</p>
 <h2>5. Updates</h2>
-<p>Minor software updates and bug fixes are included during the support period. Major upgrades or new module additions may require additional fees as separately agreed upon.</p>
+<p>Minor updates are provided; major upgrades may require additional fees.</p>
 <h2>6. Warranty</h2>
-<p>The software is provided as-is. LAP I.T. Solutions warrants that the software will perform as described in the product documentation during the warranty period. Support obligations are defined separately in the Service Level Agreement (SLA).</p>
+<p>Software is provided as-is except for covered support terms in the SLA.</p>
 <h2>7. Liability</h2>
-<p>LAP I.T. Solutions shall not be liable for any indirect, incidental, or consequential damages including but not limited to data loss, loss of profits, or business interruption resulting from:</p>
-<ul>
-  <li>Client negligence or misuse of the software</li>
-  <li>Unauthorized modifications or tampering</li>
-  <li>Hardware or infrastructure failures outside the scope of this agreement</li>
-  <li>Force majeure events</li>
-</ul>
+<p>LAP I.T. Solutions is not liable for data loss, misuse, or damages caused by client negligence.</p>
 <h2>8. Termination</h2>
-<p>This license may be revoked by LAP I.T. Solutions if the Client violates any terms of this EULA, tampers with or cracks the software, has outstanding unpaid balances, or uses the software for unauthorized or illegal purposes. Upon termination, the Client must immediately cease use and destroy all copies.</p>
+<p>License may be revoked for violations, tampering, or unpaid balances.</p>
 <h2>9. Acceptance</h2>
-<p>By signing below, the Client acknowledges that they have read, understood, and agreed to all terms of this End User License Agreement. Use of the software constitutes acceptance of this EULA.</p>
+<p>Use of the software constitutes acceptance of this EULA.</p>
+<div style="flex:1;min-height:20px;"></div>
+<div style="page-break-inside:avoid;break-inside:avoid;">
+<p>By signing below, both parties agree to the Terms and Conditions, AMC, SLA, and EULA:</p>
+<p><strong>Signed by:</strong></p>
+<div class="qptpl-sign-row" style="page-break-inside:avoid;break-inside:avoid;">
+  <div class="qptpl-sign-block">
+    <p><strong>LAP I.T. SOLUTIONS INC.</strong></p>
+    <p>Authorized Representative</p>
+    <div class="qptpl-sign-line"></div>
+    <div class="qptpl-sign-label">Signature over Printed Name</div>
+    <p style="margin-top:8px;">Date: ${DBLANK()}</p>
+  </div>
+  <div class="qptpl-sign-block">
+    <p><strong class="qptpl-auto qptpl-name">${c.name}</strong></p>
+    <p>Authorized Representative</p>
+    <div class="qptpl-sign-line"></div>
+    <div class="qptpl-sign-label">Signature over Printed Name</div>
+    <p style="margin-top:8px;">Date: ${DBLANK()}</p>
+  </div>
+</div>
+</div>
 </div>`;
     }
 
@@ -444,21 +428,12 @@
     function wrapInPage(key, num, innerHTML) {
         return `
 <div class="page page-break qptpl-template-page" id="qptpl-page-${key}"
-     style="width:8.27in;min-height:11.69in;margin:20px auto;background:white;
-            padding:0.3in 0.4in 0.6in;box-shadow:0 0 10px rgba(0,0,0,0.1);
-            position:relative;box-sizing:border-box;overflow:visible;display:flex;flex-direction:column;">
-  <div class="page-inner" style="flex:1;">${innerHTML}</div>
-  <div class="page-footer"
-       style="position:absolute;bottom:0.2in;left:0;right:0;display:flex;
-              justify-content:center;align-items:center;padding:0 0.5in;">
-    <div class="page-number"
-         style="position:absolute;left:0.5in;width:30px;height:30px;
-                background-color:#1a5276;color:white;font-weight:bold;font-size:12px;
-                border-radius:50%;display:flex;align-items:center;justify-content:center;">${num}</div>
-    <div style="font-size:10px;color:#1a5276;text-align:center;">
-      <a href="https://www.facebook.com/lapsolutions/" target="_blank"
-         style="color:#1a5276;text-decoration:none;">https://www.facebook.com/lapsolutions/</a>
-    </div>
+     style="width:8.27in;min-height:unset;margin:20px auto;background:white;
+            padding:0.3in 0.4in 0.4in;box-shadow:0 0 10px rgba(0,0,0,0.1);
+            position:relative;box-sizing:border-box;overflow:visible;display:block;">
+  <div class="page-inner">${innerHTML}</div>
+  <div class="page-footer" style="position:absolute;bottom:0.3in;right:0.4in;display:flex;align-items:center;">
+    <div class="page-number" style="width:26px;height:26px;background-color:#1a5276;color:white;font-weight:bold;font-size:11px;border-radius:50%;display:flex;align-items:center;justify-content:center;">${num}</div>
   </div>
 </div>`;
     }
