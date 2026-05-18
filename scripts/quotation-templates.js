@@ -198,7 +198,7 @@
     min-height:unset!important;
     height:auto!important;
     margin:0!important;
-    padding:0.35in 0.5in 0.5in!important;
+    padding:0.2in 0.3in 0.2in!important;
     box-shadow:none!important;
     border-radius:0!important;
     position:static!important;
@@ -254,6 +254,12 @@
   .qptpl-date-picker[value=""]{border-bottom:1px solid #000!important;min-width:140px!important;color:transparent!important;}
   .qptpl-date-picker[data-formatted]{display:none!important;width:0!important;height:0!important;overflow:hidden!important;}
   .qptpl-dp-display{display:inline!important;color:#000!important;font-weight:600!important;font-size:11px!important;border-bottom:none!important;}
+  #qptpl-page-sla{display:block!important;page-break-after:avoid!important;break-after:avoid!important;}
+  #qptpl-page-sla .qptpl-page{font-size:10px!important;line-height:1.4!important;}
+  #qptpl-page-sla .qptpl-page h2{font-size:11px!important;margin:10px 0 4px!important;}
+  #qptpl-page-sla .qptpl-page table{font-size:9px!important;}
+  #qptpl-page-sla .qptpl-page th,
+  #qptpl-page-sla .qptpl-page td{padding:3px 5px!important;}
 }
         `;
         document.head.appendChild(s);
