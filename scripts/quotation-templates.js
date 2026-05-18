@@ -190,7 +190,7 @@
    * CRITICAL: quotation.html has .page { page-break-inside: avoid !important }
    * which prevents content from flowing across multiple print sheets.
    * We override it here for template pages so AMC/SLA/EULA can span as many
-   * sheets as needed. The @page margins in quotation.html (0.4in/0.35in)
+   * sheets as needed. The @page margins in quotation.html (0.2in/0.25in)
    * apply correctly to all continuation sheets automatically.
    */
   .qptpl-template-page{
@@ -198,7 +198,7 @@
     min-height:unset!important;
     height:auto!important;
     margin:0!important;
-    padding:0.3in 0.4in 0.3in!important;
+    padding:0.15in 0.25in 0.3in!important;
     box-shadow:none!important;
     border-radius:0!important;
     position:static!important;
