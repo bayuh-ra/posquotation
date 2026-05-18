@@ -198,7 +198,7 @@
     min-height:unset!important;
     height:auto!important;
     margin:0!important;
-    padding:0.15in 0.25in 0.3in!important;
+    padding:0.35in 0.5in 0.5in!important;
     box-shadow:none!important;
     border-radius:0!important;
     position:static!important;
