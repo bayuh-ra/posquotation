@@ -1787,6 +1787,8 @@
                 min-height: unset !important;
                 max-height: none !important;
                 box-shadow: none !important;
+                -webkit-box-shadow: none !important;
+                border: none !important;
                 margin: 0 !important;
                 padding: 0.2in 0.3in 0.3in !important;
                 page-break-after: always !important;
@@ -1794,7 +1796,6 @@
                 position: relative !important;
                 overflow: visible !important;
                 box-sizing: border-box !important;
-                border-bottom: none !important;
                 border-radius: 0 !important;
             }
 
@@ -2449,7 +2450,7 @@
     <div id="pdf-content">
         <!-- PAGE 1 -->
         <div class="page"
-            style="width:8.27in; min-height:13.2in; margin:20px auto; background:white; padding:0.3in 0.4in 0.4in; box-shadow:0 0 10px rgba(0,0,0,0.1); position:relative; box-sizing:border-box; overflow:visible; display:flex; flex-direction:column;">
+            style="width:8.27in; min-height:13.2in; margin:20px auto; background:white; padding:0.3in 0.4in 0.4in; position:relative; box-sizing:border-box; overflow:visible; display:flex; flex-direction:column;">
             <div class="page-inner">
 
                 <!-- Header -->
@@ -2698,7 +2699,7 @@
 
         <!-- PAGE 2 -->
         <div class="page page-break"
-            style="width:8.27in; min-height:13.2in; margin:20px auto; background:white; padding:0.3in 0.4in 0.4in; box-shadow:0 0 10px rgba(0,0,0,0.1); position:relative; box-sizing:border-box; overflow:visible; display:flex; flex-direction:column;">
+            style="width:8.27in; min-height:13.2in; margin:20px auto; background:white; padding:0.3in 0.4in 0.4in; position:relative; box-sizing:border-box; overflow:visible; display:flex; flex-direction:column;">
             <div class="page-inner">
                 <div id="page2-content">
                     <!-- Terms and Conditions -->
@@ -3749,7 +3750,7 @@
                         const pdfBtn = document.createElement('button');
                         pdfBtn.textContent = 'Save as PDF';
                         pdfBtn.style.cssText = 'background:#0a57b0;color:white;padding:10px 20px;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:bold;flex:1;min-width:120px;max-width:220px;transition:all 0.3s;';
-                        pdfBtn.onclick = function () { markZeroValuesForPrint(); setTimeout(function () { window.print(); }, 200); };
+                        pdfBtn.onclick = function () { markZeroValuesForPrint(); setTimeout(function () { printWithTitle(); }, 200); };
                         bc.appendChild(updateBtn);
                         bc.appendChild(pdfBtn);
                     }
@@ -3815,7 +3816,7 @@
             pdfFab.style.cssText = 'position:fixed;bottom:28px;right:28px;width:52px;height:52px;border-radius:50%;background:#0a57b0;color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(10,87,176,0.4);z-index:3200;transition:all 0.2s;';
             pdfFab.onmouseenter = function () { this.style.transform = 'scale(1.08)'; this.style.boxShadow = '0 6px 24px rgba(10,87,176,0.55)'; };
             pdfFab.onmouseleave = function () { this.style.transform = 'scale(1)'; this.style.boxShadow = '0 4px 16px rgba(10,87,176,0.4)'; };
-            pdfFab.onclick = function (e) { e.preventDefault(); markZeroValuesForPrint(); setTimeout(() => window.print(), 200); };
+            pdfFab.onclick = function (e) { e.preventDefault(); markZeroValuesForPrint(); setTimeout(() => printWithTitle(), 200); };
 
             document.body.appendChild(editFab);
             document.body.appendChild(deleteFab);
@@ -4023,7 +4024,7 @@
                 const isMobileView = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
                 window.__redirectToListAfterPrint = !isMobileView;
                 showAlert('Saved Successfully! 🎉', `Quotation No: ${quotationNo}\nClient: ${clientName}\n\nPrinting PDF now...`, 'success', function () {
-                    window.print();
+                    printWithTitle();
                     if (window.__redirectToListAfterPrint) {
                         setTimeout(function () {
                             if (window.__redirectToListAfterPrint) {
@@ -4216,6 +4217,20 @@
             } catch (error) {
                 showAlert('Error', 'Failed to update quotation: ' + (error.message || 'Unknown error'), 'error');
             }
+        }
+
+        function printWithTitle() {
+            var companyName = (document.getElementById('setup-client-name') || {}).value
+                || ((document.querySelector('.client-info input[placeholder="Enter recipient name"]') || {}).value)
+                || '';
+            companyName = companyName.trim();
+            var original = document.title;
+            document.title = companyName ? 'POS Quotation - ' + companyName : 'POS Quotation';
+            window.addEventListener('afterprint', function restore() {
+                document.title = original;
+                window.removeEventListener('afterprint', restore);
+            });
+            window.print();
         }
 
         function markZeroValuesForPrint() {

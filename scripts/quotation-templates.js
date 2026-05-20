@@ -200,6 +200,8 @@
     margin:0!important;
     padding:0.2in 0.3in 0.2in!important;
     box-shadow:none!important;
+    -webkit-box-shadow:none!important;
+    border:none!important;
     border-radius:0!important;
     position:static!important;
     overflow:visible!important;
@@ -447,7 +449,7 @@
         return `
 <div class="page page-break qptpl-template-page" id="qptpl-page-${key}"
      style="width:8.27in;min-height:unset;margin:20px auto;background:white;
-            padding:0.3in 0.4in 0.3in;box-shadow:0 0 10px rgba(0,0,0,0.1);
+            padding:0.3in 0.4in 0.3in;
             position:relative;box-sizing:border-box;overflow:visible;display:block;">
   <div class="page-inner">${innerHTML}</div>
   <div class="page-footer" style="position:absolute;bottom:0.3in;right:0.4in;display:flex;align-items:center;">
