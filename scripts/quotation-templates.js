@@ -185,6 +185,7 @@
 .qptpl-sign-row{page-break-inside:avoid;break-inside:avoid}
 .qptpl-page table{page-break-inside:avoid;break-inside:avoid}
 @media print{
+  html,body,#pdf-content{overflow:visible!important;height:auto!important;max-height:none!important;}
   .qptpl-btn-row,.qptpl-section-label{display:none!important}
   /*
    * CRITICAL: quotation.html has .page { page-break-inside: avoid !important }
@@ -248,15 +249,15 @@
     position:static!important;
     flex-shrink:0!important;
   }
-  #qptpl-page-eula .qptpl-page{display:block!important;min-height:unset!important;height:auto!important;}
-  #qptpl-page-eula{page-break-before:always!important;break-before:page!important;page-break-after:avoid!important;break-after:avoid!important;display:block!important;min-height:unset!important;height:auto!important;}
+  #qptpl-page-eula,#qptpl-page-eula .page-inner,#qptpl-page-eula .qptpl-page{display:block!important;overflow:visible!important;height:auto!important;min-height:0!important;max-height:none!important;}
+  #qptpl-page-eula{break-before:page!important;page-break-before:always!important;break-after:avoid!important;page-break-after:avoid!important;}
   .qptpl-date-picker:not([value])::-webkit-datetime-edit,
   .qptpl-date-picker[value=""]::-webkit-datetime-edit{color:transparent!important;visibility:hidden!important;}
   .qptpl-date-picker:not([value]),
   .qptpl-date-picker[value=""]{border-bottom:1px solid #000!important;min-width:140px!important;color:transparent!important;}
   .qptpl-date-picker[data-formatted]{display:none!important;width:0!important;height:0!important;overflow:hidden!important;}
   .qptpl-dp-display{display:inline!important;color:#000!important;font-weight:600!important;font-size:11px!important;border-bottom:none!important;}
-  #qptpl-page-sla{display:block!important;page-break-after:avoid!important;break-after:avoid!important;}
+  #qptpl-page-sla{display:block!important;page-break-after:always!important;break-after:page!important;}
   #qptpl-page-sla .qptpl-page{font-size:10px!important;line-height:1.4!important;}
   #qptpl-page-sla .qptpl-page h2{font-size:11px!important;margin:10px 0 4px!important;}
   #qptpl-page-sla .qptpl-page table{font-size:9px!important;}
