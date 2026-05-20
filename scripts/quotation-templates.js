@@ -356,15 +356,15 @@
 <table style="table-layout:fixed;width:100%;">
   <colgroup>
     <col style="width:12%;">
-    <col style="width:44%;">
-    <col style="width:21%;">
+    <col style="width:45%;">
+    <col style="width:20%;">
     <col style="width:23%;">
   </colgroup>
   <thead><tr><th>Issue Level</th><th>Description</th><th>Response Time</th><th>Target Resolution</th></tr></thead>
   <tbody>
-    <tr><td style="vertical-align:top;"><strong>Critical</strong></td><td style="vertical-align:top;">System down, cannot operate</td><td style="vertical-align:top;">Within 4 hours</td><td style="vertical-align:top;">Same day if possible</td></tr>
-    <tr><td style="vertical-align:top;"><strong>Major</strong></td><td style="vertical-align:top;">Major functions affected but system usable</td><td style="vertical-align:top;">Within 12 hours</td><td style="vertical-align:top;">1–2 days</td></tr>
-    <tr><td style="vertical-align:top;"><strong>Minor</strong></td><td style="vertical-align:top;">Non-critical issues, UI concerns, minor bugs</td><td style="vertical-align:top;">Within 24 hours</td><td style="vertical-align:top;">2–5 days</td></tr>
+    <tr><td style="vertical-align:top;padding:5px 7px;"><strong>Critical</strong></td><td style="vertical-align:top;padding:5px 7px;">System down, cannot operate</td><td style="vertical-align:top;padding:5px 7px;">Within 4 hours</td><td style="vertical-align:top;padding:5px 7px;">Same day if possible</td></tr>
+    <tr><td style="vertical-align:top;padding:5px 7px;"><strong>Major</strong></td><td style="vertical-align:top;padding:5px 7px;">Major functions affected but system usable</td><td style="vertical-align:top;padding:5px 7px;">Within 12 hours</td><td style="vertical-align:top;padding:5px 7px;">1–2 days</td></tr>
+    <tr><td style="vertical-align:top;padding:5px 7px;"><strong>Minor</strong></td><td style="vertical-align:top;padding:5px 7px;">Non-critical issues, UI concerns, minor bugs</td><td style="vertical-align:top;padding:5px 7px;">Within 24 hours</td><td style="vertical-align:top;padding:5px 7px;">2–5 days</td></tr>
   </tbody>
 </table>
 <h2>5. Client Responsibilities</h2>

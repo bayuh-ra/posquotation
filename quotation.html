@@ -2256,6 +2256,36 @@
                 background: #fff !important;
                 overflow: visible !important;
             }
+
+            /* Mobile print scaling reset */
+            html, body {
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            #pdf-content {
+                width: 100% !important;
+                transform: none !important;
+                zoom: 1 !important;
+                overflow: visible !important;
+            }
+
+            .page {
+                width: 100% !important;
+                transform: none !important;
+                zoom: 1 !important;
+                margin: 0 !important;
+                padding: 0.2in 0.3in 0.3in !important;
+            }
+
+            body.view-mode #pdf-content .page {
+                width: 100% !important;
+                transform: none !important;
+                zoom: 1 !important;
+            }
         }
 
         /* Desktop/web: prevent cents digits being clipped in the totals inputs */
@@ -4747,6 +4777,25 @@
                         }, { passive: true });
                     }
                 }
+
+                window.addEventListener('beforeprint', function () {
+                    document.querySelectorAll('#pdf-content .page').forEach(function (p) {
+                        p._printZoom = p.style.zoom;
+                        p.style.zoom = '1';
+                        p.style.width = '100%';
+                        p.style.transform = 'none';
+                    });
+                });
+
+                window.addEventListener('afterprint', function () {
+                    document.querySelectorAll('#pdf-content .page').forEach(function (p) {
+                        if (p._printZoom !== undefined) {
+                            p.style.zoom = p._printZoom;
+                            p.style.width = '';
+                            p.style.transform = '';
+                        }
+                    });
+                });
             });
         })();
     </script>
