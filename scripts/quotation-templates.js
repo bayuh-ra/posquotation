@@ -195,25 +195,32 @@
    * apply correctly to all continuation sheets automatically.
    */
   .qptpl-template-page{
-    width:auto!important;
-    min-height:unset!important;
-    height:auto!important;
-    margin:0!important;
-    padding:0.2in 0.3in 0.2in!important;
     box-shadow:none!important;
     -webkit-box-shadow:none!important;
     border:none!important;
-    border-radius:0!important;
-    position:static!important;
-    overflow:visible!important;
-    display:block!important;
-    page-break-inside:auto!important;
-    break-inside:auto!important;
+    margin:0!important;
+    padding:0.2in 0.3in 0.2in!important;
     page-break-before:always!important;
     break-before:page!important;
-    page-break-after:avoid!important;
-    break-after:avoid!important;
+    page-break-after:auto!important;
+    break-after:auto!important;
+    page-break-inside:auto!important;
+    break-inside:auto!important;
+    display:block!important;
+    width:100%!important;
+    min-height:unset!important;
+    height:auto!important;
+    position:static!important;
+    overflow:visible!important;
     box-sizing:border-box!important;
+    -webkit-transform:none!important;
+    transform:none!important;
+    opacity:1!important;
+    visibility:visible!important;
+  }
+  .qptpl-template-page *{
+    visibility:visible!important;
+    opacity:1!important;
   }
   .qptpl-template-page:last-child{
     page-break-after:avoid!important;
@@ -221,18 +228,24 @@
   }
   .qptpl-template-page .page-inner{
     display:block!important;
+    width:100%!important;
     padding:0!important;
-    flex:none!important;
-    page-break-inside:auto!important;
-    break-inside:auto!important;
+    min-height:unset!important;
+    height:auto!important;
+    overflow:visible!important;
+    -webkit-transform:none!important;
+    transform:none!important;
+    opacity:1!important;
+    visibility:visible!important;
   }
   .qptpl-template-page .page-footer{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
     page-break-before:avoid!important;
     break-before:avoid!important;
     page-break-inside:avoid!important;
     break-inside:avoid!important;
-    page-break-after:avoid!important;
-    break-after:avoid!important;
   }
   /* Keep headings with content */
   .qptpl-page h2{page-break-after:avoid!important;break-after:avoid!important}
@@ -245,9 +258,13 @@
   .qptpl-page table{page-break-inside:avoid!important;break-inside:avoid!important}
   .tpl-section{page-break-inside:auto;break-inside:auto;}
   .tpl-section h2{page-break-after:avoid!important;break-after:avoid!important;}
-  .qptpl-template-page .page-number{
-    position:static!important;
-    flex-shrink:0!important;
+  .page-number{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    background-color:#1a5276!important;
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
   }
   #qptpl-page-eula,#qptpl-page-eula .page-inner,#qptpl-page-eula .qptpl-page{display:block!important;overflow:visible!important;height:auto!important;min-height:0!important;max-height:none!important;}
   #qptpl-page-eula{break-before:page!important;page-break-before:always!important;break-after:avoid!important;page-break-after:avoid!important;}
@@ -464,12 +481,11 @@
     function wrapInPage(key, num, innerHTML) {
         return `
 <div class="page page-break qptpl-template-page" id="qptpl-page-${key}"
-     style="width:8.27in;min-height:unset;margin:20px auto;background:white;
-            padding:0.3in 0.4in 0.3in;
-            position:relative;box-sizing:border-box;overflow:visible;display:block;">
+     style="width:8.27in;margin:20px auto;background:white;
+            padding:0.3in 0.4in 0.3in;box-sizing:border-box;overflow:visible;">
   <div class="page-inner">${innerHTML}</div>
-  <div class="page-footer" style="position:absolute;bottom:0.3in;right:0.4in;display:flex;align-items:center;">
-    <div class="page-number" style="width:26px;height:26px;background-color:#1a5276;color:white;font-weight:bold;font-size:11px;border-radius:50%;display:flex;align-items:center;justify-content:center;">${num}</div>
+  <div class="page-footer" style="display:flex;align-items:center;">
+    <div class="page-number" style="width:26px;height:26px;margin-right:10px;flex-shrink:0;background-color:#1a5276;color:white;font-weight:bold;font-size:11px;border-radius:50%;display:flex;align-items:center;justify-content:center;">${num}</div>
   </div>
 </div>`;
     }
