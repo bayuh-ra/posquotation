@@ -338,22 +338,31 @@
 <p><strong>3.2 Hardware Support</strong> — Diagnostics for POS hardware purchased from LAP I.T. Solutions, warranty processing (if applicable), and hardware replacement based on manufacturer warranty. <em>Exclusions: physical damage, liquid damage, power-related damage, tampering or unauthorized repairs.</em></p>
 <p><strong>3.3 Support Channels &amp; Availability</strong></p>
 <table style="table-layout:fixed;width:100%;">
-  <colgroup><col style="width:28%;"><col style="width:30%;"><col style="width:42%;"></colgroup>
+  <colgroup>
+    <col style="width:22%;">
+    <col style="width:35%;">
+    <col style="width:43%;">
+  </colgroup>
   <thead><tr><th>Support Type</th><th>Availability</th><th>Notes</th></tr></thead>
   <tbody>
-    <tr><td>Remote Support</td><td>Monday–Saturday, 9:00 AM – 6:00 PM</td><td>Via phone, Messenger, email, or remote tools</td></tr>
-    <tr><td>On-site (Davao City)</td><td>Within 1–3 business days</td><td>Scheduling required</td></tr>
-    <tr><td>On-site (Outside Davao City)</td><td>Within 3–10 business days</td><td>Client shoulders transportation &amp; accommodation</td></tr>
+    <tr><td style="vertical-align:top;">Remote Support</td><td style="vertical-align:top;">Monday–Saturday, 9:00 AM – 6:00 PM</td><td style="vertical-align:top;">Via phone, Messenger, email, or remote tools</td></tr>
+    <tr><td style="vertical-align:top;">On-site (Davao City)</td><td style="vertical-align:top;">Within 1–3 business days</td><td style="vertical-align:top;">Scheduling required</td></tr>
+    <tr><td style="vertical-align:top;">On-site (Outside Davao City)</td><td style="vertical-align:top;">Within 3–10 business days</td><td style="vertical-align:top;">Client shoulders transportation &amp; accommodation</td></tr>
   </tbody>
 </table>
 <h2>4. Response &amp; Resolution Times</h2>
 <table style="table-layout:fixed;width:100%;">
-  <colgroup><col style="width:14%;"><col style="width:42%;"><col style="width:22%;"><col style="width:22%;"></colgroup>
+  <colgroup>
+    <col style="width:12%;">
+    <col style="width:38%;">
+    <col style="width:22%;">
+    <col style="width:28%;">
+  </colgroup>
   <thead><tr><th>Issue Level</th><th>Description</th><th>Response Time</th><th>Target Resolution</th></tr></thead>
   <tbody>
-    <tr><td><strong>Critical</strong></td><td>System down, cannot operate</td><td>Within 4 hours</td><td>Same day if possible</td></tr>
-    <tr><td><strong>Major</strong></td><td>Major functions affected but system usable</td><td>Within 12 hours</td><td>1–2 days</td></tr>
-    <tr><td><strong>Minor</strong></td><td>Non-critical issues, UI concerns, minor bugs</td><td>Within 24 hours</td><td>2–5 days</td></tr>
+    <tr><td style="vertical-align:top;"><strong>Critical</strong></td><td style="vertical-align:top;">System down, cannot operate</td><td style="vertical-align:top;">Within 4 hours</td><td style="vertical-align:top;">Same day if possible</td></tr>
+    <tr><td style="vertical-align:top;"><strong>Major</strong></td><td style="vertical-align:top;">Major functions affected but system usable</td><td style="vertical-align:top;">Within 12 hours</td><td style="vertical-align:top;">1–2 days</td></tr>
+    <tr><td style="vertical-align:top;"><strong>Minor</strong></td><td style="vertical-align:top;">Non-critical issues, UI concerns, minor bugs</td><td style="vertical-align:top;">Within 24 hours</td><td style="vertical-align:top;">2–5 days</td></tr>
   </tbody>
 </table>
 <h2>5. Client Responsibilities</h2>
@@ -389,7 +398,7 @@
     }
 
     function buildEULA(c) {
-        return `<div class="qptpl-page" style="display:flex;flex-direction:column;flex:1;">
+        return `<div class="qptpl-page" style="display:flex;flex-direction:column;min-height:9in;">
 <h1>END USER LICENSE AGREEMENT (EULA)</h1>
 <h2>1. Grant of License</h2>
 <p>LAP I.T. Solutions grants the Client a non-exclusive, non-transferable license to use the POS software.</p>
@@ -409,26 +418,26 @@
 <p>License may be revoked for violations, tampering, or unpaid balances.</p>
 <h2>9. Acceptance</h2>
 <p>Use of the software constitutes acceptance of this EULA.</p>
-<div style="flex:1;min-height:20px;"></div>
-<div style="page-break-inside:avoid;break-inside:avoid;">
-<p>By signing below, both parties agree to the Terms and Conditions, AMC, SLA, and EULA:</p>
-<p><strong>Signed by:</strong></p>
-<div class="qptpl-sign-row" style="page-break-inside:avoid;break-inside:avoid;">
-  <div class="qptpl-sign-block">
-    <p><strong>LAP I.T. SOLUTIONS INC.</strong></p>
-    <p>Authorized Representative</p>
-    <div class="qptpl-sign-line"></div>
-    <div class="qptpl-sign-label">Signature over Printed Name</div>
-    <p style="margin-top:8px;">Date: ${DBLANK()}</p>
+<div style="margin-top:auto;padding-top:40px;">
+  <hr style="border:none;border-top:1px solid #000;margin-bottom:16px;">
+  <p>By signing below, both parties agree to the Terms and Conditions, AMC, SLA, and <u>EULA</u>:</p>
+  <p><strong>Signed by:</strong></p>
+  <div class="qptpl-sign-row" style="page-break-inside:avoid;break-inside:avoid;">
+    <div class="qptpl-sign-block">
+      <p><strong style="color:#1a5276;">LAP I.T. SOLUTIONS INC.</strong></p>
+      <p>Authorized Representative</p>
+      <div class="qptpl-sign-line"></div>
+      <div class="qptpl-sign-label">Signature over Printed Name</div>
+      <p style="margin-top:8px;">Date: ${DBLANK()}</p>
+    </div>
+    <div class="qptpl-sign-block">
+      <p><strong style="color:#1a5276;" class="qptpl-auto qptpl-name">${c.name}</strong></p>
+      <p>Authorized Representative</p>
+      <div class="qptpl-sign-line"></div>
+      <div class="qptpl-sign-label">Signature over Printed Name</div>
+      <p style="margin-top:8px;">Date: ${DBLANK()}</p>
+    </div>
   </div>
-  <div class="qptpl-sign-block">
-    <p><strong class="qptpl-auto qptpl-name">${c.name}</strong></p>
-    <p>Authorized Representative</p>
-    <div class="qptpl-sign-line"></div>
-    <div class="qptpl-sign-label">Signature over Printed Name</div>
-    <p style="margin-top:8px;">Date: ${DBLANK()}</p>
-  </div>
-</div>
 </div>
 </div>`;
     }
