@@ -248,8 +248,8 @@
     position:static!important;
     flex-shrink:0!important;
   }
-  #qptpl-page-eula{min-height:unset!important;display:flex!important;flex-direction:column!important;}
-  #qptpl-page-eula .page-inner{flex:1!important;display:flex!important;flex-direction:column!important;}
+  #qptpl-page-eula .qptpl-page{display:block!important;min-height:unset!important;height:auto!important;}
+  #qptpl-page-eula{page-break-before:always!important;break-before:page!important;page-break-after:avoid!important;break-after:avoid!important;display:block!important;min-height:unset!important;height:auto!important;}
   .qptpl-date-picker:not([value])::-webkit-datetime-edit,
   .qptpl-date-picker[value=""]::-webkit-datetime-edit{color:transparent!important;visibility:hidden!important;}
   .qptpl-date-picker:not([value]),
@@ -362,10 +362,25 @@
   </colgroup>
   <thead><tr><th>Issue Level</th><th>Description</th><th>Response Time</th><th>Target Resolution</th></tr></thead>
   <tbody>
-    <tr><td style="vertical-align:top;padding:5px 7px;"><strong>Critical</strong></td><td style="vertical-align:top;padding:5px 7px;">System down, cannot operate</td><td style="vertical-align:top;padding:5px 7px;">Within 4 hours</td><td style="vertical-align:top;padding:5px 7px;">Same day if possible</td></tr>
-    <tr><td style="vertical-align:top;padding:5px 7px;"><strong>Major</strong></td><td style="vertical-align:top;padding:5px 7px;">Major functions affected but system usable</td><td style="vertical-align:top;padding:5px 7px;">Within 12 hours</td><td style="vertical-align:top;padding:5px 7px;">1–2 days</td></tr>
-    <tr><td style="vertical-align:top;padding:5px 7px;"><strong>Minor</strong></td><td style="vertical-align:top;padding:5px 7px;">Non-critical issues, UI concerns, minor bugs</td><td style="vertical-align:top;padding:5px 7px;">Within 24 hours</td><td style="vertical-align:top;padding:5px 7px;">2–5 days</td></tr>
-  </tbody>
+  <tr>
+    <td style="vertical-align:top;padding:5px 7px;"><strong>Critical</strong></td>
+    <td style="vertical-align:top;padding:5px 7px;">System down, cannot operate</td>
+    <td style="vertical-align:top;padding:5px 7px;">Within 4 hours</td>
+    <td style="vertical-align:top;padding:5px 7px;">Same day if possible</td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top;padding:5px 7px;"><strong>Major</strong></td>
+    <td style="vertical-align:top;padding:5px 7px;">Major functions affected but system usable</td>
+    <td style="vertical-align:top;padding:5px 7px;">Within 12 hours</td>
+    <td style="vertical-align:top;padding:5px 7px;">1–2 days</td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top;padding:5px 7px;"><strong>Minor</strong></td>
+    <td style="vertical-align:top;padding:5px 7px;">Non-critical issues, UI concerns, minor bugs</td>
+    <td style="vertical-align:top;padding:5px 7px;">Within 24 hours</td>
+    <td style="vertical-align:top;padding:5px 7px;">2–5 days</td>
+  </tr>
+</tbody>
 </table>
 <h2>5. Client Responsibilities</h2>
 <ul>
@@ -400,7 +415,7 @@
     }
 
     function buildEULA(c) {
-        return `<div class="qptpl-page" style="display:flex;flex-direction:column;min-height:9in;">
+        return `<div class="qptpl-page">
 <h1>END USER LICENSE AGREEMENT (EULA)</h1>
 <h2>1. Grant of License</h2>
 <p>LAP I.T. Solutions grants the Client a non-exclusive, non-transferable license to use the POS software.</p>
@@ -420,7 +435,7 @@
 <p>License may be revoked for violations, tampering, or unpaid balances.</p>
 <h2>9. Acceptance</h2>
 <p>Use of the software constitutes acceptance of this EULA.</p>
-<div style="margin-top:auto;padding-top:40px;">
+<div style="margin-top:60px;padding-top:0;">
   <hr style="border:none;border-top:1px solid #000;margin-bottom:16px;">
   <p>By signing below, both parties agree to the Terms and Conditions, AMC, SLA, and <u>EULA</u>:</p>
   <p><strong>Signed by:</strong></p>
