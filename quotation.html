@@ -4535,7 +4535,10 @@
                         panel.classList.add('open');
                         trigger.classList.add('open');
                         var si = document.getElementById('pkg-dd-search-input');
-                        if (si) { si.value = ''; si.focus(); }
+                        if (si) {
+                            si.value = '';
+                            if (window.innerWidth > 768) si.focus();
+                        }
                     }
                 };
 
