@@ -356,9 +356,9 @@
 <table style="table-layout:fixed;width:100%;">
   <colgroup>
     <col style="width:12%;">
-    <col style="width:38%;">
-    <col style="width:22%;">
-    <col style="width:28%;">
+    <col style="width:44%;">
+    <col style="width:21%;">
+    <col style="width:23%;">
   </colgroup>
   <thead><tr><th>Issue Level</th><th>Description</th><th>Response Time</th><th>Target Resolution</th></tr></thead>
   <tbody>

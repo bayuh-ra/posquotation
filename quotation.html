@@ -4024,7 +4024,7 @@
                 const isMobileView = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
                 window.__redirectToListAfterPrint = !isMobileView;
                 showAlert('Saved Successfully! 🎉', `Quotation No: ${quotationNo}\nClient: ${clientName}\n\nPrinting PDF now...`, 'success', function () {
-                    printWithTitle();
+                    printWithTitle(clientName);
                     if (window.__redirectToListAfterPrint) {
                         setTimeout(function () {
                             if (window.__redirectToListAfterPrint) {
@@ -4219,17 +4219,13 @@
             }
         }
 
-        function printWithTitle() {
-            var companyName = (document.getElementById('setup-client-name') || {}).value
+        function printWithTitle(name) {
+            var companyName = (name != null ? name : null)
+                || (document.getElementById('setup-client-name') || {}).value
                 || ((document.querySelector('.client-info input[placeholder="Enter recipient name"]') || {}).value)
                 || '';
-            companyName = companyName.trim();
-            var original = document.title;
+            companyName = ('' + companyName).trim();
             document.title = companyName ? 'POS Quotation - ' + companyName : 'POS Quotation';
-            window.addEventListener('afterprint', function restore() {
-                document.title = original;
-                window.removeEventListener('afterprint', restore);
-            });
             window.print();
         }
 
